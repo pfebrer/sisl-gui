@@ -1,0 +1,1 @@
+export const syncWithSession = new CustomEvent("syncWithSession")

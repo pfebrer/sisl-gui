@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "sislgui",
+    "sislgui": "sisl-graphical-interface"
+  }
+}
