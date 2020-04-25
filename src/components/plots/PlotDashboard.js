@@ -8,7 +8,7 @@ import PlotCard from "./PlotCard";
 //--Redux
 import { connect } from 'react-redux'
 import { setTabPlots, setSessionTabs} from "../../redux/actions"
-import PythonApi from "../../apis/Socket";
+import PythonApi from "../../apis/PythonApi";
 
 import { Responsive, WidthProvider } from 'react-grid-layout';
 
@@ -34,7 +34,7 @@ class PlotDashboard extends React.Component {
     className: "layout",
     rowHeight: 30,
     onLayoutChange: function() {},
-    cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
+    cols: { lg: 12, sm: 6, xs: 4, xxs: 2 },
   };
 
   state = {

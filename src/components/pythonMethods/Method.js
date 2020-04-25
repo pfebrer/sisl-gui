@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactMarkDown from "react-markdown"
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
-import PythonApi from '../../apis/Socket'
+import PythonApi from '../../apis/PythonApi'
 
 export default class Method extends Component {
 

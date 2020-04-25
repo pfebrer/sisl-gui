@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Tab from './Tab'
 import { setActiveTab } from '../../redux/actions'
-import PythonApi from '../../apis/Socket'
+import PythonApi from '../../apis/PythonApi'
 import { connect } from 'react-redux'
 import { MdCreateNewFolder } from 'react-icons/md'
 

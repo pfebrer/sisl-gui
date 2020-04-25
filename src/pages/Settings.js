@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PythonApi from "../apis/Socket"
+import PythonApi from "../apis/PythonApi"
 
 //--Components
 import ReactTooltip from "react-tooltip"

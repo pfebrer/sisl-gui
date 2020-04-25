@@ -14,7 +14,7 @@ import {unflatten} from "flat"
 //--Redux
 import { connect } from 'react-redux'
 import { setActivePlot, removePlot, setSessionTabs, setActivePage, addPlots} from "../../redux/actions"
-import PythonApi from '../../apis/Socket';
+import PythonApi from '../../apis/PythonApi';
 import { HotKeys } from 'react-hotkeys';
 import { PLOT_CARD_HOT_KEYS } from '../../utils/hotkeys';
 import { toast } from 'react-toastify';

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import PythonApi from '../../apis/Socket'
+import PythonApi from '../../apis/PythonApi'
 import { setActiveTab } from '../../redux/actions'
 
 import { MdRemoveCircle } from 'react-icons/md'

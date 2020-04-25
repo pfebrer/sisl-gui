@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Card, Icon} from 'react-materialize'
 
-import PythonApi from '../../apis/Socket'
+import PythonApi from '../../apis/PythonApi'
 
 import { connect } from 'react-redux'
 import { selectActiveStructs, selectActivePlotables } from '../../redux/reducers'

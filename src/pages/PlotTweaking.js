@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Row, Col} from 'react-materialize'
 import ReactTooltip from "react-tooltip"
 
-import PythonApi from "../apis/Socket"
+import PythonApi from "../apis/PythonApi"
 
 //--Components
 import PlotCard from '../components/plots/PlotCard'

@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import './materialize.min.css'
-import Oks from './apis/Socket'
 
 //--Redux
 import getStoreAndPersistor from './redux/store'

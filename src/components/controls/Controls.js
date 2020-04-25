@@ -6,7 +6,7 @@ import { FaSave} from 'react-icons/fa'
 import { AiOutlineUpload } from 'react-icons/ai'
 import { setActivePage } from '../../redux/actions'
 
-import PythonApi from '../../apis/Socket'
+import PythonApi from '../../apis/PythonApi'
 import NavigateButton from './NavigateButton'
 
 import { GlobalHotKeys } from 'react-hotkeys'

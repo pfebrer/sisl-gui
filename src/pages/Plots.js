@@ -7,7 +7,7 @@ import ReactTooltip from "react-tooltip"
 import PlotDashboard from '../components/plots/PlotDashboard';
 
 //--Python api 
-import PythonApi from '../apis/Socket'
+import PythonApi from '../apis/PythonApi'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css'
