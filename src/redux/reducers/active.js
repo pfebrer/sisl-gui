@@ -55,11 +55,11 @@ const active = (state = defaultState, action) => {
         case SET_SESSION:
 
             const activeTabInSession = _.find(action.session.tabs, ["id", state.tab])
-            const anyTabs = action.session.tabs.length == 0
+            const anyTab = action.session.tabs.length > 0
             
             if (activeTabInSession) {
                 return state
-            } else if (anyTabs){
+            } else if (anyTab){
                 return {...state, tab: action.session.tabs[0].id}
             } else {
                 return { ...state, tab: null}

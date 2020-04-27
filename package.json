@@ -40,7 +40,9 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "dist": "electron-builder",
-    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -61,6 +63,7 @@
     "concurrently": "^5.1.0",
     "electron": "^8.2.3",
     "electron-builder": "^22.5.1",
+    "gh-pages": "^2.2.0",
     "react-scripts": "^3.4.1",
     "wait-on": "^4.0.2"
   },
