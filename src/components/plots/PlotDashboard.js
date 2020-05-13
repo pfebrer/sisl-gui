@@ -201,6 +201,23 @@ class PlotDashboard extends React.Component {
     this.setState({selected: []})
   }
 
+  removePlots = () => {
+    this.state.selected.forEach(plotID => PythonApi.removePlot(plotID))
+    this.setState({ selected: [] })
+  }
+
+  movePlots = () => {
+    // For now, we will just move the plots to the next tab
+    // (testing if it works)
+    let iTab = _.findIndex(this.props.tabs, ["id", this.props.active.tab ]) + 1
+    if (this.props.tabs.length == iTab) iTab = 0
+
+    console.warn(iTab)
+
+    this.state.selected.forEach(plotID => PythonApi.movePlot(plotID, this.props.tabs[iTab].id ))
+    this.setState({ selected: [] })
+  }
+
   renderSelectedManager = () => {
 
     const nSelected = this.state.selected.length
@@ -217,8 +234,8 @@ class PlotDashboard extends React.Component {
         {nSelected > 1 ? availableMerges.map(
           merge => <Button onClick={() => this.mergePlots(merge.to)}>{`Merge as ${merge.to}`}</Button>) 
         : null}
-        <Button>Remove</Button>
-        <Button>Move to other tab</Button>
+        <Button onClick={this.removePlots}>Remove</Button>
+        <Button onClick={this.movePlots}>Move to other tab</Button>
       </div>
     </Paper>
   }

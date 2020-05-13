@@ -37,7 +37,7 @@ class Settings extends Component {
         if ( _.isEmpty(this.props.session) ) return null
 
         return (
-            <div style={{...this.props.style, padding: 20}}>
+            <div className="scrollView" style={{...this.props.style, padding: 20}}>
                 <SettingsContainer
                     defaultActiveKey={1}
                     settings={this.props.session.settings}

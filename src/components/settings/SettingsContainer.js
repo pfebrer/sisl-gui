@@ -90,9 +90,7 @@ export default class SettingsContainer extends Component {
 
             return (
                 <MuiExpansionPanel
-                    key={groupKey}
-                    header={paramGroup.name} 
-                    icon={paramGroup.icon}>
+                    key={groupKey}>
                     <MuiExpansionPanelSummary style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <Icon>{paramGroup.icon}</Icon>
                         <span style={{paddingLeft: 10}}>{paramGroup.name}</span>

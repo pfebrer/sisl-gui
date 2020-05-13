@@ -64,7 +64,7 @@ class PlotTweaking extends Component {
                     <Grid item sm={12} md={4} style={{height:"90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems:"center"}}>
                         <PlotCard plot={activePlot} style={{height: "80vh"}}/>
                     </Grid>
-                    <Grid item sm={12} md={8} style={{ padding: 20, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} >
+                    <Grid item sm={12} md={8} style={{ padding: 20, display: "flex", flexDirection: "column"}} >
                         {this.props.browser.mediaType == "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh"}}>{setsCont}</div> : setsCont}
                     </Grid>
                 </Grid>

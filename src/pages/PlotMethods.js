@@ -30,14 +30,14 @@ class PlotMethods extends Component {
             <div style={{...this.props.style}}>
                 <GlobalHotKeys keyMap={PLOT_TWEAKING_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
                 <Grid container>
-                    <Grid item className="s12 l4" style={{height:"90vh", display: "flex", flexDirection: "Gridumn", justifyContent: "center", alignItems:"center"}}>
-                        <PlotCard plot={this.props.activePlot} style={{height: "80vh"}}/>
+                    <Grid item sm={12} md={4} style={{ height: "90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                        <PlotCard plot={this.props.activePlot} style={{ height: "80vh" }} />
                     </Grid>
-                    <Grid item className="s12 l8" style={{paddingTop: 100}}>
-                        <Methods plot={this.props.activePlot}/>
+                    <Grid item sm={12} md={8} style={{ padding: 20, display: "flex", flexDirection: "column" }} >
+                        <Methods plot={this.props.activePlot} />
                     </Grid>
                 </Grid>
-                <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false}/>  
+                <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />   
             </div>
             
         )

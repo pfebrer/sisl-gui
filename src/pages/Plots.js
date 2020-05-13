@@ -170,12 +170,10 @@ class Plots extends Component {
         }
 
         return (
-            <div style={{marginBottom: 0, display: "flex", flexWrap: "wrap"}}>
+            <div style={{display: "flex", flexWrap: "wrap"}}>
                 <GlobalHotKeys keyMap={{...GLOBAL_HOT_KEYS}} handlers={this.hotKeysHandlers}/>
-                <div style={{marginLeft: 15, marginRight: 15, width: "10vw", minWidth: 150}}>
-                    <StructurePicker/>   
-                </div>
-                <div style={{flex: 1, height: "100vh", display: "flex", flexDirection: "column"}}>
+                <StructurePicker style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}/>   
+                <div style={{flex: 1, paddingLeft: 20, height: "100vh", display: "flex", flexDirection: "column"}}>
                     <LoadingTracker/>
                     {this.props.active.page == "plots" ? <Tabs /> : null}
                     <MainComponent style={{flex: 1}}/>

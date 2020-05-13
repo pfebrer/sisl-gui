@@ -223,7 +223,7 @@ div[tabindex="-1"]:focus {
 }
 
 .newTabIcon:hover{
-  color: rgba(0,0,255, 0.4) !important;
+  color: rgba(77, 150, 35, 0.644) !important;
   transform: scale(1.1);
 }
 

@@ -3,11 +3,12 @@ import Tab from './Tab'
 import { setActiveTab } from '../../redux/actions'
 import PythonApi from '../../apis/PythonApi'
 import { connect } from 'react-redux'
-import { MdCreateNewFolder } from 'react-icons/md'
+import { MdCreateNewFolder, MdAddCircle} from 'react-icons/md'
 
 import _ from "lodash"
 import { GlobalHotKeys, HotKeys } from 'react-hotkeys'
 import { TABS_HOT_KEYS } from '../../utils/hotkeys'
+import { Button } from '@material-ui/core'
 
 export class Tabs extends Component {
 
@@ -57,18 +58,12 @@ export class Tabs extends Component {
         return (
             <div style={{display: "flex", flexWrap: "wrap", alignItems:"center", marginTop: 10, marginBottom: 5}}>
                 <GlobalHotKeys keyMap={TABS_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
-                <div onClick={this.newTab} data-tip="New tab">
-                    <MdCreateNewFolder
-                        size={30}
-                        color="darkblue"
-                        className="newTabIcon"
-                        style={{paddingRight: 0}}/>
-                </div>
                 {tabs.length == 0 ? 
                     this.noTabsMessage()
                     :
                     tabs.map( tab => <Tab tab={tab}/>)
                 }
+                <MdAddCircle onClick={this.newTab} data-tip="New tab" data-place="right" color="green" size={20} className="newTabIcon"/>
             </div>
         )
     }

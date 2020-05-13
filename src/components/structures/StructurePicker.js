@@ -35,8 +35,6 @@ export class StructurePicker extends Component {
 
         let forceShow, forceHide;
 
-        console.warn([...selectedStructs, ...selectedPlotables])
-
         if ([...selectedStructs, ...selectedPlotables].length != 0){
             forceShow = true
         } else {
@@ -210,8 +208,8 @@ export class StructurePicker extends Component {
         }
         
         return (
-            <div style={{height: "100vh", overflow: "hidden", display: "flex", flexDirection: "column", paddingTop: 20}}>
-                <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 20}}>
+            <div style={{height: "100vh", overflow: "hidden", display: "flex", flexDirection: "column", backgroundColor: "white", ...this.props.style}}>
+                <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20, marginBottom: 20 }}>
                     <TextInput
                         label="Search string"
                         autocomplete="off"

@@ -188,6 +188,10 @@ export class PythonApi {
         this._sessionMethod("remove_plot", null, null, plotID)
     }
 
+    movePlot = (plotID, tab) => {
+        this._sessionMethod("move_plot", null, null, plotID, tab)
+    }
+
     mergePlots = (plotIDs, to) => {
         this._sessionMethod("merge_plots", {to}, null, plotIDs)
     }
