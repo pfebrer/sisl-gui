@@ -23,22 +23,7 @@ const active = (state = defaultState, action) => {
             console.log("REDUX: Setting active plot...")
             var newState = {
                 ...state,
-                plot: action.activePlot,
-            }
-            console.log(newState)
-            return newState
-        
-        case CHANGE_PLOT_SETTINGS:
-            console.log("REDUX: Changing plot settings (not submitting yet)...")
-            var newState = {
-                ...state,
-                plot: {
-                    ...state.plot,
-                    settings: {
-                        ...state.plot.settings,
-                        [action.settingKey]: action.value
-                    }
-                },
+                plot: action.plotID,
             }
             console.log(newState)
             return newState

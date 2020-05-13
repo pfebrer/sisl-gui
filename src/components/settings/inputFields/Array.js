@@ -6,11 +6,19 @@ import _ from "lodash"
 export default class ArrayInput extends Component {
 
     changeValue = (newVal, i) => {
-        const value = _.cloneDeep(this.props.value)
+        let value = _.cloneDeep(this.props.value)
+
+        if(!value){
+            value = this.handleNone()
+        }
 
         value[i] = newVal
 
         this.props.onChange(value)
+    }
+
+    handleNone = () => {
+        return Array(this.props.inputField.params.shape[0]).fill(null)
     }
 
     render() {
@@ -19,15 +27,21 @@ export default class ArrayInput extends Component {
         const orientationStyles = this.props.inputField.params.vertical ? {
             marginLeft: 20, marginRight: 20, marginBottom: 0, width: 70
         } : {
-            marginLeft: 5, marginRight: 5, paddingLeft: 10, marginBottom: 0, width: 50
+            marginLeft: 5, marginRight: 5, marginBottom: 0, width: 100
         }
-        const inputStyle = { ...orientationStyles, paddingLeft: 10, textAlign: "center", borderStyle:"solid", borderWidth: 1, borderColor: "black"}
+        const inputStyle = { ...orientationStyles, textAlign: "center"}
+
+        let value = this.props.value
+
+        if (!value){
+            value = this.handleNone()
+        }
 
         return (
             <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <div style={{paddingBottom: 10}}>{this.props.setting.name}</div>
                 <div style={{display: "flex", flexDirection: this.props.inputField.params.vertical ? "column" : "row", justifyContent: "center", alignItems: "center"}} className="arrayContainer">
-                    {this.props.value.map((val, i) => <NumericInput value={val} onChange={(val) => this.changeValue(val, i)} style={inputStyle}/>)}
+                    {value.map((val, i) => <NumericInput value={val} onChange={(val) => this.changeValue(val, i)} style={inputStyle}/>)}
                 </div>  
             </div>
         )

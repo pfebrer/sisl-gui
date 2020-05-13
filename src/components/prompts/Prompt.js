@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { toast } from 'react-toastify'
 
+import TextInput from "../settings/inputFields/TextInput"
+import { Button } from '@material-ui/core'
+
 export class Prompt extends Component {
 
     constructor(props){
@@ -18,9 +21,9 @@ export class Prompt extends Component {
     render() {
         return (
             <div>
-                <div>{this.props.content}</div>
-                <input value={this.state.value} onChange={(e) => {this.setState({value: e.target.value})}}/>
-                <button onClick={this.props.closeToast}>Submit</button>
+                <div style={{paddingBottom: 10}}>{this.props.content}</div>
+                <TextInput value={this.state.value} onChange={(value) => {this.setState({value})}} label={this.props.inputProps.label}/>
+                <Button onClick={this.props.closeToast}>Submit</Button>
             </div>
         )
     }
@@ -37,10 +40,11 @@ export const connectionPrompt = (currentAddress, callback, props) => {
 
     const content = <div>
         <div>{"Couldn't connect to " + currentAddress}</div>
-        <div>Do you want to specify a different address for the API? (host:port)</div>
+        <div>Do you want to specify a different address for the API?</div>
+        <div> (http(s)://host:port)</div>
     </div>
 
-    prompt(content, callback, props)
+    prompt(content, callback, {inputProps: {label: "New address" }, ...props})
 
 }
 
@@ -51,7 +55,7 @@ export const authPrompt = (callback, props) => {
         <div>We need you to provide your username:</div>
     </div>
 
-    prompt(content, callback, props)
+    prompt(content, callback, { inputProps: { label: "Username" }, ...props })
 
 } 
 

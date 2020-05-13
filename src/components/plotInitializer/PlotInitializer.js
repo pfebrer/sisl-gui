@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 
 import _ from "lodash"
-import { v4 as uuidv4 } from 'uuid';
 
-import { Card, Icon} from 'react-materialize'
+import Card from '@material-ui/core/Card'
 
 import PythonApi from '../../apis/PythonApi'
 
@@ -11,6 +10,8 @@ import { connect } from 'react-redux'
 import { selectActiveStructs, selectActivePlotables } from '../../redux/reducers'
 import { setActiveTab, addPlots, setActiveStructs, informLoadingPlot, informLoadedPlot, deactivateStruct, deactivatePlotable, setActivePlotables } from '../../redux/actions'
 import StructuresGroup from './StructuresGroup';
+import { MdRemove, MdClose, MdDone, MdRefresh } from 'react-icons/md'
+import { Button } from '@material-ui/core'
 
 class PlotInitializer extends Component {
 
@@ -245,7 +246,7 @@ class PlotInitializer extends Component {
     renderPlotable = (plotable) => {
         return <div style={{display: "flex", flexDirection: "row", alignItems: "center", marginTop: 10}}>
             <div style={{color: "darkred", cursor: "pointer", display: "flex", justifyContent: "center", alignItems:"center"}} onClick={() => this.props.deactivatePlotable(plotable.id)}>
-                <Icon>remove</Icon>
+                <MdRemove/>
             </div>
             <div style={{marginRight: 20, marginLeft: 20, padding: 10, backgroundColor: "whitesmoke", borderRadius: 3}}>
                 {plotable.name}
@@ -271,28 +272,7 @@ class PlotInitializer extends Component {
             <div className="plotInitializer" style={this.props.style}>
 
                 <Card
-                    style={{marginLeft: 20, marginRight: 20, background: "aliceblue"}}
-                    actions={
-                        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
-
-                            <a
-                                className="btn-flat black-text initPlotBtn"
-                                onClick={this.toggleVisibility}>
-                                Dismiss
-                                <Icon right>close</Icon>
-                            </a>
-
-                            <a 
-                                className="btn-flat black-text initPlotBtn"
-                                onClick={this.getNewPlot}
-                                >
-                                Initialize plots
-                                <Icon right>done</Icon>
-                            </a>
-
-                            <a className="btn-flat black-text initPlotBtn"><Icon>refresh</Icon></a>
-                        </div>     
-                    }>
+                    style={{margin: 20, padding: 20, background: "aliceblue", overflow: "visible"}}>
                     {this.selectedStructs.length > 0 ? <div>
                         <div className="sectionHeader">
                             Structures
@@ -321,7 +301,27 @@ class PlotInitializer extends Component {
                         </div>
                     </div>)}
 
-                    {[...this.selectedPlotables, ...this.selectedStructs].length == 0 ? this.nothingToPlotMessage() : null} 
+                    {[...this.selectedPlotables, ...this.selectedStructs].length == 0 ? this.nothingToPlotMessage() : null}
+
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", paddingTop: 20 }}>
+
+                        <Button
+                            style={{marginRight: 20}}
+                            onClick={this.toggleVisibility}
+                            endIcon={<MdClose />}
+                        >
+                            Dismiss
+                        </Button>
+
+                        <Button
+                            style={{ marginLeft: 20 }}
+                            onClick={this.getNewPlot}
+                            endIcon={<MdDone/>}
+                        >
+                            Initialize plots      
+                        </Button>
+
+                    </div>     
 
                 </Card>
             </div>

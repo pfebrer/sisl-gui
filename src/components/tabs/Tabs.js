@@ -60,7 +60,8 @@ export class Tabs extends Component {
                 <div onClick={this.newTab} data-tip="New tab">
                     <MdCreateNewFolder
                         size={30}
-                        className="newTabIcon blue-text text-darken-3"
+                        color="darkblue"
+                        className="newTabIcon"
                         style={{paddingRight: 0}}/>
                 </div>
                 {tabs.length == 0 ? 

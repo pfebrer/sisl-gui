@@ -7,10 +7,11 @@ import PlotCard from "./PlotCard";
 
 //--Redux
 import { connect } from 'react-redux'
-import { setTabPlots, setSessionTabs} from "../../redux/actions"
+import { setTabPlots, setSessionTabs, setActivePlot} from "../../redux/actions"
 import PythonApi from "../../apis/PythonApi";
 
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import { Checkbox, Paper, Button } from '@material-ui/core';
 
 import 'react-grid-layout/css/styles.css'
 import'react-resizable/css/styles.css'
@@ -21,6 +22,8 @@ import Tabs from "../tabs/Tabs";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
+const selectedPlotStyles = { backgroundColor: "#757eff",  paddingTop: 5, marginTop: -5}
+
 class PlotDashboard extends React.Component {
 
   constructor(props){
@@ -28,13 +31,17 @@ class PlotDashboard extends React.Component {
 
     this._plotsInLayout = false
 
+    this.state = {
+      selected: []
+    }
+
   }
 
   static defaultProps = {
     className: "layout",
     rowHeight: 30,
     onLayoutChange: function() {},
-    cols: { lg: 12, sm: 6, xs: 4, xxs: 2 },
+    cols: { lg: 12, md: 12, sm: 6, xs: 4, xxs: 2 },
   };
 
   state = {
@@ -46,6 +53,7 @@ class PlotDashboard extends React.Component {
 
   componentDidMount() {
     this.setState({ mounted: true });
+    this.props.setActivePlot(undefined)
   }
 
   emptyDashboard = () => {
@@ -75,10 +83,27 @@ class PlotDashboard extends React.Component {
     };
   }
 
-  generateDOM(layouts, plots) {
+  generateDOM(layouts, plots, selected, toggleSelect) {
     return _.map(layouts, function(l, i) {
-      return <div key={plots[i].id}><PlotCard plot={plots[i]}/></div>
+      return <div key={plots[i].id} onClick={(e) => e.ctrlKey ? toggleSelect(plots[i].id) : null}>
+        <PlotCard 
+          plot={plots[i]} 
+          style={selected.includes(plots[i].id) ? selectedPlotStyles : {}}/>
+      </div>
     });
+  }
+
+  toggleSelected = (plotID) => {
+
+    let selected;
+
+    if (this.state.selected.includes(plotID)){
+      selected = this.state.selected.filter(id => id != plotID)
+    } else {
+      selected = [...this.state.selected, plotID]
+    }
+
+    this.setState({selected})
   }
 
   onBreakpointChange = (breakpoint) => {
@@ -155,7 +180,7 @@ class PlotDashboard extends React.Component {
         onLayoutChange={this.onLayoutChange}
         onDrop={this.onDrop}
         onResizeStop={this.onResizeStop}
-        draggableCancel=".draglayer" //Avoids plot being dragged when zooming and other drag actions
+        draggableCancel=".infolayer, .draglayer, .shapelayer" //Avoids plot being dragged when zooming and other drag actions
         // WidthProvider option
         measureBeforeMount={false}
         // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)
@@ -165,10 +190,37 @@ class PlotDashboard extends React.Component {
         preventCollision={!this.state.compactType}
         rowHeight={10}
       >
-        {this.generateDOM(layouts.lg, plots)}
+        {this.generateDOM(layouts.lg, plots, this.state.selected, this.toggleSelected)}
       </ResponsiveReactGridLayout>
     )
 
+  }
+
+  mergePlots = (to) => {
+    PythonApi.mergePlots(this.state.selected, to)
+    this.setState({selected: []})
+  }
+
+  renderSelectedManager = () => {
+
+    const nSelected = this.state.selected.length
+
+    if (nSelected == 0) return null
+
+    const availableMerges = [
+      {"to": "multiple"}, {"to": "subplots"}, {"to": "animation"}
+    ]
+
+    return <Paper style={{padding: 10, marginBottom: 10}} elevation={3}>
+      {`You have ${nSelected} plots selected. What do you want to do?`}
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+        {nSelected > 1 ? availableMerges.map(
+          merge => <Button onClick={() => this.mergePlots(merge.to)}>{`Merge as ${merge.to}`}</Button>) 
+        : null}
+        <Button>Remove</Button>
+        <Button>Move to other tab</Button>
+      </div>
+    </Paper>
   }
 
   render() {
@@ -181,6 +233,7 @@ class PlotDashboard extends React.Component {
     return (
       <div style={{padding: 10, ...this.props.style}} className="scrollView">
         <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/>
+        {this.renderSelectedManager()}
         {this.getLayout()}
       </div>
     );
@@ -198,6 +251,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   setSessionTabs,
   setTabPlots,
+  setActivePlot
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withHotKeys(PlotDashboard));

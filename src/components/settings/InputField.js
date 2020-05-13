@@ -16,8 +16,9 @@ import Range from './inputFields/Range';
 import Numeric from './inputFields/Numeric';
 import QueriesField from './inputFields/QueriesInput';
 import ArrayInput from './inputFields/Array';
+import ListInput from './inputFields/List';
 
-const INPUT_FIELDS = {
+export const INPUT_FIELDS = {
     textinput: TextInput,
     switch: Switch,
     dropdown: Dropdown,
@@ -26,7 +27,8 @@ const INPUT_FIELDS = {
     range: Range,
     number: Numeric,
     queries: QueriesField,
-    vector: ArrayInput
+    vector: ArrayInput,
+    list: ListInput
 }
 
 class InputField extends Component {
@@ -58,8 +60,12 @@ class InputField extends Component {
 
     changeSettingValue = (newValue) => {
 
-        this.props.changeSettings(this.props.onSettingChangeType, this.props.setting.key, newValue)
-        
+        if (this.props.onValueChange){
+            this.props.onValueChange(newValue)
+        } else {
+            this.props.changeSettings(this.props.onSettingChangeType, this.props.setting.key, newValue, this.props.onSettingChangeExtraParams)
+        }
+
     }
 
     static number = (value) => ["", "-"].includes(value) ? value : Number(value)
@@ -77,7 +83,7 @@ class InputField extends Component {
             {...this.props}
             inputField={inputField}
             onChange={(value) => this.changeSettingValue(value)}
-            w={this.w} //This is only needed by the queries field, maybe there is a better way to do it
+            //w={this.w} //This is only needed by the queries field, maybe there is a better way to do it
         />
 
         let tooltipParams = {
@@ -90,7 +96,7 @@ class InputField extends Component {
         const backgroundColor = this.props.value == null ? "rgba(230,230,230,0.4)" : undefined
 
         return <div
-            onClick={(e) => e.ctrlKey ? this.changeSettingValue(this.props.value == null ? this.props.setting.default : null) : null}
+            onClick={(e) => inputField.type != "queries" && e.ctrlKey ? this.changeSettingValue(this.props.value == null ? this.props.setting.default : null) : null}
             style={{backgroundColor, paddingTop: 10, paddingBottom: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 3, marginTop: 20, marginBottom: 20, width: this.w(inputField.width), ...inputField.style}}
             {...tooltipParams}>
                 {fieldLayout}
@@ -103,9 +109,9 @@ const mapStateToProps = state => ({
     browser: state.browser
 })
 
-const mapDispatchToProps = dispatch => ({
-    changeSettings: (actionType, settingKey, newValue) => dispatch(changeSettings(actionType, settingKey, newValue)),
-})
+const mapDispatchToProps = {
+    changeSettings,
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputField);
 

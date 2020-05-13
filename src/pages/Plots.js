@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.min.css'
 
 //--Redux
 import { connect } from 'react-redux'
-import {addPlots, addTabs, setNewStructures, setActiveTab, setActivePlot, setSessionTabs, setCurrentSession, setNewPlotables, setActivePage, setActiveStructs} from "../redux/actions"
+import {addPlots, setNewStructures, setActiveTab, setActivePlot, setSessionTabs, setCurrentSession, setNewPlotables, setActivePage} from "../redux/actions"
 import StructurePicker from '../components/structures/StructurePicker'
 import PlotInitializer from '../components/plotInitializer/PlotInitializer'
 import LoadingTracker from '../components/loading/LoadingTracker'
@@ -26,7 +26,10 @@ import Settings from './Settings'
 import {getApplicationKeyMap, GlobalHotKeys, configure} from 'react-hotkeys'
 import { GLOBAL_HOT_KEYS, ADDITIONAL_GLOBAL_HOT_KEYS } from '../utils/hotkeys';
 import PlotMethods from './PlotMethods';
-import { AiFillSketchCircle } from 'react-icons/ai';
+import FilesInput from '../components/settings/inputFields/Files';
+import ConnectionStatus from '../components/controls/ConnectionStatus';
+import MoleculeViewer from '../components/structureView/MoleculeViewer';
+import PlotEditor from './PlotEditor';
 
 configure({logLevel: "debug", simulateMissingKeyPressEvents: false})
 class Plots extends Component {
@@ -74,6 +77,7 @@ class Plots extends Component {
     hotKeysHandlers = {
         GO_TO_SETTINGS: () => this.props.setActivePage("settings"),
         GO_TO_DASHBOARD: () => this.props.setActivePage("plots"),
+        GO_TO_MOLECULEVIEWER: () => this.props.setActivePage("moleculeViewer"),
         SHOW_AVAIL_HOTKEYS: () => console.warn(getApplicationKeyMap())
     }
 
@@ -93,7 +97,7 @@ class Plots extends Component {
 
         //Add the listener to display or not the plot initializer
         this.listener = document.addEventListener("togglePlotInitializer", this.togglePlotInitializer)
-        
+
     }
 
     componentDidUpdate(){
@@ -143,10 +147,27 @@ class Plots extends Component {
         const MainComponent = {
             'plots': PlotDashboard,
             'settings': Settings,
+            'plotLayoutEditor': PlotEditor,
             'plotTweaking': PlotTweaking,
             'plotMethods': PlotMethods,
-            'plotInitializer': PlotInitializer
+            'plotInitializer': PlotInitializer,
+            'moleculeViewer': MoleculeViewer,
         }[this.props.active.page]
+
+        if(this.props.active.page == 'plotLayoutEditor') {
+            return (
+                <div style={{ marginBottom: 0, display: "flex", flexWrap: "wrap", height: "100vh", position: "relative"}}>
+                    <GlobalHotKeys keyMap={{ ...GLOBAL_HOT_KEYS }} handlers={this.hotKeysHandlers} />
+                    <MainComponent />
+                    <Controls style={{position: "absolute", bottom: 0, right: 0}}/>
+                    <ToastContainer />
+                    <ConnectionStatus
+                        connectedProps={{ style: { backgroundColor: "lightgreen" } }}
+                        style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />
+                    <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />
+                </div>
+            )
+        }
 
         return (
             <div style={{marginBottom: 0, display: "flex", flexWrap: "wrap"}}>
@@ -156,11 +177,15 @@ class Plots extends Component {
                 </div>
                 <div style={{flex: 1, height: "100vh", display: "flex", flexDirection: "column"}}>
                     <LoadingTracker/>
-                    {this.props.active.page == "plots" ? <Tabs/> : null}
+                    {this.props.active.page == "plots" ? <Tabs /> : null}
                     <MainComponent style={{flex: 1}}/>
-                    <Controls/>
+                    <FilesInput/>
                 </div>
+                <Controls />
                 <ToastContainer/>
+                <ConnectionStatus 
+                connectedProps={{ style: {backgroundColor: "lightgreen"}}}
+                style={{ position: "absolute", right: 0, top: 0, margin: 20, width:40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center"}}/>
                 <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false}/>
             </div>
         )

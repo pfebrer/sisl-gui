@@ -39,10 +39,11 @@ export const removePlot = (plotID, tabID) => ({
     tabID
 })
 
-export const changeSettings = (actionType, settingKey, value) => ({
+export const changeSettings = (actionType, settingKey, value, extraParams) => ({
     type: actionType, //Valid action types are all of type CHANGE_<something>_SETTINGS
     settingKey,
-    value
+    value,
+    extraParams // Here the plotID is passed, for example, if the actionType is CHANGE_PLOT_SETTINGS
 })
 
 export const addTabs = (newTabs) => ({
@@ -68,7 +69,7 @@ export const setSessionTabs = (tabs) => ({
 
 export const setActivePlot = (plot) => ({
     type: SET_ACTIVE_PLOT,
-    activePlot: plot
+    plotID: plot ? typeof(plot) == "string" ? plot : plot.id : undefined
 })
 
 export const setActiveTab = (tab) => ({

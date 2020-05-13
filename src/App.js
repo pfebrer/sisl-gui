@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-import './materialize.min.css'
 
 //--Redux
 import getStoreAndPersistor from './redux/store'

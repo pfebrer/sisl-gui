@@ -5,14 +5,16 @@ import { setActivePage } from '../../redux/actions'
 import { IoMdSettings } from 'react-icons/io'
 import { MdDashboard } from 'react-icons/md'
 
-const ROUTES = {
+export const ROUTES = {
     settings: {
-        icon: IoMdSettings,
+        name: "Settings",
+        icon: <IoMdSettings size={20}/>,
         color: "grey",
         hotKey: "Shift + s",
     },
     plots: {
-        icon: MdDashboard,
+        name: "Dashboard",
+        icon: <MdDashboard/>,
         color: "grey",
         hotKey: "Shift + d"
     }

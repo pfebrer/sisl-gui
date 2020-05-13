@@ -6,25 +6,28 @@
   "main": "public/electron.js",
   "homepage": "./",
   "dependencies": {
+    "@material-ui/core": "^4.9.14",
+    "@material-ui/lab": "^4.0.0-alpha.53",
     "flat": "^5.0.0",
     "html-react-parser": "^0.10.3",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "materialize-css": "^1.0.0",
     "moment": "^2.24.0",
-    "plotly.js": "^1.52.3",
+    "plotly.js": "^1.54.1",
     "rc-slider": "^8.7.1",
     "react": "^16.13.1",
+    "react-chart-editor": "^0.41.3",
     "react-color": "^2.18.0",
     "react-dom": "^16.13.1",
     "react-grid-layout": "^0.18.3",
     "react-hotkeys": "^2.0.0",
     "react-icons": "^3.9.0",
     "react-markdown": "^4.3.1",
-    "react-materialize": "^3.6.1",
     "react-plotly.js": "^2.4.0",
     "react-redux": "^7.2.0",
     "react-select": "^3.1.0",
+    "react-sortable-hoc": "^1.11.0",
     "react-spinners": "^0.6.1",
     "react-toastify": "^5.5.0",
     "react-tooltip": "^3.11.6",
@@ -40,9 +43,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "dist": "electron-builder",
-    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -65,6 +66,7 @@
     "electron-builder": "^22.5.1",
     "gh-pages": "^2.2.0",
     "react-scripts": "^3.4.1",
+    "speck-renderer": "0.0.8",
     "wait-on": "^4.0.2"
   },
   "build": {

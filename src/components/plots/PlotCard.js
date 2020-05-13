@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import Plot from 'react-plotly.js';
-import { Card, Row, Icon } from 'react-materialize';
+import Card from "@material-ui/core/Card"
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineExport, AiOutlineFullscreen } from 'react-icons/ai'
 import { FaHammer } from 'react-icons/fa'
+import { MdSettings } from 'react-icons/md'
 import { IconContext } from 'react-icons'
 
 import { CircleLoader} from 'react-spinners';
@@ -32,7 +33,8 @@ class PlotCard extends Component {
     hotKeys = () => document.querySelectorAll(".plotCardHotKeys")
 
     hotKeysHandlers = {
-        GO_TO_PLOT_EDITING: () => this.goToPlotEditing(),
+        GO_TO_PLOT_LAYOUTEDITING: () => this.goToPlotLayoutEditing(),
+        GO_TO_PLOT_SETTINGSEDITING: () => this.goToPlotSettingsEditing(),
         GO_TO_PLOT_METHODS: () => this.goToPlotMethods(),
         FULL_SCREEN: () => this.showPlotFullScreen(),
         UNDO_PLOT_SETTINGS: () => this.undoSettings(),
@@ -42,6 +44,12 @@ class PlotCard extends Component {
     callPlotShortcut = (sequence) => {
         toast.warn("Applying " + this.props.plot.shortcuts[sequence].name + " shortcut")
         PythonApi.callPlotShortcut(this.props.plot.id, sequence)
+    }
+
+    handlePlotClick = ({points}) => {
+        const data = _.omit(points[0], ["data", "fullData", "xaxis", "yaxis"])
+        console.warn(data)
+        PythonApi.dispatchPlotEvent(this.props.plot.id, "click", data)
     }
 
     undoSettings = () => {
@@ -63,9 +71,14 @@ class PlotCard extends Component {
         PythonApi.removePlot(this.props.plot.id)   
     }
 
-    goToPlotEditing = () => {
+    goToPlotSettingsEditing = () => {
         this.setPlotAsActive()
         this.props.setActivePage("plotTweaking")
+    }
+
+    goToPlotLayoutEditing = () => {
+        this.setPlotAsActive()
+        this.props.setActivePage("plotLayoutEditor")
     }
 
     goToPlotMethods = () => {
@@ -86,7 +99,7 @@ class PlotCard extends Component {
     }
 
     get isActivePlot(){
-        return this.props.active.plot && this.props.plot.id == this.props.active.plot.id
+        return this.props.plot.id == this.props.active.plot
     }
 
     showPlotFullScreen = () => {
@@ -100,60 +113,13 @@ class PlotCard extends Component {
                 <Card 
                     className="plotcard"
                     style={{borderRadius: 15}}>
-                    <Row style={{textAlign: "center"}}>
-                        <CircleLoader color="#36D7B7"/>
-                    </Row>
                     <div>We are working hard to load your plot.</div>
                 </Card>
             )
         }
 
         let layout = this.props.plot.figure.layout;
-        let backColor = this.props.plot.settings.paper_bgcolor || "white"
-
-        //If this is the active plot, we are going to overwrite the layout with the settings (so that user is able to see a preview)
-        if (this.props.active.plot && this.props.active.plot.id == this.props.plot.id){
-
-            backColor = this.props.active.plot.settings.paper_bgcolor || "white"
-
-            // let layoutSubGroups = _.groupBy( _.groupBy(this.props.active.plot.params, "group")["layout"] , "subGroup")
-
-            // layout = {
-            //     ...layout,
-            //     ...layoutSubGroups["undefined"].reduce((map, param) => {map[param.key] = this.props.active.plot.settings[param.key]; return map}, {} ),
-            //     "xaxis": {
-            //         ...layout.xaxis,
-            //         ...layoutSubGroups["xaxis"].reduce((map, param) => {map[param.key.split("_").pop()] = this.props.active.plot.settings[param.key]; return map}, {}),
-            //     },
-            //     "yaxis": {
-            //         ...layout.yaxis,
-            //         ...layoutSubGroups["yaxis"].reduce((map, param) => {map[param.key.split("_").pop()] = this.props.active.plot.settings[param.key]; return map}, {} ),
-            //     }
-
-            // }
-
-            let layoutParams = _.groupBy(this.props.active.plot.params, "group")["layout"]
-
-            let layoutSettings = layoutParams.reduce((map,param) => {map[param.key] = this.props.active.plot.settings[param.key]; return map},{})
-
-            let nestedLayoutParams = unflatten( layoutSettings, {delimiter: "_"})
-
-
-            layout = {
-                ...layout,
-                ...layoutSettings,
-                "xaxis": {
-                    ...layout.xaxis,
-                    ...nestedLayoutParams.xaxis
-                },
-                "yaxis": {
-                    ...layout.yaxis,
-                    ...nestedLayoutParams.yaxis
-                }
-
-            }
-            
-        }
+        let backColor = layout.paper_bgcolor || "white"
 
         const hotKeysKeyMap = {
             ...PLOT_CARD_HOT_KEYS,
@@ -180,15 +146,17 @@ class PlotCard extends Component {
             }, {})
         }
 
-        const activeStyles = this.isActivePlot ? {
-            borderStyle: "solid",
+        const activeStyles = this.isActivePlot && false ? {
+            borderStyle: "dashed",
             borderWidth: "2px",
             borderColor: "black"
         } : {}
 
         return <HotKeys
                  className="plotCardHotKeys"
-                 onClick={(e) => {if (e.ctrlKey){this.togglePlotAsActive()}}}
+                 //onClick={(e) => {if (e.ctrlKey && false){this.togglePlotAsActive()}}}
+                 component={Card}
+                 elevation={this.props.elevation || 1}
                  keyMap={hotKeysKeyMap} handlers={hotKeysHandlers} allowChanges={true}
                  style={ {width: "100%", height: "100%", display: "flex", flexDirection: "column", borderRadius: 3, overflow:"hidden", background: backColor, paddingTop: 5, ...activeStyles, ...this.props.style}}>
                 <div style={{flex:1}}>
@@ -201,33 +169,38 @@ class PlotCard extends Component {
                         data={this.props.plot.figure.data}
                         layout={{autosize: true, ...layout}}
                         frames={this.props.plot.figure.frames}
-                        onClick={(data) => {}}
-                        onUpdate={(figure) => {}}
-                        config={{responsive: true}}
+                        onClick={this.handlePlotClick}
+                        onRelayout={(layoutUpdates) => PythonApi.updatePlotLayout(this.props.plot.id, layoutUpdates)}
+                        onUpdate={(figure) => {}}//PythonApi.updateFigure(this.props.plot.id, figure)}
+                    config={{editable: true, responsive: true}}
                     />
                 </div>
                 
-            <div style={{display: "flex", paddingLeft: 10, paddingRight: 20}} className="card-action">
-                <IconContext.Provider value={{size: 25, style:{margin: 5}}}>
+            <div style={{ display: "flex", paddingLeft: 10, paddingRight: 20, background: backColor}} className="card-action">
+                <IconContext.Provider value={{ size: 25, style: { margin: 5 }, color: "#6eb6ff"}}>
                     <div style={{flex:1, textAlign: "left"}}>
                         <a data-tip="Full screen (f)" href="#" onClick={this.showPlotFullScreen}><AiOutlineFullscreen/></a> 
                     </div>
 
                     <div>
                         <a
+                            data-tip="Settings (s)"
+                            href="#"
+                            onClick={this.goToPlotSettingsEditing}><MdSettings /></a>
+                        <a
                             data-tip="Methods (m)"
                             href="#"
                             onClick={this.goToPlotMethods}><FaHammer/></a>
                         <a
-                            data-tip="Edit (e)"
+                            data-tip="Edit layout (e)"
                             href="#"
-                            onClick={this.goToPlotEditing}><AiOutlineEdit/></a>
-                        <a data-tip="Export data" href="#"><AiOutlineExport/></a>
+                            onClick={this.goToPlotLayoutEditing}><AiOutlineEdit/></a>
+                        <span data-tip="Export data (comming soon)" href="#"><AiOutlineExport color="#ccc"/></span>
                         <a data-tip="Remove (supr)" href="#" onClick={this.removePlot}><AiOutlineDelete color="red"/></a>
                     </div> 
                 </IconContext.Provider>
-                <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false}/>
-            </div>  
+                <ReactTooltip disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} /> 
+            </div>
         </HotKeys>
     }
 }

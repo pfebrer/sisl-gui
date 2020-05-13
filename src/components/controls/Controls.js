@@ -1,16 +1,92 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {Button, Icon} from 'react-materialize'
+import SpeedDial from '@material-ui/lab/SpeedDial';
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import { makeStyles } from '@material-ui/core/styles';
+import { Button } from '@material-ui/core';
+
 import { FaSave} from 'react-icons/fa'
 import { AiOutlineUpload } from 'react-icons/ai'
 import { setActivePage } from '../../redux/actions'
 
 import PythonApi from '../../apis/PythonApi'
-import NavigateButton from './NavigateButton'
+import { ROUTES } from './NavigateButton'
 
 import { GlobalHotKeys } from 'react-hotkeys'
 import { GLOBAL_HOT_KEYS } from '../../utils/hotkeys'
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        transform: 'translateZ(0px)',
+        flexGrow: 1,
+    },
+    exampleWrapper: {
+        position: 'relative',
+        marginTop: theme.spacing(3),
+    },
+    radioGroup: {
+        margin: theme.spacing(1, 0),
+    },
+    speedDial: {
+        position: 'absolute',
+        '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
+            bottom: theme.spacing(2),
+            right: theme.spacing(2),
+        },
+        '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
+            top: theme.spacing(2),
+            left: theme.spacing(2),
+        },
+    },
+}));
+
+function SpeedDials(props) {
+    const classes = useStyles();
+    const [direction, setDirection] = React.useState('left');
+    const [open, setOpen] = React.useState(false);
+    const [hidden, setHidden] = React.useState(false);
+
+    const handleDirectionChange = (event) => {
+        setDirection(event.target.value);
+    };
+
+    const handleHiddenChange = (event) => {
+        setHidden(event.target.checked);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    return (
+        <SpeedDial
+            ariaLabel="SpeedDial example"
+            className={classes.speedDial}
+            hidden={hidden}
+            icon={<SpeedDialIcon />}
+            onClose={handleClose}
+            onOpen={handleOpen}
+            open={open}
+            direction={direction}
+        >
+            {props.actions.map((action) => (
+                <SpeedDialAction
+                    key={action.name}
+                    icon={action.icon}
+                    tooltipTitle={action.tip || action.name}
+                    tooltipPlacement={"top"}
+                    onClick={action.onClick}
+                />
+            ))}
+        </SpeedDial>
+    );
+}
 
 class Controls extends Component {
 
@@ -46,28 +122,17 @@ class Controls extends Component {
 
         const margins = { marginRight: 20, padding: 0, display:"flex", justifyContent: "center", alignItems: "center"}
 
-        return (
-            <div style={{display: "flex", justifyContent: "flex-end", marginBottom: 10, marginTop: 10}}>
-                <GlobalHotKeys keyMap={GLOBAL_HOT_KEYS} handlers={this.hotKeysHandler}/>
-                    <NavigateButton to="plots" style={margins}/>
-                    <NavigateButton to="settings" style={margins}/>
-                    <Button
-                        data-tip="Save session"
-                        style={margins}
-                        floating
-                        icon={<FaSave size={20}/>} 
-                        onClick={this.saveCurrentSession}
-                        className="yellow darken-1" />
-                    <Button
-                        data-tip="Load session"
-                        style={margins}
-                        floating
-                    icon={<AiOutlineUpload size={20}/>}
-                        onClick={this.loadSession}
-                        className="green" />
-                
-            </div>
-        )
+        const actions = [{
+            name: "Save session",
+            icon: <FaSave size={20} />,
+            onClick: this.saveCurrentSession
+        }, {
+            name: "Load session",
+                icon: <AiOutlineUpload size={20} />,
+            onClick: this.loadSession
+        }]
+
+        return <SpeedDials actions={actions} />
     }
 }
 
@@ -79,7 +144,7 @@ export class Control extends Component {
                     data-tip={this.props.tooltip}
                     style={this.props.style}
                     floating
-                    icon={<this.props.icon size={20}/>}
+                    icon={this.props.icon}
                     onClick={this.props.onClick}
                     className={this.props.className} />
     }

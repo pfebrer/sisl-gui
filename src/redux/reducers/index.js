@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import {createResponsiveStateReducer} from 'redux-responsive'
+import _ from "lodash"
 
 import session from './session'
 import plots from './plots'
@@ -24,4 +25,8 @@ export const selectActiveStructs = (state) => {
 
 export const selectActivePlotables = (state) => {
     return state.active.plotables.map(plotableID => state.session.plotables[plotableID])
+}
+
+export const selectActivePlot = (state) => {
+    return state.plots[state.active.plot]
 }

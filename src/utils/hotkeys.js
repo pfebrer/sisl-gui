@@ -17,6 +17,10 @@ export const GLOBAL_HOT_KEYS = {
         name: "Go to the plot's dashboard",
         sequence: "shift+d",
     },
+    GO_TO_MOLECULEVIEWER: {
+        name: "Go to the molecule viewer",
+        sequence: "shift+m",
+    },
 
     //SESSION
     SAVE_SESSION: {
@@ -80,8 +84,12 @@ export const PLOTS_HOT_KEYS = {
 
 export const PLOT_CARD_HOT_KEYS = {
 
-    GO_TO_PLOT_EDITING: {
-        name: "Edit current plot",
+    GO_TO_PLOT_SETTINGSEDITING: {
+        name: "Edit current plot's settings",
+        sequence: "s"
+    },
+    GO_TO_PLOT_LAYOUTEDITING: {
+        name: "Edit current plot's layout",
         sequence: "e"
     },
     GO_TO_PLOT_METHODS: {

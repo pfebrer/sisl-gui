@@ -135,10 +135,6 @@ div[tabindex="-1"]:focus {
   padding-right: 25pt;
 }
 
-.btn-flat.initPlotBtn:hover{
-  opacity: 0.4;
-}
-
 .structurePicker{
   border-radius: 5px;
   border-color: black;

@@ -16,7 +16,7 @@ export class PythonApi {
         /*This can be dangerous in the browser if the user let's other websites
         access this tab. By default it is not possible, one would have to download
         an extension to make it possible, but still. */ 
-        document.session = this
+        document.api = this
 
     }
 
@@ -30,48 +30,79 @@ export class PythonApi {
         // Timeout to prompt the user for a new api address if the socket fails to connect
         this.connectionTimeOut = setTimeout(() => {
 
-            connectionPrompt(this.apiAddress.replace("http://", ""), (newAddress) => {
+            connectionPrompt(this.apiAddress, (newAddress) => {
                 if (newAddress) {
-                    this.apiAddress = "http://" + newAddress
+                    this.apiAddress = newAddress.trim()
                 }
+                this.disconnect()
                 this.connect()
             })
             
         }, 3000)
 
+        
+
         this.socket.connect()
 
     }
 
+    disconnect = () => {
+        this.socket.disconnect()
+    }
+
+    on = (...args) => {
+        this.socket.on(...args)
+    }
+
+    onConnect = (...args) => {
+        this.on('connect', ...args)
+    }
+
+    onDisconnect = (...args) => {
+        this.on('disconnect', ...args)
+    }
+
     setupListeners = () => {
 
-        this.socket.on('connect', () => {
+        this.on('connect', () => {
             clearTimeout(this.connectionTimeOut)
             this.requestSession()
         });
 
-        this.socket.on('auth_required', this.askForAuth)
+        this.on('disconnect', () => {
+            this.disconnect()
+            this.connect()
+        });
 
-        this.socket.on('logged_in', this.requestSession)
+        this.on('auth_required', this.askForAuth)
 
-        this.socket.on('error', this.handleError);
+        this.on('logged_in', this.requestSession)
+
+        this.on('error', (err) => this.handleError(err, "socket"));
+
+        this.on('server_error', (err) => this.handleError(err, "server"));
         
-        this.socket.on('current_session', (session) => {
+        this.on('current_session', (session) => {
             document.dispatchEvent(new CustomEvent("syncWithSession", { detail: { session } }))
         })
 
-        this.socket.on('loading_plot', (info) => {
+        this.on('loading_plot', (info) => {
             document.dispatchEvent(new CustomEvent("loadingPlot", { detail: info }))
         })
 
-        this.socket.on('plot', (plot) => {
+        this.on('plot', (plot) => {
             document.dispatchEvent(new CustomEvent("plot", { detail: { plot } }))
         })
 
     }
 
-    handleError = (err) => {
-        toast.error("THERE WAS A PYTHON ERROR:\n" + err)
+    handleError = (err, type) => {
+        if (type == "server"){
+            toast.error("THERE WAS A PYTHON ERROR:\n" + err)
+        } else {
+            toast.error(err)
+        }
+        
     }
 
     askForAuth = () => {
@@ -157,6 +188,10 @@ export class PythonApi {
         this._sessionMethod("remove_plot", null, null, plotID)
     }
 
+    mergePlots = (plotIDs, to) => {
+        this._sessionMethod("merge_plots", {to}, null, plotIDs)
+    }
+
     _plotMethod = (plotID, methodName, kwargs, callback, ...args) => {
         this._sessionMethod("_run_plot_method", kwargs, callback, plotID, methodName, ...args)
     }
@@ -166,15 +201,31 @@ export class PythonApi {
     }
 
     updatePlotSettings = (plotID, settings) => {
-        this._plotMethod(plotID, "updateSettings", settings)
+        this._plotMethod(plotID, "update_settings", settings)
     }
 
     undoPlotSettings = (plotID) => {
-        this._plotMethod(plotID, "undoSettings")
+        this._plotMethod(plotID, "undo_settings")
+    }
+
+    updatePlotLayout = (plotID, layoutUpdates) => {
+        this._plotMethod(plotID, "update_layout", layoutUpdates)
+    }
+
+    updateFigure = (plotID, {layout, data, frames, overwrite}) => {
+        this._plotMethod(plotID, "update", {layout, data, frames, overwrite})
     }
 
     callPlotShortcut = (plotID, sequence) => {
         this._plotMethod(plotID, "call_shortcut", null, null, sequence)
+    }
+
+    dispatchPlotEvent = (plotID, event, data) => {
+        this._plotMethod(plotID, 'dispatch_event', data, null, event)
+    }
+
+    sendFile = (file) => {
+        this.socket.emit("upload_file", file, file.name)
     }
 
 }

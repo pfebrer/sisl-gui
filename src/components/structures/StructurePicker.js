@@ -3,11 +3,12 @@ import StructureTag from './StructureTag'
 import _ from "lodash"
 import { setActiveStructs, setActivePlotables } from '../../redux/actions'
 import { MdFolder, MdFolderOpen} from 'react-icons/md'
-import {Icon, TextInput} from 'react-materialize'
 
 import { connect } from 'react-redux'
 import NavigateButton from '../controls/NavigateButton'
 import PlotableTag from './PlotableTag'
+import TextField from '@material-ui/core/TextField'
+import TextInput from '../settings/inputFields/TextInput'
 
 function wildTest(wildcard, str) {
     const re = new RegExp(`^${wildcard.replace(/\*/g,'.*').replace(/\?/g,'.')}$`,'i');
@@ -130,6 +131,7 @@ export class StructurePicker extends Component {
 
         searchString = searchString || this.state.searchString
 
+        console.warn(searchString)
         searchString = searchString.includes("*") || searchString.includes("?") ? searchString : "*"+searchString+"*"
 
         let structs = {}
@@ -208,19 +210,19 @@ export class StructurePicker extends Component {
         }
         
         return (
-            <div style={{height: "100vh", overflow: "hidden", display: "flex", flexDirection: "column"}}>
-                <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+            <div style={{height: "100vh", overflow: "hidden", display: "flex", flexDirection: "column", paddingTop: 20}}>
+                <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 20}}>
                     <TextInput
-                        noLayout
+                        label="Search string"
                         autocomplete="off"
-                        style={{marginBottom:0}}
+                        placeholder="Enter your search string..."
+                        style={{marginRight: 10}}
                         value={this.state.searchString} 
-                        onChange={(e) => this.newSearchString(e.target.value)}/>
-                    <div style={{width: 20}}/>
+                        onChange={this.newSearchString}/>
                     <div
                         data-tip="Search by folder"
                         className={"structPickerToggle " + (this.state.searchByFolder ? "active" : "")}
-        onClick={this.toggleSearchByFolder} style={{cursor: "pointer"}}>{this.state.searchByFolder ? <MdFolder/> : <MdFolderOpen/>}</div>
+                        onClick={this.toggleSearchByFolder} style={{cursor: "pointer"}}>{this.state.searchByFolder ? <MdFolder/> : <MdFolderOpen/>}</div>
                 </div>
                 <div style={{display: "flex", justifyContent: "space-between", marginBottom: 5}}>
                     <span

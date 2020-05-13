@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
 
-import { Row, Collapsible, CollapsibleItem, Icon, Button} from 'react-materialize'
+import Button from '@material-ui/core/Button'
+import Icon from '@material-ui/core/Icon'
+import MuiExpansionPanel from '@material-ui/core/ExpansionPanel';
+import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
 import { MdRestore } from 'react-icons/md'
 
@@ -10,6 +14,7 @@ import parse from 'html-react-parser';
 import _ from "lodash"
 import { HotKeys, ObserveKeys } from 'react-hotkeys';
 import { SETTING_GROUP_HOT_KEYS, SETTING_CONTAINER_HOT_KEYS } from '../../utils/hotkeys';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 
 export default class SettingsContainer extends Component {
 
@@ -31,8 +36,6 @@ export default class SettingsContainer extends Component {
             newExpanded = this.state.expanded != 2 ? this.state.expanded + 1 : 0 
         }
 
-        console.warn(this.refs)
-
         this.setState({expanded: newExpanded})
     }
 
@@ -46,7 +49,8 @@ export default class SettingsContainer extends Component {
                         key={setting.key}
                         setting={setting} 
                         value={this.props.settings[setting.key]}
-                        onSettingChangeType={this.props.onSettingChangeType}/>
+                        onSettingChangeType={this.props.onSettingChangeType}
+                        onSettingChangeExtraParams={this.props.onSettingChangeExtraParams}/>
         }) 
     }
 
@@ -84,56 +88,48 @@ export default class SettingsContainer extends Component {
                 UNDO_SETTINGS: this.props.undoSettings,
             }
 
-            let icon;
-            if (typeof paramGroup.icon == "string"){
-                icon = {
-                    folder: "md",
-                    name: "Md"+paramGroup.icon.split("_").map(sub => sub.charAt(0).toUpperCase() + sub.slice(1)).join("")
-                }
-            }
-
-            const requireFrom  = 'react-icons/' + icon.folder
-
-            //const { [icon.name]: Icon} = require(requireFrom)
-
-            //const Icon = require("react-icons/md/"+paramGroup.icon)
-
             return (
-                <CollapsibleItem
+                <MuiExpansionPanel
                     key={groupKey}
                     header={paramGroup.name} 
-                    icon={<Icon>{paramGroup.icon}</Icon>}>
-                    <HotKeys keyMap={SETTING_GROUP_HOT_KEYS} handlers={hotKeysHandlers}>
-                        <ObserveKeys>
-                        <blockquote style={{textAlign: "left"}}>
-                            {parse(paramGroup.description)}
-                        </blockquote>
-                        {itemContent}
-                        <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around"}}>
-                            <Button
-                                onClick={this.props.undoSettings}
-                                data-tip="This will roll back to previous settings.<br> IT AFFECTS ALL GROUPS OF PARAMETERS, not only this one."
-                                className="orange"
-                                style={{margin:20}}>
-                                    <FaAngleLeft/>Previous settings
+                    icon={paramGroup.icon}>
+                    <MuiExpansionPanelSummary style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <Icon>{paramGroup.icon}</Icon>
+                        <span style={{paddingLeft: 10}}>{paramGroup.name}</span>
+                    </MuiExpansionPanelSummary>
+                    <MuiExpansionPanelDetails>
+                        <HotKeys keyMap={SETTING_GROUP_HOT_KEYS} handlers={hotKeysHandlers}>
+                            <ObserveKeys>
+                                <blockquote style={{ textAlign: "left" }}>
+                                    {parse(paramGroup.description)}
+                                </blockquote>
+                                {itemContent}
+                                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
+                                    <Button
+                                        onClick={this.props.undoSettings}
+                                        data-tip="This will roll back to previous settings.<br> IT AFFECTS ALL GROUPS OF PARAMETERS, not only this one."
+                                        className="orange"
+                                        style={{ margin: 20 }}>
+                                        <FaAngleLeft />Previous settings
                             </Button>
 
-                            <Button
-                                data-tip="This will restore all settings to the plot's defaults"
-                                className="red" style={{margin:20}}><MdRestore/>Restore defaults</Button>
+                                    <Button
+                                        data-tip="This will restore all settings to the plot's defaults"
+                                        className="red" style={{ margin: 20 }}><MdRestore />Restore defaults</Button>
 
-                            <Button
-                                data-tip="This will change the settings and will update everything accordingly.<br> IT ONLY AFFECTS THIS GROUP OF SETTINGS, not all settings"
-                                onClick={submitSettings}
-                                className="blue" 
-                                style={{margin:20}}>
-                                    Submit settings<FaAngleRight/>
-                            </Button>
-                            
-                        </div>
-                        </ObserveKeys>
-                    </HotKeys>
-                </CollapsibleItem> 
+                                    <Button
+                                        data-tip="This will change the settings and will update everything accordingly.<br> IT ONLY AFFECTS THIS GROUP OF SETTINGS, not all settings"
+                                        onClick={submitSettings}
+                                        className="blue"
+                                        style={{ margin: 20 }}>
+                                        Submit settings<FaAngleRight />
+                                    </Button>
+
+                                </div>
+                            </ObserveKeys>
+                        </HotKeys>
+                    </MuiExpansionPanelDetails>
+                </MuiExpansionPanel> 
             )
 
         })
@@ -144,9 +140,9 @@ export default class SettingsContainer extends Component {
         let groupedParams = _.groupBy(this.props.params, "group")
 
         return (
-            <Collapsible popout defaultActiveKey={this.props.defaultActiveKey || 0}>
+            <div style={this.props.style}>
                 {this.renderSettingsGroups(groupedParams)}          
-            </Collapsible>
+            </div>
         )
     }
 }

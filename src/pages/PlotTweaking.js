@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Row, Col} from 'react-materialize'
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 import ReactTooltip from "react-tooltip"
 
 import PythonApi from "../apis/PythonApi"
@@ -14,8 +15,7 @@ import { addPlots, setNewStructures, setActivePlot, setCurrentSession, informLoa
 import { CHANGE_PLOT_SETTINGS } from '../redux/actions/actionTypes'
 import { GlobalHotKeys } from 'react-hotkeys'
 import { PLOT_TWEAKING_HOT_KEYS } from '../utils/hotkeys'
-
-
+import { selectActivePlot } from '../redux/reducers'
 
 class PlotTweaking extends Component {
 
@@ -27,46 +27,47 @@ class PlotTweaking extends Component {
     submitSettings = (settings) => {
 
         if (settings = "all"){
-            settings = this.props.active.plot.settings
+            settings = this.props.activePlot.unsubmittedSettings
         }
 
-        PythonApi.updatePlotSettings(this.props.active.plot.id, settings)
+        PythonApi.updatePlotSettings(this.props.activePlot.id, settings)
 
-        // We would need to update the active plot here!!!!!!
-        // But with the new socket-based approach there's probably
-        // a smarter way.
     }
 
     undoSettings = () => {
 
-        PythonApi.undoPlotSettings(this.props.active.plot.id)
+        PythonApi.undoPlotSettings(this.props.activePlot.id)
 
-        //Same as with updatePlotSettings
     }
 
     render() {
 
-        if (! this.props.active.plot ) return null
+        const activePlot = this.props.activePlot
+
+        if (! activePlot ) return null
+
+        const plotSettings = { ...activePlot.settings, ...activePlot.unsubmittedSettings}
 
         let setsCont = <SettingsContainer
-                            settings={this.props.active.plot.settings}
-                            params={this.props.active.plot.params}
-                            paramGroups={this.props.active.plot.paramGroups}
+                            settings={plotSettings}
+                            params={activePlot.params}
+                            paramGroups={activePlot.paramGroups}
                             onSettingChangeType={CHANGE_PLOT_SETTINGS}
+                            onSettingChangeExtraParams={{plotID: activePlot.id}}
                             submitSettings={this.submitSettings}
                             undoSettings={this.undoSettings}/>
         
         return (
             <div style={{...this.props.style}}>
                 <GlobalHotKeys keyMap={PLOT_TWEAKING_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
-                <Row>
-                    <Col className="s12 l4" style={{height:"90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems:"center"}}>
-                        <PlotCard plot={this.props.active.plot} style={{height: "80vh"}}/>
-                    </Col>
-                    <Col className="s12 l8" >
-                        {this.props.browser.mediaType == "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh" }}>{setsCont}</div> : setsCont}
-                    </Col>
-                </Row>
+                <Grid container>
+                    <Grid item sm={12} md={4} style={{height:"90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems:"center"}}>
+                        <PlotCard plot={activePlot} style={{height: "80vh"}}/>
+                    </Grid>
+                    <Grid item sm={12} md={8} style={{ padding: 20, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} >
+                        {this.props.browser.mediaType == "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh"}}>{setsCont}</div> : setsCont}
+                    </Grid>
+                </Grid>
                 <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false}/>  
             </div>
             
@@ -78,6 +79,7 @@ const mapStateToProps = state => ({
     plots: state.plots,
     structures: state.structures,
     active: state.active,
+    activePlot: selectActivePlot(state),
     session: state.session,
     browser: state.browser
 })

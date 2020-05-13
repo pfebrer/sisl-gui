@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {Row} from 'react-materialize'
 import Select from 'react-select'
 
 import _ from "lodash"

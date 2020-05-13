@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import Icon from 'react-materialize/lib/Icon'
 import { connect } from 'react-redux'
 import { deactivateStruct, setActiveStructs } from '../../redux/actions'
+import { MdRemove } from 'react-icons/md'
 
 class StructureRow extends Component {
 
@@ -15,7 +15,7 @@ class StructureRow extends Component {
                 <div 
                     style={{color: "darkred", cursor: "pointer", display: "flex", justifyContent: "center", alignItems:"center"}}
                     onClick={() => this.props.deactivateStruct(struct.id)}>
-                    <Icon>remove</Icon>
+                    <MdRemove/>
                 </div>
                 <div 
                     style={{cursor: groupActive ? "default" : "pointer", marginRight: 20, marginLeft: 20, padding: 10, backgroundColor: groupActive ? "whitesmoke" : "#ccc", borderRadius: 3}}
