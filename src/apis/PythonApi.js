@@ -34,9 +34,12 @@ export class PythonApi {
                 if (newAddress) {
                     this.apiAddress = newAddress.trim()
                 }
-                this.disconnect()
-                this.connect()
-            })
+                if (!this.socket.connected){
+                    this.disconnect()
+                    this.connect()
+                }
+                
+            }, {controlClose: (close) => this.onConnect(close)})
             
         }, 3000)
 

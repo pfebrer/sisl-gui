@@ -85,7 +85,7 @@ class PlotDashboard extends React.Component {
 
   generateDOM(layouts, plots, selected, toggleSelect) {
     return _.map(layouts, function(l, i) {
-      return <div key={plots[i].id} onClick={(e) => e.ctrlKey ? toggleSelect(plots[i].id) : null}>
+      return <div key={plots[i].id} onClick={(e) => e.ctrlKey ? toggleSelect(plots[i].id) : null}> 
         <PlotCard 
           plot={plots[i]} 
           style={selected.includes(plots[i].id) ? selectedPlotStyles : {}}/>
@@ -180,7 +180,7 @@ class PlotDashboard extends React.Component {
         onLayoutChange={this.onLayoutChange}
         onDrop={this.onDrop}
         onResizeStop={this.onResizeStop}
-        draggableCancel=".infolayer, .draglayer, .shapelayer" //Avoids plot being dragged when zooming and other drag actions
+        draggableCancel=".infolayer, .draglayer, .shapelayer, #scene" //Avoids plot being dragged when zooming and other drag actions
         // WidthProvider option
         measureBeforeMount={false}
         // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)

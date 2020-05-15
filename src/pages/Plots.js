@@ -17,7 +17,6 @@ import { connect } from 'react-redux'
 import {addPlots, setNewStructures, setActiveTab, setActivePlot, setSessionTabs, setCurrentSession, setNewPlotables, setActivePage} from "../redux/actions"
 import StructurePicker from '../components/structures/StructurePicker'
 import PlotInitializer from '../components/plotInitializer/PlotInitializer'
-import LoadingTracker from '../components/loading/LoadingTracker'
 import Tabs from '../components/tabs/Tabs'
 import Controls from '../components/controls/Controls'
 import PlotTweaking from './PlotTweaking'
@@ -30,6 +29,7 @@ import FilesInput from '../components/settings/inputFields/Files';
 import ConnectionStatus from '../components/controls/ConnectionStatus';
 import MoleculeViewer from '../components/structureView/MoleculeViewer';
 import PlotEditor from './PlotEditor';
+import NotConnected from '../components/loading/NotConnected';
 
 configure({logLevel: "debug", simulateMissingKeyPressEvents: false})
 class Plots extends Component {
@@ -38,14 +38,13 @@ class Plots extends Component {
         super(props)
 
         this.state = {
-            displayPlotInitializer: false,
-            plotToInitialize: {
-                struct: false,
-                animation: false
-            },
-            loadingPlots: [],
-            plotOptions:[]
+            connected: PythonApi.socket.connected,
+            loadingPlots: []
         }
+
+        PythonApi.onConnect(() => {
+            this.setState({connected: true})
+        })
 
         document.addEventListener("syncWithSession", (e) => this.syncWithSession(e.detail.session) )
 
@@ -154,6 +153,21 @@ class Plots extends Component {
             'moleculeViewer': MoleculeViewer,
         }[this.props.active.page]
 
+        if (!this.state.connected){
+            return <div style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+                <div style={{ paddingTop: 100 }}>
+                    <div style={{ fontSize: "2.5em", fontWeight: "bold"}}>We are trying to connect to the sisl API.</div>
+                </div>
+                <NotConnected camera={{ position: [0, 0, 5] }}/>
+                <div style={{ paddingBottom: 100, fontSize: "1.2em" }}> Meanwhile you can have fun with these two moving cubes. </div>
+                <ConnectionStatus
+                    connectedProps={{ style: { backgroundColor: "lightgreen" } }}
+                    style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />
+                <ToastContainer />
+                <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />
+                </div>
+        }
+
         if(this.props.active.page == 'plotLayoutEditor') {
             return (
                 <div style={{ marginBottom: 0, display: "flex", flexWrap: "wrap", height: "100vh", position: "relative"}}>
@@ -174,7 +188,6 @@ class Plots extends Component {
                 <GlobalHotKeys keyMap={{...GLOBAL_HOT_KEYS}} handlers={this.hotKeysHandlers}/>
                 <StructurePicker style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}/>   
                 <div style={{flex: 1, paddingLeft: 20, height: "100vh", display: "flex", flexDirection: "column"}}>
-                    <LoadingTracker/>
                     {this.props.active.page == "plots" ? <Tabs /> : null}
                     <MainComponent style={{flex: 1}}/>
                     <FilesInput/>

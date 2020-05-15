@@ -28,17 +28,18 @@
     "react-redux": "^7.2.0",
     "react-select": "^3.1.0",
     "react-sortable-hoc": "^1.11.0",
-    "react-spinners": "^0.6.1",
+    "react-three-fiber": "^4.2.4",
     "react-toastify": "^5.5.0",
     "react-tooltip": "^3.11.6",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-responsive": "^4.3.8",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "three": "^0.116.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",

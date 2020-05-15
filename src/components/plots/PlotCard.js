@@ -6,7 +6,6 @@ import { FaHammer } from 'react-icons/fa'
 import { MdSettings } from 'react-icons/md'
 import { IconContext } from 'react-icons'
 
-import { CircleLoader} from 'react-spinners';
 import ReactTooltip from "react-tooltip"
 
 import _ from "lodash"
@@ -50,6 +49,17 @@ class PlotCard extends Component {
         const data = _.omit(points[0], ["data", "fullData", "xaxis", "yaxis"])
         console.warn(data)
         PythonApi.dispatchPlotEvent(this.props.plot.id, "click", data)
+    }
+
+    handlePlotRelayout = (layoutUpdates) => {
+        if (layoutUpdates["scene.camera"]) return
+
+        const keys = Object.keys(layoutUpdates)
+        if (keys.includes("autosize")) return 
+        else if (keys.length == 0) return
+        else {
+            PythonApi.updatePlotLayout(this.props.plot.id, layoutUpdates)
+        }
     }
 
     undoSettings = () => {
@@ -170,7 +180,7 @@ class PlotCard extends Component {
                         layout={{autosize: true, ...layout}}
                         frames={this.props.plot.figure.frames}
                         onClick={this.handlePlotClick}
-                        onRelayout={(layoutUpdates) => PythonApi.updatePlotLayout(this.props.plot.id, layoutUpdates)}
+                        onRelayout={this.handlePlotRelayout}
                         onUpdate={(figure) => {}}//PythonApi.updateFigure(this.props.plot.id, figure)}
                     config={{editable: true, responsive: true}}
                     />
