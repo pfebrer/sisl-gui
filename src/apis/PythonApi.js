@@ -8,8 +8,10 @@ export class PythonApi {
     constructor() {
 
         this.apiAddress = 'http://localhost:4000'
-
         this.user = undefined
+
+        this.listeners = []
+        this.setupListeners()
 
         this.connect()
 
@@ -24,8 +26,10 @@ export class PythonApi {
 
         if (address) this.apiAddress = address
 
+        this.externalListeners = {}
+
         this.socket = io(this.apiAddress);
-        this.setupListeners()
+        this.listeners.forEach(listener => this.socket.on(...listener))
 
         // Timeout to prompt the user for a new api address if the socket fails to connect
         this.connectionTimeOut = setTimeout(() => {
@@ -38,12 +42,10 @@ export class PythonApi {
                     this.disconnect()
                     this.connect()
                 }
-                
+
             }, {controlClose: (close) => this.onConnect(close)})
             
         }, 3000)
-
-        
 
         this.socket.connect()
 
@@ -54,7 +56,13 @@ export class PythonApi {
     }
 
     on = (...args) => {
-        this.socket.on(...args)
+
+        if (this.socket){
+            this.socket.on(...args)
+        }
+        // In this way all the listeners are registered each time
+        // The socket changes
+        this.listeners.push(args)
     }
 
     onConnect = (...args) => {
@@ -68,6 +76,7 @@ export class PythonApi {
     setupListeners = () => {
 
         this.on('connect', () => {
+            //document.dispatchEvent(new Event('socket_connect'))
             clearTimeout(this.connectionTimeOut)
             this.requestSession()
         });

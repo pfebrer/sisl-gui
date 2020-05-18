@@ -43,6 +43,7 @@ class Plots extends Component {
         }
 
         PythonApi.onConnect(() => {
+            console.warn("YEEEY")
             this.setState({connected: true})
         })
 

@@ -250,7 +250,7 @@ export class StructurePicker extends Component {
                         this.noMatchingStructuresMessage() : null
                 }
 
-                <div className="scrollView" style={{flex:1}}>
+                <div className="scrollView" >
                     {Object.values(structsAndPlotables).map(obj => {
                         if (obj.isPlotable) {
                             return <PlotableTag id={obj.id} 
