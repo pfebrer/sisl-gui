@@ -17,11 +17,13 @@ import Numeric from './inputFields/Numeric';
 import QueriesField from './inputFields/QueriesInput';
 import ArrayInput from './inputFields/Array';
 import ListInput from './inputFields/List';
+import CreatableDropdown from './inputFields/CreatableDropown';
 
 export const INPUT_FIELDS = {
     textinput: TextInput,
     switch: Switch,
     dropdown: Dropdown,
+    "creatable dropdown": CreatableDropdown,
     color: ColorPicker,
     rangeslider: RangeSlider,
     range: Range,
