@@ -66,11 +66,13 @@ export default class QueriesField extends Component {
 
     render() {
 
+        const value = this.props.value || []
+
         return (
             <div>
                 <div style={{paddingBottom: 10}}>{this.props.setting.name}</div>
                 <div>
-                    {this.props.value.map( (query, iQuery) => this.renderQuery(query, iQuery))}
+                    {value.map( (query, iQuery) => this.renderQuery(query, iQuery))}
                     <Button
                         data-tip="Add a new query"
                         onClick={this.addQuery}>
