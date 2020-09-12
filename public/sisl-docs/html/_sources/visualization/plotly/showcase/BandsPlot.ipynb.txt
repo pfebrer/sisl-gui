@@ -1,0 +1,141 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "notebook-header"
+    ]
+   },
+   "source": [
+    "[![GitHub issues by-label](https://img.shields.io/github/issues-raw/pfebrer96/sisl/BandsPlot?style=for-the-badge)](https://github.com/pfebrer96/sisl/labels/BandsPlot)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "    \n",
+    "    \n",
+    "BandsPlot (under construction)\n",
+    "========="
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import sisl"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<span style=\"color:red\">Notebook under construction</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plotting from a .bands file\n",
+    "\n",
+    "This is the most straightforward to plot some bands"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sisl.get_sile(\"../files/SrTiO3.bands\").plot()\n",
+    "# or Plot(\"../files/SrTiO3.bands\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plotting from a hamiltonian"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "notebook-end"
+    ]
+   },
+   "source": [
+    "We hope you enjoyed what you learned!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----\n",
+    "This next cell is just to create the thumbnail for the notebook in the docs "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "tags": [
+     "nbsphinx-thumbnail"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "thumbnail_plot = sisl.get_sile(\"../files/SrTiO3.bands\").plot(Erange=[-7,10], gap=True)\n",
+    "\n",
+    "if thumbnail_plot:\n",
+    "    thumbnail_plot.show(\"png\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "notebook-footer"
+    ]
+   },
+   "source": [
+    "-------------"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "sislGUIv2",
+   "language": "python",
+   "name": "sislguiv2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

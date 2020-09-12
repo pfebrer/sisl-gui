@@ -30,6 +30,7 @@ import ConnectionStatus from '../components/controls/ConnectionStatus';
 import MoleculeViewer from '../components/structureView/MoleculeViewer';
 import PlotEditor from './PlotEditor';
 import NotConnected from '../components/loading/NotConnected';
+import SislDocs from './SislDocs';
 
 configure({logLevel: "debug", simulateMissingKeyPressEvents: false})
 class Plots extends Component {
@@ -43,7 +44,6 @@ class Plots extends Component {
         }
 
         PythonApi.onConnect(() => {
-            console.warn("YEEEY")
             this.setState({connected: true})
         })
 
@@ -152,9 +152,10 @@ class Plots extends Component {
             'plotMethods': PlotMethods,
             'plotInitializer': PlotInitializer,
             'moleculeViewer': MoleculeViewer,
+            'sislDocs': SislDocs,
         }[this.props.active.page]
 
-        if (!this.state.connected){
+        if (!this.state.connected && this.props.active.page != 'sislDocs'){
             return <div style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <div style={{ paddingTop: 100 }}>
                     <div style={{ fontSize: "2.5em", fontWeight: "bold"}}>We are trying to connect to the sisl API.</div>
@@ -165,20 +166,21 @@ class Plots extends Component {
                     connectedProps={{ style: { backgroundColor: "lightgreen" } }}
                     style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />
                 <ToastContainer />
+                <Controls />
                 <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />
                 </div>
         }
 
-        if(this.props.active.page == 'plotLayoutEditor') {
+        if (['plotLayoutEditor', "sislDocs"].includes(this.props.active.page)) {
             return (
                 <div style={{ marginBottom: 0, display: "flex", flexWrap: "wrap", height: "100vh", position: "relative"}}>
                     <GlobalHotKeys keyMap={{ ...GLOBAL_HOT_KEYS }} handlers={this.hotKeysHandlers} />
                     <MainComponent />
                     <Controls style={{position: "absolute", bottom: 0, right: 0}}/>
-                    <ToastContainer />
-                    <ConnectionStatus
+                    {this.props.active.page == "sislDocs" ? null : <ToastContainer />}
+                    {this.props.active.page == "sislDocs" ? null : <ConnectionStatus
                         connectedProps={{ style: { backgroundColor: "lightgreen" } }}
-                        style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />
+                        style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />}
                     <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />
                 </div>
             )

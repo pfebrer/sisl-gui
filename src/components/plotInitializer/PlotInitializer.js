@@ -10,8 +10,9 @@ import { connect } from 'react-redux'
 import { selectActiveStructs, selectActivePlotables } from '../../redux/reducers'
 import { setActiveTab, addPlots, setActiveStructs, informLoadingPlot, informLoadedPlot, deactivateStruct, deactivatePlotable, setActivePlotables } from '../../redux/actions'
 import StructuresGroup from './StructuresGroup';
-import { MdRemove, MdClose, MdDone, MdRefresh } from 'react-icons/md'
+import { MdClose, MdDone, MdRefresh } from 'react-icons/md'
 import { Button } from '@material-ui/core'
+import PlotableRow from './PlotableRow'
 
 class PlotInitializer extends Component {
 
@@ -210,7 +211,9 @@ class PlotInitializer extends Component {
 
         //Plot plotables
         this.selectedPlotables.forEach(plotable => {
-            PythonApi.newPlot({tabID: this.defaultTabID, plotableID: plotable.id})
+            plotable.chosenPlots.forEach(plotType => {
+                PythonApi.newPlot({ tabID: this.defaultTabID, plotable_path: plotable.path, plot_method: plotType})
+            })
         })
 
         //Plot the structures
@@ -243,18 +246,6 @@ class PlotInitializer extends Component {
 
     }
 
-    renderPlotable = (plotable) => {
-        return <div style={{display: "flex", flexDirection: "row", alignItems: "center", marginTop: 10}}>
-            <div style={{color: "darkred", cursor: "pointer", display: "flex", justifyContent: "center", alignItems:"center"}} onClick={() => this.props.deactivatePlotable(plotable.id)}>
-                <MdRemove/>
-            </div>
-            <div style={{marginRight: 20, marginLeft: 20, padding: 10, backgroundColor: "whitesmoke", borderRadius: 3}}>
-                {plotable.name}
-            </div>
-            <div data-tip={plotable.path}>{".../" + plotable.path.split("/").slice(-2,-1)[0]}</div>
-        </div> 
-    }
-
     nothingToPlotMessage = () => {
         return <div>
             <div style={{color: "darkred", fontSize: "1.3em", fontWeight: "bold"}}>There's nothing to plot currently</div>
@@ -266,7 +257,9 @@ class PlotInitializer extends Component {
 
         if (this.props.tabs.length == 0) return null
 
-        let plotables = _.groupBy(this.selectedPlotables, "plot")
+        // let plotables = _.groupBy(this.selectedPlotables, "plot")
+
+        const plotables = this.selectedPlotables
 
         return (
             <div className="plotInitializer" style={this.props.style}>
@@ -294,12 +287,10 @@ class PlotInitializer extends Component {
                         Plotables
                     </div> : null}
 
-                    {Object.keys(plotables).map(plot => <div>
-                        <div style={{textAlign: "left", fontSize: "1.1em", marginTop: 20}}>{plot}</div>
-                        <div style={{marginLeft: 30, paddingLeft: 20, borderLeftStyle: "solid", borderWidth: 1, borderColor: "#ccc"}}>
-                            {plotables[plot].map(plotable => this.renderPlotable(plotable))}
-                        </div>
-                    </div>)}
+                    <div>
+                        {plotables.map(plotable => <PlotableRow plotable={plotable}/>)}
+                    </div>
+                        
 
                     {[...this.selectedPlotables, ...this.selectedStructs].length == 0 ? this.nothingToPlotMessage() : null}
 

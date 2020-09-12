@@ -147,7 +147,6 @@ class PlotCard extends Component {
 
         const hotKeysHandlers = {
             ...this.hotKeysHandlers,
-            TESTING: () => console.warn("YEEEY"),
             ...Object.keys(this.props.plot.shortcuts).reduce((plotShortcuts, sequence) => {
                 let shortcut = this.props.plot.shortcuts[sequence]
                 if (["ctrl+z", "ctrl+alt+l"].includes(sequence)) return plotShortcuts

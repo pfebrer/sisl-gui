@@ -16,7 +16,8 @@ import {
     SET_ACTIVE_PAGE,
     DEACTIVATE_PLOTABLE,
     SET_ACTIVE_PLOTABLES,
-    SET_PLOTABLES
+    SET_PLOTABLES,
+    SET_PLOTABLE_PLOTS
 } from './actionTypes'
 
 export const setCurrentSession = (session) => {
@@ -119,6 +120,12 @@ export const setActivePlotables = (plotables) => ({
 export const deactivatePlotable = (plotableID) => ({
     type: DEACTIVATE_PLOTABLE,
     plotableID
+})
+
+export const setPlotablePlots = (plotableID, chosenPlots) => ({
+    type: SET_PLOTABLE_PLOTS,
+    plotableID,
+    chosenPlots
 })
 
 

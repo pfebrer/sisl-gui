@@ -1,4 +1,4 @@
-import { CLEAR_SESSION, SET_SESSION, CHANGE_SESSION_SETTINGS} from '../actions/actionTypes'
+import { CLEAR_SESSION, SET_SESSION, CHANGE_SESSION_SETTINGS, SET_PLOTABLE_PLOTS, DEACTIVATE_PLOTABLE} from '../actions/actionTypes'
 import _ from "lodash"
 
 const defaultState = {}
@@ -8,6 +8,7 @@ const session = (state = defaultState, action) => {
     switch (action.type) {
         case SET_SESSION:
             console.log("REDUX: Setting current session...")
+            console.warn(action.session)
             var newState = action.session
             console.log(newState)
 
@@ -28,6 +29,25 @@ const session = (state = defaultState, action) => {
         
         case CLEAR_SESSION:
             return defaultState
+
+        case DEACTIVATE_PLOTABLE:
+
+            action.chosenPlots = []
+
+        case SET_PLOTABLE_PLOTS:
+
+            var newState = {
+                ...state,
+                plotables: {
+                    ...state.plotables,
+                    [action.plotableID]: {
+                        ...state.plotables[action.plotableID],
+                        chosenPlots: action.chosenPlots
+                    }
+                }
+            }
+
+            return newState
 
         default:
             return state

@@ -49,7 +49,7 @@ export default class QueriesField extends Component {
                     id={iQuery+"active"}
                     checked={query.active}
                     onChange={(e) => this.changeSettingValue(iQuery, "active", e.target.checked) }/>
-                <Card className="queryCard" style={{flex: 1, background: query.active ? "#CBFFC0" : "#ffc3cd", borderRadius: 10}}>
+                <div className="queryCard MuiPaper-elevation3" style={{flex: 1, background: query.active ? "#CBFFC0" : "#ffc3cd", borderRadius: 10, margin: 10}}>
                     <div style={{display:"flex", flexWrap: "wrap", justifyContent: "space-around"}}>
                         {this.props.setting.inputField.queryForm.map(queryParam => <InputField 
                                                                                     id={String(iQuery) + queryParam.key}
@@ -57,7 +57,7 @@ export default class QueriesField extends Component {
                                                                                     value={query[queryParam.key]}
                                                                                     onValueChange={(val) => this.changeSettingValue(iQuery, queryParam.key, val)}/>)}
                     </div>   
-                </Card>
+                </div>
             </div>
             
         )
