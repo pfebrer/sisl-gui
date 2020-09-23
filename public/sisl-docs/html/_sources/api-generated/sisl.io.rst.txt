@@ -1,4 +1,0 @@
-﻿.. automodule:: sisl.io
-   :no-members:
-   :no-undoc-members:
-   :no-inherited-members:
