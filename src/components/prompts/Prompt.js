@@ -3,7 +3,6 @@ import { toast } from 'react-toastify'
 
 import TextInput from "../settings/inputFields/TextInput"
 import { Button } from '@material-ui/core'
-import PythonApi from '../../apis/PythonApi'
 
 export class Prompt extends Component {
 

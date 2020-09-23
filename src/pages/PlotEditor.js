@@ -3,10 +3,6 @@ import PythonApi from "../apis/PythonApi"
 
 //--Redux
 import { connect } from 'react-redux'
-import { addPlots, setNewStructures, setActivePlot, setCurrentSession, informLoadedPlot, informLoadingPlot } from "../redux/actions"
-import { CHANGE_PLOT_SETTINGS } from '../redux/actions/actionTypes'
-import { GlobalHotKeys } from 'react-hotkeys'
-import { PLOT_TWEAKING_HOT_KEYS } from '../utils/hotkeys'
 import { selectActivePlot } from '../redux/reducers'
 
 import React, { Component } from 'react';
@@ -42,7 +38,7 @@ class PlotEditor extends Component {
 
     submitSettings = (settings) => {
 
-        if (settings = "all") {
+        if (settings === "all") {
             settings = this.props.activePlot.unsubmittedSettings
         }
 

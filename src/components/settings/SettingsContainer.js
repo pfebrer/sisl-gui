@@ -13,14 +13,9 @@ import InputField from "./InputField"
 import parse from 'html-react-parser';
 import _ from "lodash"
 import { HotKeys, ObserveKeys } from 'react-hotkeys';
-import { SETTING_GROUP_HOT_KEYS, SETTING_CONTAINER_HOT_KEYS } from '../../utils/hotkeys';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import { SETTING_GROUP_HOT_KEYS } from '../../utils/hotkeys';
 
 export default class SettingsContainer extends Component {
-
-    constructor(props){
-        super(props)
-    }
 
     hotKeysHandlers = {
         MOVE_EXPANDED_UP: () => this.moveExpanded("up"),
@@ -30,10 +25,10 @@ export default class SettingsContainer extends Component {
     moveExpanded = (direction = "down") => {
 
         var newExpanded;
-        if (direction == "up"){
-            newExpanded = this.state.expanded != 0 ? this.state.expanded - 1 : 2
-        } else if (direction == "down"){
-            newExpanded = this.state.expanded != 2 ? this.state.expanded + 1 : 0 
+        if (direction === "up"){
+            newExpanded = this.state.expanded !== 0 ? this.state.expanded - 1 : 2
+        } else if (direction === "down"){
+            newExpanded = this.state.expanded !== 2 ? this.state.expanded + 1 : 0 
         }
 
         this.setState({expanded: newExpanded})

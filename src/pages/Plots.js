@@ -23,7 +23,7 @@ import PlotTweaking from './PlotTweaking'
 import Settings from './Settings'
 
 import {getApplicationKeyMap, GlobalHotKeys, configure} from 'react-hotkeys'
-import { GLOBAL_HOT_KEYS, ADDITIONAL_GLOBAL_HOT_KEYS } from '../utils/hotkeys';
+import { GLOBAL_HOT_KEYS } from '../utils/hotkeys';
 import PlotMethods from './PlotMethods';
 import FilesInput from '../components/settings/inputFields/Files';
 import ConnectionStatus from '../components/controls/ConnectionStatus';
@@ -58,7 +58,7 @@ class Plots extends Component {
         document.addEventListener("plot", (e) => {
             const plot = e.detail.plot
             props.addPlots({ [plot.id]: plot })
-            this.setState({ loadingPlots: this.state.loadingPlots.filter(id => id != plot.id) })
+            this.setState({ loadingPlots: this.state.loadingPlots.filter(id => id !== plot.id) })
         })
 
         document.addEventListener("newPlot", () => this.syncWithSession())
@@ -109,7 +109,7 @@ class Plots extends Component {
         //Get the missing plots if there are any
         activeTab.plots.forEach(plotID => {
 
-            if ( !this.props.plots[plotID] && this.state.loadingPlots.indexOf(plotID) == -1){
+            if ( !this.props.plots[plotID] && this.state.loadingPlots.indexOf(plotID) === -1){
 
                 PythonApi.getPlot(plotID)
                 
@@ -128,9 +128,9 @@ class Plots extends Component {
 
     togglePlotInitializer = (e) => {
 
-        let currentlyShowing = this.props.active.page == "plotInitializer"
+        let currentlyShowing = this.props.active.page === "plotInitializer"
 
-        if (e != undefined & e.detail != undefined) {
+        if (e !== undefined & e.detail !== undefined) {
             if (e.detail.forceShow &&  !currentlyShowing){
                 this.props.setActivePage("plotInitializer")
             } if (e.detail.forceHide && currentlyShowing){
@@ -155,7 +155,7 @@ class Plots extends Component {
             'sislDocs': SislDocs,
         }[this.props.active.page]
 
-        if (!this.state.connected && this.props.active.page != 'sislDocs'){
+        if (!this.state.connected && this.props.active.page !== 'sislDocs'){
             return <div style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <div style={{ paddingTop: 100 }}>
                     <div style={{ fontSize: "2.5em", fontWeight: "bold"}}>We are trying to connect to the sisl API.</div>
@@ -177,8 +177,8 @@ class Plots extends Component {
                     <GlobalHotKeys keyMap={{ ...GLOBAL_HOT_KEYS }} handlers={this.hotKeysHandlers} />
                     <MainComponent />
                     <Controls style={{position: "absolute", bottom: 0, right: 0}}/>
-                    {this.props.active.page == "sislDocs" ? null : <ToastContainer />}
-                    {this.props.active.page == "sislDocs" ? null : <ConnectionStatus
+                    {this.props.active.page === "sislDocs" ? null : <ToastContainer />}
+                    {this.props.active.page === "sislDocs" ? null : <ConnectionStatus
                         connectedProps={{ style: { backgroundColor: "lightgreen" } }}
                         style={{ position: "absolute", right: 0, top: 0, margin: 20, width: 40, height: 40, borderRadius: 40, display: "flex", justifyContent: "center", alignItems: "center" }} />}
                     <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} />
@@ -191,7 +191,7 @@ class Plots extends Component {
                 <GlobalHotKeys keyMap={{...GLOBAL_HOT_KEYS}} handlers={this.hotKeysHandlers}/>
                 <StructurePicker style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}/>   
                 <div style={{flex: 1, paddingLeft: 20, height: "100vh", display: "flex", flexDirection: "column"}}>
-                    {this.props.active.page == "plots" ? <Tabs /> : null}
+                    {this.props.active.page === "plots" ? <Tabs /> : null}
                     <MainComponent style={{flex: 1}}/>
                     <FilesInput/>
                 </div>

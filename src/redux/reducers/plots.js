@@ -5,10 +5,11 @@ import { toast } from 'react-toastify';
 const defaultState = {};
 
 const plots = (state = defaultState, action) => {
+    let newState;
     switch (action.type) {
         case ADD_PLOTS:
             console.log("REDUX: Storing a new plot...")
-            var newState = {
+            newState = {
                 ...state,
                 ...action.newPlots,
             }
@@ -27,7 +28,7 @@ const plots = (state = defaultState, action) => {
                 return state
             }
 
-            var newState = {
+            newState = {
                 ...state,
                 [plotID]: {
                     ...state[plotID],

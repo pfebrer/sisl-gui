@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 import {createResponsiveStateReducer} from 'redux-responsive'
-import _ from "lodash"
 
 import session from './session'
 import plots from './plots'

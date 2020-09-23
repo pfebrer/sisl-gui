@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import ReactTooltip from "react-tooltip"
 
@@ -26,7 +25,7 @@ class PlotTweaking extends Component {
 
     submitSettings = (settings) => {
 
-        if (settings = "all"){
+        if (settings === "all"){
             settings = this.props.activePlot.unsubmittedSettings
         }
 
@@ -65,7 +64,7 @@ class PlotTweaking extends Component {
                         <PlotCard plot={activePlot} style={{height: "80vh"}}/>
                     </Grid>
                     <Grid item sm={12} md={8} style={{ padding: 20, display: "flex", flexDirection: "column"}} >
-                        {this.props.browser.mediaType == "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh"}}>{setsCont}</div> : setsCont}
+                        {this.props.browser.mediaType === "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh"}}>{setsCont}</div> : setsCont}
                     </Grid>
                 </Grid>
                 <ReactTooltip multiline disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false}/>  

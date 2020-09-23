@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { selectActiveStructs, selectActivePlotables } from '../../redux/reducers'
 import { setActiveTab, addPlots, setActiveStructs, informLoadingPlot, informLoadedPlot, deactivateStruct, deactivatePlotable, setActivePlotables } from '../../redux/actions'
 import StructuresGroup from './StructuresGroup';
-import { MdClose, MdDone, MdRefresh } from 'react-icons/md'
+import { MdClose, MdDone } from 'react-icons/md'
 import { Button } from '@material-ui/core'
 import PlotableRow from './PlotableRow'
 
@@ -63,7 +63,7 @@ class PlotInitializer extends Component {
 
         const newStructs = this.selectedStructs.filter(({id:structID}) => !prevActiveStructs.includes(structID))
 
-        if (this.state.structureGroups.length == 0){
+        if (this.state.structureGroups.length === 0){
             //In this case build a new group and mark it as active
             structureGroups = this.markActiveGroup(0, [this.newGroup(this.selectedStructs)])
         } else {
@@ -129,7 +129,7 @@ class PlotInitializer extends Component {
         } else {
             //If no structures in the group, we just delete it
 
-            let structureGroups = this.state.structureGroups.filter((g, i) => i != iGroup)
+            let structureGroups = this.state.structureGroups.filter((g, i) => i !== iGroup)
 
             if (group.active){
                 structureGroups = this.markActiveGroup(structureGroups.length - 1, structureGroups)
@@ -146,7 +146,7 @@ class PlotInitializer extends Component {
         const splitted = group.structs.map( struct => this.newGroup([struct], _.omit(group, ["structs"])) )
 
         //Remove the old group
-        let structureGroups = this.state.structureGroups.filter( (g, i) => i != iGroup)
+        let structureGroups = this.state.structureGroups.filter( (g, i) => i !== iGroup)
 
         //Add the new ones
         structureGroups = [...structureGroups.slice(0,iGroup), ...splitted, ...structureGroups.slice(iGroup) ]
@@ -162,7 +162,7 @@ class PlotInitializer extends Component {
         groups = groups || this.state.structureGroups
         
         return groups.map((group, i) => {
-            return {...group, active: i == iGroup}
+            return {...group, active: i === iGroup}
         })
     }
 
@@ -180,7 +180,7 @@ class PlotInitializer extends Component {
         //WE SHOULD THEN SPECIFY THE ORIGIN GROUP!!!!!!!!!!!!!!
         const structureGroups = this.state.structureGroups.map( group => {
 
-            let structs = group.active ? [...group.structs, struct] : group.structs.filter( ({id}) => id != structID)
+            let structs = group.active ? [...group.structs, struct] : group.structs.filter( ({id}) => id !== structID)
             
             return {...group, structs}
         })
@@ -192,7 +192,7 @@ class PlotInitializer extends Component {
     updateGroupInitParams = (iGroup, key, val) => {
 
         const structureGroups = this.state.structureGroups.map((group, i) => {
-            return i == iGroup ? {...group, initializingOptions: {...group.initializingOptions, [key]: val}}: group
+            return i === iGroup ? {...group, initializingOptions: {...group.initializingOptions, [key]: val}}: group
         })
 
         this.setState({structureGroups})
@@ -255,7 +255,7 @@ class PlotInitializer extends Component {
 
     render() {
 
-        if (this.props.tabs.length == 0) return null
+        if (this.props.tabs.length === 0) return null
 
         // let plotables = _.groupBy(this.selectedPlotables, "plot")
 
@@ -292,7 +292,7 @@ class PlotInitializer extends Component {
                     </div>
                         
 
-                    {[...this.selectedPlotables, ...this.selectedStructs].length == 0 ? this.nothingToPlotMessage() : null}
+                    {[...this.selectedPlotables, ...this.selectedStructs].length === 0 ? this.nothingToPlotMessage() : null}
 
                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", paddingTop: 20 }}>
 

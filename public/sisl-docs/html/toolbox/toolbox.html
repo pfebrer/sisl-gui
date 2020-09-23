@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Graphene tight-binding model &mdash; sisl |release| documentation</title>
+  <title>Toolboxes &mdash; sisl |release| documentation</title>
   
 
   
@@ -42,8 +42,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Scripts" href="../scripts/scripts.html" />
-    <link rel="prev" title="Examples" href="../examples.html" /> 
+    <link rel="next" title="ASE" href="../visualization/ase/index.html" />
+    <link rel="prev" title="File formats" href="../rst/files.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -103,15 +103,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications using sisl</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Guide</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Graphene tight-binding model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../scripts/scripts.html">Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripts/scripts.html">Command line scripts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rst/files.html">File formats</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Toolboxes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Toolboxes</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Visualization</span></p>
 <ul>
@@ -167,15 +167,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../examples.html">Examples</a> &raquo;</li>
-        
-      <li>Graphene tight-binding model</li>
+      <li>Toolboxes</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/examples/ex_01.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/toolbox/toolbox.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -212,45 +210,15 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="graphene-tight-binding-model">
-<h1>Graphene tight-binding model<a class="headerlink" href="#graphene-tight-binding-model" title="Permalink to this headline">¶</a></h1>
-<p>This example creates a minimal graphene unit-cell of two atoms.
-The Carbon atoms are described with a single orbital per atom
-and with a cutoff radius of 1.42 Å.</p>
-<p>The <em class="xref py py-obj">Hamiltonian</em> <em class="xref py py-obj">H</em> is an object which may be treated as a sparse
-matrix. The <em class="xref py py-obj">for</em> loop below loops over all atoms (<em class="xref py py-obj">ia</em>) in the graphene
-unit-cell. The <em class="xref py py-obj">close</em> function returns a list of length <em class="xref py py-obj">len(R)</em> with
-elements where all neighbouring atoms within the radius defined in <em class="xref py py-obj">R</em>
-are listed. Comments in the below example clarifies each of the steps
-carefully.</p>
-<div class="highlight-python notranslate" id="ex-01"><div class="highlight"><pre><span></span><span class="c1"># This example creates the tight-binding Hamiltonian</span>
-<span class="c1"># for graphene with on-site energy 0, and hopping energy</span>
-<span class="c1"># -2.7 eV.</span>
-
-<span class="kn">import</span> <span class="nn">sisl</span>
-
-<span class="n">bond</span> <span class="o">=</span> <span class="mf">1.42</span>
-<span class="c1"># Construct the atom with the appropriate orbital range</span>
-<span class="c1"># Note the 0.01 which is for numerical accuracy.</span>
-<span class="n">C</span> <span class="o">=</span> <span class="n">sisl</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">bond</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">)</span>
-<span class="c1"># Create graphene unit-cell</span>
-<span class="n">gr</span> <span class="o">=</span> <span class="n">sisl</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">graphene</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
-
-<span class="c1"># Create the tight-binding Hamiltonian</span>
-<span class="n">H</span> <span class="o">=</span> <span class="n">sisl</span><span class="o">.</span><span class="n">Hamiltonian</span><span class="p">(</span><span class="n">gr</span><span class="p">)</span>
-<span class="n">R</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">bond</span><span class="p">,</span> <span class="n">bond</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">]</span>
-
-<span class="k">for</span> <span class="n">ia</span> <span class="ow">in</span> <span class="n">gr</span><span class="p">:</span>
-    <span class="n">idx_a</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">ia</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
-    <span class="c1"># On-site</span>
-    <span class="n">H</span><span class="p">[</span><span class="n">ia</span><span class="p">,</span> <span class="n">idx_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.</span>
-    <span class="c1"># Nearest neighbour hopping</span>
-    <span class="n">H</span><span class="p">[</span><span class="n">ia</span><span class="p">,</span> <span class="n">idx_a</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.7</span>
-
-<span class="c1"># Calculate eigenvalues at K-point</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">eigh</span><span class="p">([</span><span class="mf">2.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]))</span>
-</pre></div>
-</div>
+<div class="section" id="toolboxes">
+<span id="toc-toolbox"></span><h1>Toolboxes<a class="headerlink" href="#toolboxes" title="Permalink to this headline">¶</a></h1>
+<p>Installing <a class="reference internal" href="../api-generated/sisl.html#module-sisl" title="sisl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sisl</span></code></a> will install two packages, <a class="reference internal" href="../api-generated/sisl.html#module-sisl" title="sisl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sisl</span></code></a> and <em class="xref py py-obj">sisl_toolbox</em>.</p>
+<p>The latter are user-contributed tools that are useful for end-users but are
+very focused on solving a particular problem. In order to maintain a stable
+and sufficiently clean API any <a class="reference internal" href="../api-generated/sisl.html#module-sisl" title="sisl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sisl</span></code></a> extensions that are thought to be specialized
+would go into the <em class="xref py py-obj">sisl_toolbox</em> suite.</p>
+<p>Currently these are not heavily documented. We are working on adding the documentations
+for the toolboxes.</p>
 </div>
 
 
@@ -261,10 +229,10 @@ carefully.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../scripts/scripts.html" class="btn btn-neutral float-right" title="Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../visualization/ase/index.html" class="btn btn-neutral float-right" title="ASE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../rst/files.html" class="btn btn-neutral float-left" title="File formats" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

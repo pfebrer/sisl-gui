@@ -49,7 +49,7 @@ class InputField extends Component {
 
         let iWindowSize = ["small", "medium", "infinity"].indexOf(this.props.browser.mediaType)
 
-        for (var i = iWindowSize; i > -1; i--) {
+        for (let i = iWindowSize; i > -1; i--) {
             
             if(isSizeDefined[i]){
                 let width = _.find(string.split(" "), (str) => str.indexOf(["s","m","l"][i]) >= 0)
@@ -92,13 +92,13 @@ class InputField extends Component {
             "data-tip": (this.props.setting.help ? this.props.setting.help + "<br>" : "") + "Default: " + (this.props.setting.default || "None"),
             "data-multiline": true,
             "data-effect": "solid",
-            "data-place": inputField.type == "color" ? "bottom" : "top", 
+            "data-place": inputField.type === "color" ? "bottom" : "top", 
         }
 
         const backgroundColor = this.props.value == null ? "rgba(230,230,230,0.4)" : undefined
 
         return <div
-            onClick={(e) => inputField.type != "queries" && e.ctrlKey ? this.changeSettingValue(this.props.value == null ? this.props.setting.default : null) : null}
+            onClick={(e) => inputField.type !== "queries" && e.ctrlKey ? this.changeSettingValue(this.props.value == null ? this.props.setting.default : null) : null}
             style={{backgroundColor, paddingTop: 10, paddingBottom: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 3, marginTop: 20, marginBottom: 20, width: this.w(inputField.width), ...inputField.style}}
             {...tooltipParams}>
                 {fieldLayout}

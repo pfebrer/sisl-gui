@@ -13,10 +13,7 @@ import { SiReadthedocs } from 'react-icons/si'
 import { setActivePage } from '../../redux/actions'
 
 import PythonApi from '../../apis/PythonApi'
-import { ROUTES } from './NavigateButton'
 
-import { GlobalHotKeys } from 'react-hotkeys'
-import { GLOBAL_HOT_KEYS } from '../../utils/hotkeys'
 import { MdDashboard } from 'react-icons/md';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,17 +43,9 @@ const useStyles = makeStyles((theme) => ({
 
 function SpeedDials(props) {
     const classes = useStyles();
-    const [direction, setDirection] = React.useState('left');
+    const direction = React.useState('left')[0];
     const [open, setOpen] = React.useState(false);
-    const [hidden, setHidden] = React.useState(false);
-
-    const handleDirectionChange = (event) => {
-        setDirection(event.target.value);
-    };
-
-    const handleHiddenChange = (event) => {
-        setHidden(event.target.checked);
-    };
+    const hidden = React.useState(false)[0];
 
     const handleClose = () => {
         setOpen(false);
@@ -123,8 +112,6 @@ class Controls extends Component {
 
     render() {
 
-        const margins = { marginRight: 20, padding: 0, display:"flex", justifyContent: "center", alignItems: "center"}
-
         const actions = [{
             name: "Save session",
             icon: <FaSave size={20} />,
@@ -133,7 +120,7 @@ class Controls extends Component {
             name: "Load session",
                 icon: <AiOutlineUpload size={20} />,
             onClick: this.loadSession
-        }, this.props.active.page == "sislDocs" ? {
+        }, this.props.active.page === "sislDocs" ? {
             name: "GUI",
                 icon: <MdDashboard size={20} />,
             onClick: () => this.showPage("plots"),

@@ -49,8 +49,6 @@ class StructuresGroup extends Component {
     }
 }
 
-const mapStateToProps = state => ({})
-
 const mapDispatchToProps = {
     deactivateStruct
 }

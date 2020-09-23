@@ -1,4 +1,3 @@
-import _ from 'lodash'
 
 export const GLOBAL_HOT_KEYS = {
 

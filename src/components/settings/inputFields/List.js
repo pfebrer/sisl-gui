@@ -54,7 +54,7 @@ export default class ListInput extends Component {
     }
 
     removeItem = (i) => {
-        this.props.onChange(this.sanitizeVal().filter((val, index) => index != i))
+        this.props.onChange(this.sanitizeVal().filter((val, index) => index !== i))
     }
 
     onSortEnd = ({ oldIndex, newIndex }) => {

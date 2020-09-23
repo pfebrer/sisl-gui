@@ -110,7 +110,7 @@ export class PythonApi {
     }
 
     handleError = (err, type) => {
-        if (type == "server"){
+        if (type === "server"){
             toast.error("THERE WAS A PYTHON ERROR:\n" + err)
         } else {
             toast.error(err)

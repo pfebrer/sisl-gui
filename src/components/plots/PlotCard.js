@@ -9,7 +9,6 @@ import { IconContext } from 'react-icons'
 import ReactTooltip from "react-tooltip"
 
 import _ from "lodash"
-import {unflatten} from "flat"
 
 //--Redux
 import { connect } from 'react-redux'
@@ -18,6 +17,7 @@ import PythonApi from '../../apis/PythonApi';
 import { HotKeys } from 'react-hotkeys';
 import { PLOT_CARD_HOT_KEYS } from '../../utils/hotkeys';
 import { toast } from 'react-toastify';
+import { IconButton } from '@material-ui/core';
 
 class PlotCard extends Component {
 
@@ -56,7 +56,7 @@ class PlotCard extends Component {
 
         const keys = Object.keys(layoutUpdates)
         if (keys.includes("autosize")) return 
-        else if (keys.length == 0) return
+        else if (keys.length === 0) return
         else {
             PythonApi.updatePlotLayout(this.props.plot.id, layoutUpdates)
         }
@@ -70,7 +70,7 @@ class PlotCard extends Component {
     componentDidMount(){
         document.addEventListener("plotResize", (e) => {
             
-            if (e.detail.id == this.props.plot.id || e.detail.id == "all"){
+            if (e.detail.id === this.props.plot.id || e.detail.id === "all"){
                 this.setState({cou: Math.random()})          
             }
             
@@ -109,7 +109,7 @@ class PlotCard extends Component {
     }
 
     get isActivePlot(){
-        return this.props.plot.id == this.props.active.plot
+        return this.props.plot.id === this.props.active.plot
     }
 
     showPlotFullScreen = () => {
@@ -185,27 +185,27 @@ class PlotCard extends Component {
                     />
                 </div>
                 
-            <div style={{ display: "flex", paddingLeft: 10, paddingRight: 20, background: backColor}} className="card-action">
+            <div style={{ display: "flex", paddingLeft: 10, paddingRight: 20, background: backColor, marginBottom: 5}} className="card-action">
                 <IconContext.Provider value={{ size: 25, style: { margin: 5 }, color: "#6eb6ff"}}>
                     <div style={{flex:1, textAlign: "left"}}>
-                        <a data-tip="Full screen (f)" href="#" onClick={this.showPlotFullScreen}><AiOutlineFullscreen/></a> 
+                        <IconButton size="small" data-tip="Full screen (f)" onClick={this.showPlotFullScreen}><AiOutlineFullscreen/></IconButton> 
                     </div>
 
                     <div>
-                        <a
+                        <IconButton
+                            size="small"
                             data-tip="Settings (s)"
-                            href="#"
-                            onClick={this.goToPlotSettingsEditing}><MdSettings /></a>
-                        <a
+                            onClick={this.goToPlotSettingsEditing}><MdSettings /></IconButton>
+                        <IconButton
+                            size="small"
                             data-tip="Methods (m)"
-                            href="#"
-                            onClick={this.goToPlotMethods}><FaHammer/></a>
-                        <a
+                            onClick={this.goToPlotMethods}><FaHammer/></IconButton>
+                        <IconButton
+                            size="small"
                             data-tip="Edit layout (e)"
-                            href="#"
-                            onClick={this.goToPlotLayoutEditing}><AiOutlineEdit/></a>
-                        <span data-tip="Export data (comming soon)" href="#"><AiOutlineExport color="#ccc"/></span>
-                        <a data-tip="Remove (supr)" href="#" onClick={this.removePlot}><AiOutlineDelete color="red"/></a>
+                            onClick={this.goToPlotLayoutEditing}><AiOutlineEdit/></IconButton>
+                        <IconButton size="small" data-tip="Export data (comming soon)"><AiOutlineExport color="#ccc"/></IconButton>
+                        <IconButton size="small" data-tip="Remove (supr)" onClick={this.removePlot}><AiOutlineDelete color="red"/></IconButton>
                     </div> 
                 </IconContext.Provider>
                 <ReactTooltip disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} /> 

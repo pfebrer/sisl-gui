@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import ReactTooltip from "react-tooltip"
 
@@ -9,7 +8,6 @@ import PlotCard from '../components/plots/PlotCard'
 //--Redux
 import { connect } from 'react-redux'
 import { addPlots, setNewStructures, setActivePlot, setCurrentSession, informLoadedPlot, informLoadingPlot } from "../redux/actions"
-import { CHANGE_PLOT_SETTINGS } from '../redux/actions/actionTypes'
 import { GlobalHotKeys } from 'react-hotkeys'
 import { PLOT_TWEAKING_HOT_KEYS } from '../utils/hotkeys'
 import Methods from '../components/pythonMethods/Methods'

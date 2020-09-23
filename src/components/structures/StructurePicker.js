@@ -7,7 +7,6 @@ import { MdFolder, MdFolderOpen} from 'react-icons/md'
 import { connect } from 'react-redux'
 import NavigateButton from '../controls/NavigateButton'
 import PlotableTag from './PlotableTag'
-import TextField from '@material-ui/core/TextField'
 import TextInput from '../settings/inputFields/TextInput'
 
 function wildTest(wildcard, str) {
@@ -35,7 +34,7 @@ export class StructurePicker extends Component {
 
         let forceShow, forceHide;
 
-        if ([...selectedStructs, ...selectedPlotables].length != 0){
+        if ([...selectedStructs, ...selectedPlotables].length !== 0){
             forceShow = true
         } else {
             forceHide = true
@@ -106,7 +105,7 @@ export class StructurePicker extends Component {
 
         const onDisplay = Object.keys(this.filterStructs())
 
-        const onDisplaySelected = _.intersection([...this.selectedStructs, ...this.selectedPlotables], onDisplay).length == 0
+        const onDisplaySelected = _.intersection([...this.selectedStructs, ...this.selectedPlotables], onDisplay).length === 0
 
         const displayedStructs = _.intersection(Object.keys(this.props.structures), onDisplay)
         const displayedPlotables = _.intersection(Object.keys(this.props.plotables), onDisplay)
@@ -145,7 +144,7 @@ export class StructurePicker extends Component {
 
             if (!toggles[index]) return
 
-            const isPlotable = index == 1
+            const isPlotable = index === 1
 
             let newStructs = Object.keys(object).reduce( (structs, structID) => {
 
@@ -245,8 +244,8 @@ export class StructurePicker extends Component {
                         onClick={this.toggleAll} style={{cursor: "pointer"}}>All</span>
                 </div>
 
-                {Object.keys({...this.props.structures, ...this.props.plotables}).length == 0 ? 
-                    this.noStructuresMessage() : Object.values(structsAndPlotables).length == 0 ? 
+                {Object.keys({...this.props.structures, ...this.props.plotables}).length === 0 ? 
+                    this.noStructuresMessage() : Object.values(structsAndPlotables).length === 0 ? 
                         this.noMatchingStructuresMessage() : null
                 }
 

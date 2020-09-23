@@ -28,8 +28,4 @@ const mapStateToProps = state => ({
     active: state.active
 })
 
-const mapDispatchToProps = {
-
-}
-
 export default connect(mapStateToProps, null)(TabPicker);

@@ -75,8 +75,4 @@ const mapStateToProps = state => ({
     session: state.session
 })
 
-const mapDispatchToProps = {
-
-}
-
 export default connect(mapStateToProps, null)(PlotTypePicker);

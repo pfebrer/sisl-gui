@@ -6,10 +6,11 @@ import {
 import _ from 'lodash';
 
 const loading = (state = {plots:{}}, action) => {
+    let newState;
     switch (action.type) {
         case START_LOADING_PLOT:
             console.log("REDUX: Setting active plot...")
-            var newState = {
+            newState = {
                 ...state,
                 plots: {
                     ...state.plots,
@@ -24,7 +25,7 @@ const loading = (state = {plots:{}}, action) => {
         
         case END_LOADING_PLOT:
             console.log("REDUX: Changing plot settings (not submitting yet)...")
-            var newState = {
+            newState = {
                 ...state,
                 plots: _.omit(state.plots, [action.plotID]),
             }

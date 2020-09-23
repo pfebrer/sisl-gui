@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 //--Components
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
 import 'rc-slider/assets/index.css';
 
 import _ from "lodash"

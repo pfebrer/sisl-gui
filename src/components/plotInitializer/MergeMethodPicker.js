@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-
 import Select from 'react-select'
 
 import _ from "lodash"
@@ -12,12 +10,7 @@ const OPTIONS = [
     {label: "Animation for each", value:"separateAnimation"},
 ]
 
-class MergeMethodPicker extends Component {
-
-    constructor(props){
-        super(props)
-        this.state={}
-    }
+export default class MergeMethodPicker extends Component {
 
     render() {
         return (
@@ -33,11 +26,3 @@ class MergeMethodPicker extends Component {
         )
     }
 }
-
-const mapStateToProps = state => ({})
-
-const mapDispatchToProps = {
-
-}
-
-export default connect(mapStateToProps, null)(MergeMethodPicker);

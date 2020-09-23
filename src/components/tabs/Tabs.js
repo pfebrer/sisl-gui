@@ -3,12 +3,11 @@ import Tab from './Tab'
 import { setActiveTab } from '../../redux/actions'
 import PythonApi from '../../apis/PythonApi'
 import { connect } from 'react-redux'
-import { MdCreateNewFolder, MdAddCircle} from 'react-icons/md'
+import { MdAddCircle} from 'react-icons/md'
 
 import _ from "lodash"
-import { GlobalHotKeys, HotKeys } from 'react-hotkeys'
+import { GlobalHotKeys } from 'react-hotkeys'
 import { TABS_HOT_KEYS } from '../../utils/hotkeys'
-import { Button } from '@material-ui/core'
 
 export class Tabs extends Component {
 
@@ -25,10 +24,10 @@ export class Tabs extends Component {
         const i = _.findIndex(tabs, ["id", this.props.active.tab])
 
         var newI;
-        if (direction == "left"){
-            newI = i != 0 ? i-1 : tabs.length -1
-        } else if (direction == "right"){
-            newI = i != tabs.length - 1 ? i+1 : 0 
+        if (direction === "left"){
+            newI = i !== 0 ? i-1 : tabs.length -1
+        } else if (direction === "right"){
+            newI = i !== tabs.length - 1 ? i+1 : 0 
         }
 
         this.props.setActiveTab(tabs[newI].id)
@@ -58,7 +57,7 @@ export class Tabs extends Component {
         return (
             <div style={{display: "flex", flexWrap: "wrap", alignItems:"center", marginTop: 10, marginBottom: 5}}>
                 <GlobalHotKeys keyMap={TABS_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
-                {tabs.length == 0 ? 
+                {tabs.length === 0 ? 
                     this.noTabsMessage()
                     :
                     tabs.map( tab => <Tab tab={tab}/>)

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import ReactMarkDown from "react-markdown"
-import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io'
 import PythonApi from '../../apis/PythonApi'
 import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Button, ExpansionPanelActions } from '@material-ui/core'
 

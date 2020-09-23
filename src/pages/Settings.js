@@ -9,8 +9,6 @@ import SettingsContainer from "../components/settings/SettingsContainer"
 import { connect } from 'react-redux'
 import { setCurrentSession } from "../redux/actions"
 
-import { toast } from 'react-toastify';
-
 import _ from "lodash"
 import { CHANGE_SESSION_SETTINGS } from '../redux/actions/actionTypes'
 

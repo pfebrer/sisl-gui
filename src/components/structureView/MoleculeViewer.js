@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import Speck from 'speck-renderer';
+//import Speck from 'speck-renderer';
 
 export default class MoleculeViewer extends Component {
 
     componentDidMount(){
-        const speck = new Speck({ canvasContainerID: "speck-root", canvasID: "speck-canvas" });
+        //const speck = new Speck({ canvasContainerID: "speck-root", canvasID: "speck-canvas" });
     }
     
     render() {

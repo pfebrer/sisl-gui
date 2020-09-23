@@ -2,7 +2,6 @@ import {
     SET_ACTIVE_PLOT,
     SET_ACTIVE_TAB,
     CLEAR_SESSION,
-    CHANGE_PLOT_SETTINGS,
     SET_ACTIVE_STRUCTS,
     SET_ACTIVE_PLOTABLES,
     DEACTIVATE_STRUCT,
@@ -18,10 +17,11 @@ import _ from "lodash"
 const defaultState = {plot: undefined, tab: undefined, structs: [], plotables:[], page: "plots"};
 
 const active = (state = defaultState, action) => {
+    let newState;
     switch (action.type) {
         case SET_ACTIVE_PLOT:
             console.log("REDUX: Setting active plot...")
-            var newState = {
+            newState = {
                 ...state,
                 plot: action.plotID,
             }
@@ -30,7 +30,7 @@ const active = (state = defaultState, action) => {
 
         case SET_ACTIVE_TAB:
             console.log("REDUX: Setting active tab...")
-            var newState = {
+            newState = {
                 ...state,
                 tab: action.activeTab,
             }
@@ -52,7 +52,7 @@ const active = (state = defaultState, action) => {
         
         case SET_ACTIVE_STRUCTS:
             
-            var newState = {
+            newState = {
                 ...state,
                 structs: action.structs,
             }
@@ -67,7 +67,7 @@ const active = (state = defaultState, action) => {
 
             let structsToDeactivate = Array.isArray(action.structID) ? action.structID : [action.structID]
 
-            var newState = {
+            newState = {
                 ...state,
                 structs: state.structs.filter( structID => !structsToDeactivate.includes(structID) ),
             }
@@ -76,7 +76,7 @@ const active = (state = defaultState, action) => {
         
         case SET_ACTIVE_PAGE:
 
-            var newState = {
+            newState = {
                 ...state,
                 page: action.pageName,
             }
@@ -85,7 +85,7 @@ const active = (state = defaultState, action) => {
         
         case SET_ACTIVE_PLOTABLES:
         
-            var newState = {
+            newState = {
                 ...state,
                 plotables: action.plotables,
             }
@@ -100,7 +100,7 @@ const active = (state = defaultState, action) => {
 
             let plotablesToDeactivate = Array.isArray(action.plotableID) ? action.plotableID : [action.plotableID]
     
-            var newState = {
+            newState = {
                 ...state,
                 plotables: state.plotables.filter( plotableID => !plotablesToDeactivate.includes(plotableID) ),
             }

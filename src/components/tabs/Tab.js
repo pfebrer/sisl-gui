@@ -6,8 +6,6 @@ import { setActiveTab } from '../../redux/actions'
 
 import { MdRemoveCircle } from 'react-icons/md'
 
-import _ from "lodash"
-
 class Tab extends Component {
 
     updateTabs = (tabs) => {
@@ -31,7 +29,7 @@ class Tab extends Component {
 
         let {id: tabID, name: tabName} = this.props.tab
 
-        let active = tabID == this.props.active.tab
+        let active = tabID === this.props.active.tab
 
         return (
             <div

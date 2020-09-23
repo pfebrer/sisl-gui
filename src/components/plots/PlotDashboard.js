@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import _ from "lodash"
 
@@ -11,13 +11,13 @@ import { setTabPlots, setSessionTabs, setActivePlot} from "../../redux/actions"
 import PythonApi from "../../apis/PythonApi";
 
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { Checkbox, Paper, Button } from '@material-ui/core';
+import { Paper, Button } from '@material-ui/core';
 
 import 'react-grid-layout/css/styles.css'
 import'react-resizable/css/styles.css'
 
-import { HotKeys, withHotKeys, GlobalHotKeys } from "react-hotkeys";
-import { PLOTS_HOT_KEYS, ADDITIONAL_GLOBAL_HOT_KEYS } from "../../utils/hotkeys";
+import { withHotKeys, GlobalHotKeys } from "react-hotkeys";
+import { PLOTS_HOT_KEYS } from "../../utils/hotkeys";
 import Tabs from "../tabs/Tabs";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -98,7 +98,7 @@ class PlotDashboard extends React.Component {
     let selected;
 
     if (this.state.selected.includes(plotID)){
-      selected = this.state.selected.filter(id => id != plotID)
+      selected = this.state.selected.filter(id => id !== plotID)
     } else {
       selected = [...this.state.selected, plotID]
     }
@@ -118,7 +118,7 @@ class PlotDashboard extends React.Component {
 
     if( !this._plotsInLayout ) return true
 
-    const isDifferentTab = newProps.active.tab != this.props.active.tab
+    const isDifferentTab = newProps.active.tab !== this.props.active.tab
     let hasDifferentPlots;
     if (!isDifferentTab){
       let tab = _.find(this.props.tabs, ["id", this.props.active.tab])
@@ -151,7 +151,7 @@ class PlotDashboard extends React.Component {
     let tab = _.find(this.props.tabs, ["id", this.props.active.tab])
 
     if (!tab) return this.noTabsMessage()
-    if (tab.plots.length == 0) return this.noPlotsMessage()
+    if (tab.plots.length === 0) return this.noPlotsMessage()
     
     let plots = tab.plots.map(plotID => this.props.plots[plotID])
 
@@ -159,11 +159,11 @@ class PlotDashboard extends React.Component {
 
     // Wait for all plots to draw a first layout
     // THIS IS KEY in order to avoid the layout going crazy
-    if (plots.length != tab.plots.length) return null
+    if (plots.length !== tab.plots.length) return null
 
     let layouts = tab.layouts
 
-    if (layouts.lg.length != plots.length){
+    if (layouts.lg.length !== plots.length){
       layouts.lg = plots.map(plot => {
         let layout = _.find(layouts.lg, ["i", plot.id])
         return layout || PlotDashboard.newPlotLayout(plot, layouts)
@@ -210,7 +210,7 @@ class PlotDashboard extends React.Component {
     // For now, we will just move the plots to the next tab
     // (testing if it works)
     let iTab = _.findIndex(this.props.tabs, ["id", this.props.active.tab ]) + 1
-    if (this.props.tabs.length == iTab) iTab = 0
+    if (this.props.tabs.length === iTab) iTab = 0
 
     console.warn(iTab)
 
@@ -222,7 +222,7 @@ class PlotDashboard extends React.Component {
 
     const nSelected = this.state.selected.length
 
-    if (nSelected == 0) return null
+    if (nSelected === 0) return null
 
     const availableMerges = [
       {"to": "multiple"}, {"to": "subplots"}, {"to": "animation"}
