@@ -9,6 +9,7 @@ firebase-debug.log*
 # Firebase cache
 .firebase/
 
+build/
 dist/
 node_modules/
 .env
