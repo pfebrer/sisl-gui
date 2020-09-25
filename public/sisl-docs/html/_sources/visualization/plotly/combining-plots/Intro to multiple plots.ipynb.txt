@@ -16,7 +16,8 @@
    "source": [
     "## Multiple better than individual\n",
     "\n",
-    "The power of multiple plots is threefold:\n\n",
+    "The power of multiple plots is threefold:\n",
+    "\n",
     "- Multiple plot is just a coordinator. It doesn't hold any data related to it's childplots, which are full instances of `Plot` themselves. This allows you to **grab the separate child plots whenever you want**, as well as modifying only some of its child plots very easily.\n",
     "- It will **create the layout for you** without requiring any effort on your side.\n",
     "- If all your plots inside a multiple plot need to read from the same data, the plot will coordinate all plots so that they can share the data. Therefore, **data will be read only once, saving both time and memory**."
@@ -28,7 +29,8 @@
    "source": [
     "## Types of multiple plots\n",
     "\n",
-    "There are three ways of combining your plots in the visualization framework, each with its associated class:\n\n",
+    "There are three ways of combining your plots in the visualization framework, each with its associated class:\n",
+    "\n",
     "- In the same plot (`MultiplePlot`): it's the most basic one. It just takes the traces from all plots and displays them in the same plot.\n",
     "- As subplots (`SubPlots`): Creates a grid of subplots, where each item of the grid contains a plot. Uses [plotly's subplots capabilities](https://plotly.com/python/subplots/).\n",
     "- As frames of an animation (`Animation`): Creates an animation where each child plot is represented in a frame. [plotly's animation capabilities](https://plotly.com/python/animations/)."
