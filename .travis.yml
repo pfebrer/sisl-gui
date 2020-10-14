@@ -4,7 +4,7 @@ env:
     - RELEASE_NAME=build
 node_js:
 - 12
-script: echo "Here we would be building" #travis_wait npm run build
+script: travis_wait npm run build
 before_deploy:
   - >
     if ! [ "$BEFORE_DEPLOY_RUN" ]; then
