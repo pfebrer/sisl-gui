@@ -9,10 +9,12 @@ before_deploy:
   - >
     if ! [ "$BEFORE_DEPLOY_RUN" ]; then
       export BEFORE_DEPLOY_RUN=1;
-      cp -r $RELEASE_NAME $RELEASE_NAME-$TRAVIS_TAG
-      rm -r $RELEASE_NAME-$TRAVIS_TAG/sisl-docs
-      tar -czf $RELEASE_NAME-$TRAVIS_TAG.tar.gz $RELEASE_NAME-$TRAVIS_TAG
-      zip -r $RELEASE_NAME-$TRAVIS_TAG.zip $RELEASE_NAME-$TRAVIS_TAG
+      cp -r $RELEASE_NAME safe-$RELEASE_NAME
+      rm -rf $RELEASE_NAME/sisl-docs
+      tar -czf $RELEASE_NAME-$TRAVIS_TAG.tar.gz $RELEASE_NAME
+      zip -r $RELEASE_NAME-$TRAVIS_TAG.zip $RELEASE_NAME
+      rm -rf $RELEASE_NAME
+      mv safe-$RELEASE_NAME $RELEASE_NAME
     fi
 deploy:
 - provider: firebase
