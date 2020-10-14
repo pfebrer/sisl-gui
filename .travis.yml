@@ -1,7 +1,16 @@
 language: node_js
+env:
+  global:
+    - RELEASE_NAME=build
 node_js:
 - 12
 script: echo "Here we would be building" #travis_wait npm run build
+before_deploy:
+  - >
+    if ! [ "$BEFORE_DEPLOY_RUN" ]; then
+      export BEFORE_DEPLOY_RUN=1;
+      tar -czf $RELEASE_NAME.tar.gz $RELEASE_NAME
+    fi
 deploy:
 - provider: firebase
   skip_cleanup: true
@@ -11,7 +20,8 @@ deploy:
 - provider: releases
   api_key:
     secure: rkYPqxpPgnwo2Gb1gSLVrIK3jDK9mzokEecesXxqDRrVcEwuoiy6rLN9rWjcPLIq60y59IW237OLNDfkQCfqmqUaUKTHUXVBCwWERIjosl7uj75W3YDWfx20jki+oqlu2FmsN+xVu1jqr4pNdr6FG/bm26hcWfQOacPev39Q3b21hykdKNs7LCgw9WV5cPQ+uuQW7oo1kb2ckGcOT6EaCFjHnTG3azaqK4ll8olRH2U+igRfRvXC1CM54bpfI0Js8lKIYQkDjmJtStH+3i1cZnIyUaTCefv8jxI4Ks72eHonDV6aikWzja2+wbLcSYMvIlF1VzErA6j5udjz4UlCF6aez57woat1FVNwmuSqPePQAXczkMLfpVVNk0pPLht27ZIQW7Mtmu+ph++jVixEKiL3+OqC8ALHkYg1iSEP2gkVPU3LqqWDO2IdWfcvaa8mog9T5Wwkw+qRC2GT6bG7f1HlqsxY/zp6YTY2xXt06gHUYMq0Kl2kaLJjMLoOMoDIu4NHGTjJul8EiOsd4X/+dtATBRt1gCfxGUjy1gdvGwY8gMkzafWnicURhSamd24FOu29asDnICLldQbDoOIjYQcjh09JzP1p9BHWc+Ql4XZwFSdZPWL90D+6X36jnFLBJW4JGNjqpjvleyhNPqNFv7iVXHpw45/q1sSEdAF7Zn0=
-  file: build/
+  file: build.tar.gz
   on:
+    tags: true
     repo: pfebrer96/sislGUIpublic
-  skip_cleanup: 'true'
+  skip_cleanup: true
