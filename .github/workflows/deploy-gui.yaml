@@ -1,4 +1,4 @@
-name: My first action
+name: Build and deploy GUI
 
 on:
   push:
@@ -24,7 +24,17 @@ jobs:
       
       - name: "Run the build"
         run: npm run build
-
+      
+      # If this commit was tagged, then create a release
+      - name: "Create release"
+        if: startsWith(github.ref, "refs/tags/v")
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+        
+      # Deploy to github pages
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@132898
         with:
