@@ -24,6 +24,14 @@ jobs:
       
       - name: "Run the build"
         run: npm run build
+        
+      # Deploy to github pages
+      - name: Deploy to github pages
+        uses: JamesIves/github-pages-deploy-action@132898
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: build
+          FOLDER: build
       
       # If this commit was tagged, then create a release
       # - name: "Compress build folder"
@@ -40,12 +48,3 @@ jobs:
       
       # - name: Upload build to releases
       #   if: startsWith(github.ref, "refs/tags/v")
-
-        
-      # Deploy to github pages
-      - name: Deploy to github pages
-        uses: JamesIves/github-pages-deploy-action@132898
-        with:
-          GITHUB_TOKEN: ${{ github.token }}
-          BRANCH: gh-pages
-          FOLDER: build
