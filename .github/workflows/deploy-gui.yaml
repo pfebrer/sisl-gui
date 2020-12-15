@@ -26,16 +26,24 @@ jobs:
         run: npm run build
       
       # If this commit was tagged, then create a release
-      - name: "Create release"
-        if: startsWith(github.ref, "refs/tags/v")
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+      # - name: "Compress build folder"
+      #   if: startsWith(github.ref, "refs/tags/v")
+      #   run : |
+
+      # - name: "Create release"
+      #   if: startsWith(github.ref, "refs/tags/v")
+      #   env:
+      #     GITHUB_TOKEN: ${{ github.token }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: ${{ github.ref }}
+      
+      # - name: Upload build to releases
+      #   if: startsWith(github.ref, "refs/tags/v")
+
         
       # Deploy to github pages
-      - name: Deploy
+      - name: Deploy to github pages
         uses: JamesIves/github-pages-deploy-action@132898
         with:
           GITHUB_TOKEN: ${{ github.token }}
