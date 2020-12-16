@@ -1,3 +1,4 @@
+// This is currently not used
 import React, { Component } from 'react'
 
 export default class SislDocs extends Component {

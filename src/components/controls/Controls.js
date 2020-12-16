@@ -9,12 +9,9 @@ import { Button } from '@material-ui/core';
 
 import { FaSave} from 'react-icons/fa'
 import { AiOutlineUpload } from 'react-icons/ai'
-import { SiReadthedocs } from 'react-icons/si'
 import { setActivePage } from '../../redux/actions'
 
 import PythonApi from '../../apis/PythonApi'
-
-import { MdDashboard } from 'react-icons/md';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -120,14 +117,6 @@ class Controls extends Component {
             name: "Load session",
                 icon: <AiOutlineUpload size={20} />,
             onClick: this.loadSession
-        }, this.props.active.page === "sislDocs" ? {
-            name: "GUI",
-                icon: <MdDashboard size={20} />,
-            onClick: () => this.showPage("plots"),
-        } : {
-            name: "Sisl docs",
-                icon: <SiReadthedocs size={20} />,
-            onClick: () => this.showPage("sislDocs"),
         }]
 
         return <SpeedDials actions={actions} />

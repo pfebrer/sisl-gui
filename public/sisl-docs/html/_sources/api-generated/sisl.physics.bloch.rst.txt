@@ -1,4 +1,0 @@
-﻿.. automodule:: sisl.physics.bloch
-   :no-members:
-   :no-undoc-members:
-   :no-inherited-members:
