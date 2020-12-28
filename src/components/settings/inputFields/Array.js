@@ -18,7 +18,7 @@ export default class ArrayInput extends Component {
     }
 
     handleNone = () => {
-        return Array(this.props.inputField.params.shape[0]).fill(null)
+        return Array((this.props.inputField.params.shape || [1])[0]).fill(null)
     }
 
     render() {

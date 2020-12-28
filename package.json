@@ -62,6 +62,7 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/react": "^11.2.2",
     "concurrently": "^5.1.0",
     "electron": "^8.2.3",
     "electron-builder": "^22.5.1",

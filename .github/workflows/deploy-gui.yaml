@@ -23,6 +23,12 @@ jobs:
 
       - name: "Install node packages"
         run: npm install
+
+      - name: Run tests
+        run: npm test
+      
+      - name: Upload code coverage results
+        uses: codecov/codecov-action@v1
       
       # Generate the production build
       - name: "Run the build"
@@ -35,19 +41,3 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           BRANCH: build
           FOLDER: build
-      
-      # If this commit was tagged, then create a release
-      # - name: "Compress build folder"
-      #   if: startsWith(github.ref, "refs/tags/v")
-      #   run : |
-
-      # - name: "Create release"
-      #   if: startsWith(github.ref, "refs/tags/v")
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      #   with:
-      #     tag_name: ${{ github.ref }}
-      #     release_name: ${{ github.ref }}
-      
-      # - name: Upload build to releases
-      #   if: startsWith(github.ref, "refs/tags/v")
