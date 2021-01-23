@@ -10,24 +10,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      - run: |
-          cd frontend
-          pwd
-
-      - run: pwd
 
       # Install nodejs
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12'
-
-      # Install all the dependencies using the cached packages
-      - uses: c-hive/gha-npm-cache@v1
 
       - name: "Install node packages"
         run: npm install
@@ -42,14 +35,12 @@ jobs:
       - name: "Run the build"
         run: npm run build
 
-      - name: Go back to root directory
-        run: cd ..
-
       - name: Copy the build to the python package
-        run: cp -r frontend/build /sisl-gui/build
+        run: cp -r build ../sisl-gui/build
 
       - name: Push the new build
         run: |
+          cd ..
           git add sisl-gui/build
           git commit -m ${{ github.event.head_commit.message }}
           git push
