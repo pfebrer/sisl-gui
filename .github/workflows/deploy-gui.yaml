@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
       - name: Go back to root directory
-        name: cd ..
+        run: cd ..
 
       - name: Copy the build to the python package
         run: cp -r frontend/build /sisl-gui/build
