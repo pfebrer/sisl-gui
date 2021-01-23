@@ -1,7 +1,7 @@
 This is the graphical interface that you can use to interact with [sisl's](https://github.com/zerothi/sisl) visualization module.
 
 It consists of two parts:
-- [Back-end](sisl-gui): A python app, using `flask` (and `flask-socketio`) to connect `sisl` with the UI.
+- [Back-end](sisl_gui): A python app, using `flask` (and `flask-socketio`) to connect `sisl` with the UI.
 - [Front-end](frontend): A javascript UI, which is developed using [React](https://reactjs.org/).
 
 # User guide
