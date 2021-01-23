@@ -1,12 +1,38 @@
 This is the graphical interface that you can use to interact with [sisl's](https://github.com/zerothi/sisl) visualization module.
 
 It consists of two parts:
-- [Back-end](sisl-gui): A python app, using flask (and flask-socketio) to connect sisl with the UI.
+- [Back-end](sisl-gui): A python app, using `flask` (and `flask-socketio`) to connect `sisl` with the UI.
 - [Front-end](frontend): A javascript UI, which is developed using [React](https://reactjs.org/).
+
+# User guide
+
+## Installation
+
+Make sure you have [sisl]() installed. Then you can install `sisl-gui` with `pip`:
+
+```
+pip install sisl-gui
+```
+
+## Usage
+
+### From a terminal
+
+You can use the `sisl-gui` command.
+
+### From python
+
+```
+import sisl_gui
+
+sisl_gui.launch()
+```
+
+# Info for developers
 
 ## The build branch
 
-The build branch contains the ready-to-use UI. You can download its contents and open `index.html` in your favorite browser to start enjoying it.
+The `build` branch contains the ready-to-use UI. You can download its contents and open `index.html` in your favorite browser to start enjoying it.
 
 This branch is shipped automatically with the `sisl-gui` package and is available at [`sisl-siesta.xyz`](https://sisl-siesta.xyz) (hosted by github pages).
 
