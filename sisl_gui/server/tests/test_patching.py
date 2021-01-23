@@ -3,7 +3,7 @@ This file makes sure that patching has been successful, and therefore connection
 """
 # This import is just so that the gui module is initialized and therefore
 # the Session and Plot classes get patched.
-import sisl.viz.plotly.gui
+import sisl_gui
 
 from sisl.viz import Plot, Session
 

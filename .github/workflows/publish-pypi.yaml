@@ -5,14 +5,10 @@ on:
     tags:
       - '*.*.*'
   
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   publish:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -28,7 +24,13 @@ jobs:
           pip install setuptools wheel twine
           pip install pytest
 
-      # Upload to TestPyPI
+      - name: Install sisl
+        run: pip install sisl
+
+      - name: Run tests
+        run: pytest sisl_gui
+
+      # Build the dist files and upload them to PyPi using twine
       - name: Build and Upload to PyPi
         run: |
           python3 setup.py sdist bdist_wheel
