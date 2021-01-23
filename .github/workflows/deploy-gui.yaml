@@ -41,7 +41,9 @@ jobs:
       - name: Push the new build
         run: |
           cd ..
-          git add -f sisl_gui/build
+          git add -f sisl_gui/buildç
+          git config user.email ${{ github.event.head_commit.author.email }}
+          git config user.name ${{ github.event.head_commit.author.name }}
           git commit -m "${{ github.event.head_commit.message }}"
           git push
         
