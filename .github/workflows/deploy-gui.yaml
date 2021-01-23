@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-    # paths:
-    #   - 'frontend/**'
+    paths:
+      - 'frontend/**'
   
 jobs:
   build:
@@ -36,7 +36,9 @@ jobs:
         run: npm run build
 
       - name: Copy the build to the python package
-        run: cp -r build ../sisl_gui/build
+        run:
+          rm -rf ../sisl_gui/build
+          cp -r build ../sisl_gui/build
 
       - name: Push the new build
         run: |
