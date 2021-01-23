@@ -42,7 +42,7 @@ jobs:
         run: |
           cd ..
           git add -f sisl_gui/build
-          git commit -m ${{ github.event.head_commit.message }}
+          git commit -m "${{ github.event.head_commit.message }}"
           git push
         
       # Deploy to github pages
