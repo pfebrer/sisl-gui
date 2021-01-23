@@ -43,3 +43,7 @@ When a commit is pushed to the `master` branch and files inside the `frontend` f
 The rest of branches are sources. 
 
 If you want to develop a new feature of the UI, you'll need to have [`nodejs`](https://nodejs.org/en/) and [`npm`](https://www.npmjs.com/) installed. Then, just clone this directory, start a new branch, and run `npm install` inside the `frontend` directory. This should install all the project's dependencies as listed in the `package.json` file. Then just run `npm start` to start a development server where you can visualize your code changes in real time. If you want to generate a production build, you should run `npm run build`.
+
+## Integration between front-end and python package
+
+The same trigger that updates the [build branch](#the-build-branch) also pushes the new build to [its location in the python package](sisl_gui/build). So, any change implemented to the front-end is immediately synced to the python package if the tests pass succesfully. Therefore, don't forget to `git pull` to get the last build!
