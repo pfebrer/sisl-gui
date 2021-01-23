@@ -41,7 +41,7 @@ jobs:
       - name: Push the new build
         run: |
           cd ..
-          git add sisl_gui/build
+          git add -f sisl_gui/build
           git commit -m ${{ github.event.head_commit.message }}
           git push
         
