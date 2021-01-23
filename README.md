@@ -22,7 +22,7 @@ You can use the `sisl-gui` command.
 
 ### From python
 
-```
+```python
 import sisl_gui
 
 sisl_gui.launch()
