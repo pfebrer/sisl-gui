@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'frontend/**'
+    # paths:
+    #   - 'frontend/**'
   
 jobs:
   build:
@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: cd frontend
+
+      - run: pwd
 
       # Install nodejs
       - uses: actions/setup-node@v2-beta
