@@ -68,7 +68,6 @@
     "electron-builder": "^22.5.1",
     "gh-pages": "^2.2.0",
     "react-scripts": "^3.4.3",
-    "speck-renderer": "0.0.8",
     "wait-on": "^4.0.2"
   },
   "build": {
