@@ -29,7 +29,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pip install . -e
+          pip install .
           pytest sisl_gui
 
       # Build the dist files and upload them to PyPi using twine
