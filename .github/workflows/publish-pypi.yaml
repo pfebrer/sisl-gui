@@ -27,7 +27,7 @@ jobs:
       - name: Install sisl
         run: |
           pip install Cython
-          pip install git+https://github.com/zerothi/sisl.git
+          pip install "sisl[viz] @ git+https://github.com/zerothi/sisl.git"
 
       - name: Run tests
         run: |
