@@ -26,12 +26,12 @@ jobs:
 
       - name: Install sisl
         run: |
-          pip install cython
+          pip install Cython
           pip install git+https://github.com/zerothi/sisl.git
 
       - name: Run tests
         run: |
-          pip install Cython
+          pip install .
           pytest sisl_gui
 
       # Build the dist files and upload them to PyPi using twine
