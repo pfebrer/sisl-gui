@@ -68,6 +68,7 @@ def create_app(get_session, set_session):
     # Create a new session
     new_session = BlankSession(socketio=socketio)
     set_session(new_session)
+    new_session.socketio = socketio
 
     @socketio.on_error()
     def send_error(err):
