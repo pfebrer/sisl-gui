@@ -35,7 +35,7 @@
     "redux-persist": "^6.0.0",
     "redux-responsive": "^4.3.8",
     "socket.io-client": "^3.0.4",
-    "three": "^0.116.1"
+    "three": "^0.125.0"
   },
   "scripts": {
     "start": "react-scripts start",
