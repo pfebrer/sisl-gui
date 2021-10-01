@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Plot from 'react-plotly.js';
 import Card from "@material-ui/core/Card"
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineExport, AiOutlineFullscreen } from 'react-icons/ai'
-import { FaHammer } from 'react-icons/fa'
+import { FaHammer, FaSave } from 'react-icons/fa'
 import { MdSettings } from 'react-icons/md'
 import { IconContext } from 'react-icons'
 
@@ -108,6 +108,13 @@ class PlotCard extends Component {
         }
     }
 
+    savePlot = () => {
+        let path = prompt("Please provide the path to save the plot.\n\nRoot directory:\n" + this.props.session.settings.rootDir)
+        if (!path) return
+
+        PythonApi.savePlot(this.props.plot.id, path)
+    }
+
     get isActivePlot(){
         return this.props.plot.id === this.props.active.plot
     }
@@ -204,7 +211,8 @@ class PlotCard extends Component {
                             size="small"
                             data-tip="Edit layout (e)"
                             onClick={this.goToPlotLayoutEditing}><AiOutlineEdit/></IconButton>
-                        <IconButton size="small" data-tip="Export data (comming soon)"><AiOutlineExport color="#ccc"/></IconButton>
+                        <IconButton size="small" data-tip="Save plot (coming soon)"><FaSave color="#ccc"/></IconButton>
+                        <IconButton size="small" data-tip="Export data (coming soon)"><AiOutlineExport color="#ccc"/></IconButton>
                         <IconButton size="small" data-tip="Remove (supr)" onClick={this.removePlot}><AiOutlineDelete color="red"/></IconButton>
                     </div> 
                 </IconContext.Provider>

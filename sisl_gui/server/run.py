@@ -73,13 +73,13 @@ def get_server_address():
     return f"http://{SERVER_HOST}:{SERVER_PORT}"
 
 
-def run(host=None, port=None, debug=False, app=None, socketio=None, prelaunch=None):
+def run(host=None, port=None, debug=False, app=None, socketio=None, prelaunch=None, async_mode="threading"):
 
     global SERVER_PORT
     global SERVER_HOST
 
     if app is None:
-        app, socketio = api.create_app(get_session, set_session)
+        app, socketio = api.create_app(get_session, set_session, async_mode=async_mode)
 
     # Disable all kinds of logging
     if not debug:

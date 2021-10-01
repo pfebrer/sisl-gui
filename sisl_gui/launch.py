@@ -4,7 +4,7 @@ from threading import Thread
 import time
 import webbrowser
 
-from sisl.viz.plotly.plotutils import get_session_classes
+from sisl.viz.plotutils import get_session_classes
 
 from . import server
 
@@ -29,7 +29,7 @@ def launch(no_api=False, only_api=False, server_kwargs={}, load_session=None, se
         You will probably want this if you already have the GUI open or are planning
         to use the online version of the GUI (https://sisl-siesta.xyz)
     server_kwargs: dict, optional
-        keyword arguments that go into `sisl.viz.plotly.gui.server.run`. These are {"host", "port", "debug"}
+        keyword arguments that go into `sisl_gui.server.run`. These are {"host", "port", "debug", "async_mode"}
     load_session: str or Session, optional
         the session to set.
         If it is a string, it will be interpreted as the path were the session is.
@@ -80,7 +80,7 @@ def launch(no_api=False, only_api=False, server_kwargs={}, load_session=None, se
         threads.append(Thread(target=interact, kwargs={'local': vars(server)}))
 
     if not only_api:
-        threads.append(Thread(target=open_gui))
+        open_gui()
 
     for t in threads:
         t.start()
@@ -95,4 +95,4 @@ def launch(no_api=False, only_api=False, server_kwargs={}, load_session=None, se
             print("Please use Ctrl+D to kill the interactive console first")
 
 if __name__ == "__main__":
-    run()
+    launch()

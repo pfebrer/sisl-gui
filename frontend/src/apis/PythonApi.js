@@ -81,7 +81,8 @@ export class PythonApi {
             this.requestSession()
         });
 
-        this.on('disconnect', () => {
+        this.on('disconnect', (reason) => {
+            console.warn(reason)
             this.disconnect()
             this.connect()
         });
@@ -241,7 +242,12 @@ export class PythonApi {
         this._plotMethod(plotID, 'dispatch_event', data, null, event)
     }
 
+    savePlot = (plotID, path) => {
+        this._plotMethod(plotID, "save", { path: path })
+    }
+
     sendFile = (file) => {
+        console.log("TRYING TO SEND")
         this.socket.emit("upload_file", file, file.name)
     }
 

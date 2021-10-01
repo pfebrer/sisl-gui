@@ -18,6 +18,7 @@ import QueriesField from './inputFields/QueriesInput';
 import ArrayInput from './inputFields/Array';
 import ListInput from './inputFields/List';
 import CreatableDropdown from './inputFields/CreatableDropown';
+import AtomSelector from './inputFields/AtomSelector';
 
 export const INPUT_FIELDS = {
     textinput: TextInput,
@@ -30,7 +31,8 @@ export const INPUT_FIELDS = {
     number: Numeric,
     queries: QueriesField,
     vector: ArrayInput,
-    list: ListInput
+    list: ListInput,
+    "atom selector": AtomSelector,
 }
 
 export class InputField extends Component {

@@ -1,6 +1,5 @@
 import shutil
 import pathlib
-import traceback
 
 from plotly.graph_objects import Figure
 import numpy as np
@@ -8,13 +7,12 @@ import simplejson
 from simplejson.encoder import JSONEncoder
 from functools import partial
 
-import flask
-from flask import Flask, request, jsonify, make_response
-from flask_socketio import SocketIO, join_room
+from flask import Flask
+from flask_socketio import SocketIO
 
-from sisl.viz.plotly.plotutils import load
+from sisl.viz.plotutils import load
 
-from .emiters import emit_plot, emit_session, emit_error, emit_loading_plot, emit
+from .emiters import emit_plot, emit_session, emit_error, emit
 from .user_management import with_user_management, if_user_can, listen_to_users
 
 
@@ -45,9 +43,9 @@ class CustomJSONEncoder(JSONEncoder):
 # and then javascript does not understand it
 simplejson.dumps = partial(simplejson.dumps, ignore_nan=True, cls=CustomJSONEncoder)
 
-def create_app(get_session, set_session):
+def create_app(get_session, set_session, async_mode="threading"):
 
-    from sisl.viz.plotly import BlankSession, Plot
+    from sisl.viz import BlankSession, Plot
 
     app = Flask("SISL GUI API")
 
@@ -56,10 +54,11 @@ def create_app(get_session, set_session):
         with_user_management(app)
 
     socketio = SocketIO(app, cors_allowed_origins="*",
-                        json=simplejson, manage_session=True, async_mode="threading")
+                        json=simplejson, manage_session=True, async_mode=async_mode)
                         # async_mode="threading" this option can not use websockets, therefore there is less communication performance
                         # however, it's the only way we can emit socket events from outside of the thread that is running the api
                         # Maybe instead of threading we can use socketio.start_background_task (see https://github.com/miguelgrinberg/Flask-SocketIO/issues/876)
+                        # You can set this to any other async_mode if you don't plan to interact from python (i.e. only through the GUI)
     on = socketio.on
 
     if False:
@@ -122,7 +121,6 @@ def create_app(get_session, set_session):
     @on("upload_file")
     @if_user_can("edit")
     def plot_uploaded_file(file_bytes, name):
-
         session = get_session()
 
         dirname = session.get_setting("file_storage_dir")

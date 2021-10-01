@@ -3,9 +3,10 @@ capable of updating the GUI automatically when an action is performed
 on it """
 
 from functools import wraps
+from flask_socketio import SocketIO
 
 from sisl._dispatcher import AbstractDispatch
-from sisl.viz.plotly.plotutils import call_method_if_present
+from sisl.viz.plotutils import call_method_if_present
 
 from .emiters import emit_object
 

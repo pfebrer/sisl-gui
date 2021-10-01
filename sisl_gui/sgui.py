@@ -1,8 +1,7 @@
 import argparse
 
-from sisl.viz.plotly.plotutils import get_session_classes
+from sisl.viz.plotutils import get_session_classes
 
-from sisl.viz.plotly._user_customs import SESSION_FILE
 from .launch import launch
 
 
@@ -43,8 +42,7 @@ def sgui():
         help="YOU DON'T NEED TO PASS A SESSION CLASS. You can provide a session file to load a saved session (see the --load flag)."+
         " However, if you want to start a new session and the default one (BlankSession) is not good for you"+
         " you can pass a session class. By doing so, you will also get access to session-specific settings. Try sgui BlankSession -h, for example." +
-        " Note that you can also build your own sessions that will be automatically available here." +
-        f" Sisl is looking to import plots defined in {SESSION_FILE}",
+        " Note that you can also build your own sessions that will be automatically available here.",
         dest="session_class"
     )
 

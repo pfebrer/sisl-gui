@@ -1,6 +1,6 @@
 
 def _patch():
-    from sisl.viz.plotly import Session, Plot
+    from sisl.viz import Session, Plot
 
     from .server.sync import Connected
 
@@ -63,13 +63,13 @@ def _patch():
         """ This method is thought mainly to prepare data to be sent through the API to the GUI.
         Data has to be sent as JSON, so this method can only return JSONifiable objects. (no numpy arrays, no NaN,...)
         """
-        from sisl.viz.plotly.input_fields import ProgramaticInput
+        from sisl.viz.input_fields import ProgramaticInput
 
         info_dict = {
             "id": self.id,
             "plotClass": self.__class__.__name__,
             "struct": getattr(self, "struct", None),
-            "figure": self.figure,
+            "figure": getattr(self, "figure", None),
             "settings": {param.key: self.settings[param.key] for param in self.params if not isinstance(param, ProgramaticInput)},
             "params": self.params,
             "paramGroups": self.param_groups,
