@@ -34,7 +34,7 @@ sisl_gui.launch()
 
 The `build` branch contains the ready-to-use UI. You can download its contents and open `index.html` in your favorite browser to start enjoying it.
 
-This branch is shipped automatically with the `sisl-gui` package and is available at [`sisl-siesta.xyz`](https://sisl-siesta.xyz) (hosted by github pages).
+This branch is shipped automatically with the `sisl-gui` package and is available at [`https://pfebrer.github.io/sisl-gui/`](https://pfebrer.github.io/sisl-gui/) (hosted by github pages).
 
 When a commit is pushed to the `master` branch and files inside the `frontend` folder have been modified, a build is generated and this branch is automatically updated through Github Actions.
 
