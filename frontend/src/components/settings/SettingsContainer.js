@@ -40,12 +40,13 @@ export default class SettingsContainer extends Component {
 
             if (!setting.inputField) return null
         
-            return <InputField 
+            return <div> <InputField 
                         key={setting.key}
                         setting={setting} 
                         value={this.props.settings[setting.key]}
                         onSettingChangeType={this.props.onSettingChangeType}
-                        onSettingChangeExtraParams={this.props.onSettingChangeExtraParams}/>
+                        onSettingChangeExtraParams={this.props.onSettingChangeExtraParams} />
+            </div>
         }) 
     }
 
@@ -69,7 +70,7 @@ export default class SettingsContainer extends Component {
                 
                 return <div key={key}>
                     <div style={{paddingBottom: 20, fontWeight:"bold", fontSize: "1.3em", textAlign: "left"}}>{name}</div>
-                    <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", alignItems: "center"}}>{this.renderSettingsGroup(subGrouped[key])}</div>
+                    <div>{this.renderSettingsGroup(subGrouped[key])}</div>
                 </div>
             })
 
@@ -91,12 +92,14 @@ export default class SettingsContainer extends Component {
                         <span style={{paddingLeft: 10}}>{paramGroup.name}</span>
                     </MuiExpansionPanelSummary>
                     <MuiExpansionPanelDetails>
-                        <HotKeys keyMap={SETTING_GROUP_HOT_KEYS} handlers={hotKeysHandlers}>
+                        <HotKeys style={{width: "100%"}} keyMap={SETTING_GROUP_HOT_KEYS} handlers={hotKeysHandlers}>
                             <ObserveKeys>
                                 <blockquote style={{ textAlign: "left" }}>
                                     {parse(paramGroup.description)}
                                 </blockquote>
-                                {itemContent}
+                                <div>
+                                    {itemContent}
+                                </div>
                                 <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
                                     <Button
                                         onClick={this.props.undoSettings}

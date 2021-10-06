@@ -135,6 +135,16 @@ class PlotCard extends Component {
             )
         }
 
+        if (! this.props.plot.figure){
+            return (
+                <Card
+                    className="plotcard"
+                    style={{ borderRadius: 15 }}>
+                    <div>A figure could not be generated for this plot.</div>
+                </Card>
+            )
+        }
+
         let layout = this.props.plot.figure.layout;
         let backColor = layout.paper_bgcolor || "white"
 

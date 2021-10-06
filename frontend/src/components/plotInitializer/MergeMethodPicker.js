@@ -1,7 +1,5 @@
-import React, { Component } from 'react'
-import Select from 'react-select'
-
-import _ from "lodash"
+import React from 'react'
+import Dropdown from '../settings/inputFields/Dropdown'
 
 const OPTIONS = [
     {label: "Plot individually", value:"separatePlot"},
@@ -10,19 +8,28 @@ const OPTIONS = [
     {label: "Animation for each", value:"separateAnimation"},
 ]
 
-export default class MergeMethodPicker extends Component {
+const MergeMethodPicker = (props) => {
 
-    render() {
-        return (
-            <Select
-                options={OPTIONS}
-                defaultValue={OPTIONS[0]}
-                placeholder="Choose the plotting method..."
-                isSearchable
-                onChange={(obj) => this.props.onChange(obj ? obj.value || obj.map(selected => selected.value) : undefined)}
-                value={_.find(OPTIONS, ["value", this.props.value])}
-            />
-                
-        )
+    const value = props.value
+    if (value == null) {
+        props.onChange(OPTIONS[0].value)
     }
+
+    const inputField = {
+        params: {
+            options: OPTIONS,
+            isClearable: false, isMulti: false,
+        }
+    }
+
+    return (
+        <Dropdown
+            value={value}
+            inputField={inputField}
+            onChange={props.onChange}
+            label="Plotting method"
+        />   
+    )
 }
+
+export default MergeMethodPicker

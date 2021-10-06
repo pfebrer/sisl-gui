@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import InputField from "../InputField"
-import {MdDragHandle} from "react-icons/md"
-import { IoIosRemoveCircle, IoIosAddCircle } from "react-icons/io"
+
+import { IconButton } from '@material-ui/core'
+import { AiOutlineDelete } from 'react-icons/ai'
+import { MdDragHandle, MdPlaylistAdd } from "react-icons/md"
 import _ from "lodash"
 import {
     sortableContainer,
@@ -15,13 +17,15 @@ const DragHandle = sortableHandle(() => <MdDragHandle size={20} color="gray"/>);
 const SortableItem = sortableElement((props) => (
     <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
         {props.sortable ? <DragHandle /> : null}
-        <InputField {...props} />
-        { props.remove ? <IoIosRemoveCircle color="darkred" size={20} onClick={props.remove}/> : null }
+        <div style={{flex: 1}}>
+            <InputField {...props} />
+        </div>
+        {props.remove ? <IconButton onClick={props.remove}><AiOutlineDelete color="red"/></IconButton> : null }
     </div>
 ));
 
 const SortableContainer = sortableContainer(({ children }) => {
-    return <div>{children}</div>;
+    return <div style={{ width: "100%"}}>{children}</div>;
 });
 
 export default class ListInput extends Component {
@@ -50,7 +54,7 @@ export default class ListInput extends Component {
 
     addItem = () => {
 
-        this.props.onChange([...this.sanitizeVal(), null])
+        this.props.onChange([...this.sanitizeVal(), this.props.setting.default || null])
     }
 
     removeItem = (i) => {
@@ -70,7 +74,7 @@ export default class ListInput extends Component {
         let value = this.sanitizeVal()
 
         return (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+            <div className="ListInput_container" style={this.props.style}>
                 <div style={{ paddingBottom: 10 }}>{this.props.setting.name}</div>
                 <SortableContainer onSortEnd={this.onSortEnd} useDragHandle>
                     {value.map((val, i) => (
@@ -82,12 +86,11 @@ export default class ListInput extends Component {
                             setting={this.props.setting.inputField.params.itemInput} />
                     ))}
                 </SortableContainer>
-                <IoIosAddCircle
+                <IconButton 
                     data-tip="Add a new item"
-                    onClick={this.addItem}
-                    size={20}
-                    color="green"
-                />
+                    onClick={this.addItem}>
+                        <MdPlaylistAdd color="green" />
+                </IconButton>
             </div>
         )
     }

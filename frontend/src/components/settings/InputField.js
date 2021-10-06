@@ -14,25 +14,28 @@ import ColorPicker from './inputFields/ColorPicker';
 import RangeSlider from './inputFields/RangeSlider';
 import Range from './inputFields/Range';
 import Numeric from './inputFields/Numeric';
-import QueriesField from './inputFields/QueriesInput';
 import ArrayInput from './inputFields/Array';
 import ListInput from './inputFields/List';
 import CreatableDropdown from './inputFields/CreatableDropown';
-import AtomSelector from './inputFields/AtomSelector';
+import DictInput from './inputFields/DictInput';
+import CreatableDictInput from './inputFields/CreatableDict';
+
+import "./input_styles.css"
+
 
 export const INPUT_FIELDS = {
     textinput: TextInput,
-    switch: Switch,
-    dropdown: Dropdown,
-    "creatable dropdown": CreatableDropdown,
+    bool: Switch,
+    options: Dropdown,
+    "creatable options": CreatableDropdown,
+    dict: DictInput,
+    "creatable dict": CreatableDictInput,
     color: ColorPicker,
     rangeslider: RangeSlider,
     range: Range,
     number: Numeric,
-    queries: QueriesField,
     vector: ArrayInput,
     list: ListInput,
-    "atom selector": AtomSelector,
 }
 
 export class InputField extends Component {
@@ -41,25 +44,6 @@ export class InputField extends Component {
         super(props)
 
         this.state ={}
-    }
-
-    w = (string) => {
-
-        if (!string) return undefined
-
-        let isSizeDefined = ["s", "m", "l"].map(sizeLabel => string.indexOf(sizeLabel) >= 0)
-
-        let iWindowSize = ["small", "medium", "infinity"].indexOf(this.props.browser.mediaType)
-
-        for (let i = iWindowSize; i > -1; i--) {
-            
-            if(isSizeDefined[i]){
-                let width = _.find(string.split(" "), (str) => str.indexOf(["s","m","l"][i]) >= 0)
-                return width.substr(1)
-            }
-          }
-
-        return undefined
     }
 
     changeSettingValue = (newValue) => {
@@ -87,7 +71,6 @@ export class InputField extends Component {
             {...this.props}
             inputField={inputField}
             onChange={(value) => this.changeSettingValue(value)}
-            //w={this.w} //This is only needed by the queries field, maybe there is a better way to do it
         />
 
         let tooltipParams = {
@@ -97,11 +80,13 @@ export class InputField extends Component {
             "data-place": inputField.type === "color" ? "bottom" : "top", 
         }
 
-        const backgroundColor = this.props.value == null ? "rgba(230,230,230,0.4)" : undefined
+        let className = "InputField_container"
+        if (this.props.value == null) className = className + " inputvalue_None"
 
         return <div
+            className={className}
             onClick={(e) => inputField.type !== "queries" && e.ctrlKey ? this.changeSettingValue(this.props.value == null ? this.props.setting.default : null) : null}
-            style={{backgroundColor, paddingTop: 10, paddingBottom: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 3, marginTop: 20, marginBottom: 20, width: this.w(inputField.width), ...inputField.style}}
+            style={{...inputField.style}}
             {...tooltipParams}>
                 {fieldLayout}
             </div>

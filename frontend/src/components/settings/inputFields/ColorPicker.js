@@ -31,7 +31,7 @@ export default class ColorPicker extends Component {
             <div style={{position: "relative",display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
                 <div style={{paddingBottom: 10}}>{this.props.setting.name}</div>
                 <div 
-                    className="z-depth-2"
+                    className="MuiPaper-elevation3"
                     onClick={this.toggleColorPicker}
                     style={{width: 30, height: 30, borderRadius: 30, background: this.props.value}}/>
                 
