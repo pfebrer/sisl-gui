@@ -8,7 +8,7 @@ It consists of two parts:
 
 ## Installation
 
-Make sure you have [sisl]() installed. Then you can install `sisl-gui` with `pip`:
+It is extremely simple to install `sisl-gui` with `pip`:
 
 ```
 pip install sisl-gui
