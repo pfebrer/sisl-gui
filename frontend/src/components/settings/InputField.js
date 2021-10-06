@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 
-import _ from "lodash"
-
 //--Redux
 import { connect } from 'react-redux'
 import { changeSettings } from "../../redux/actions"
