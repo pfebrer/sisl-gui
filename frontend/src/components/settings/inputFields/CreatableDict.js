@@ -67,11 +67,6 @@ export default class CreatableDictInput extends Component {
         const creatable_fields = fields
 
         let value = this.props.value || {}
-        // If we are getting a list of atomic indices, convert it to categories
-        if (Array.isArray(value)) {
-            value = {index: value}
-            return this.props.onChange(value)
-        }
 
         return (
             <div>

@@ -41,7 +41,7 @@ export default class ArrayInput extends Component {
             <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <div style={{paddingBottom: 10}}>{this.props.setting.name}</div>
                 <div style={{display: "flex", flexDirection: this.props.inputField.params.vertical ? "column" : "row", justifyContent: "center", alignItems: "center"}} className="arrayContainer">
-                    {value.map((val, i) => <NumericInput value={val} onChange={(val) => this.changeValue(val, i)} style={inputStyle}/>)}
+                    {value.map((val, i) => <NumericInput key={i} value={val} onChange={(val) => this.changeValue(val, i)} style={inputStyle}/>)}
                 </div>  
             </div>
         )
