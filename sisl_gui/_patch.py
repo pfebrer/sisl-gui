@@ -63,14 +63,23 @@ def _patch():
         """ This method is thought mainly to prepare data to be sent through the API to the GUI.
         Data has to be sent as JSON, so this method can only return JSONifiable objects. (no numpy arrays, no NaN,...)
         """
-        from sisl.viz.input_fields import ProgramaticInput
+        from sisl.viz.input_fields import ProgramaticInput, GeomAxisSelect
+
+        def _get_setting(param):
+            val = self.settings[param.key]
+            if isinstance(param, GeomAxisSelect):
+                # If there's an axes setting, then parse it so that GUI doesn't
+                # go crazy (Options input only understands a list of axes, not
+                # "xyz")
+                val = param.parse(val)
+            return val
 
         info_dict = {
             "id": self.id,
             "plotClass": self.__class__.__name__,
             "struct": getattr(self, "struct", None),
             "figure": getattr(self, "figure", None),
-            "settings": {param.key: self.settings[param.key] for param in self.params if not isinstance(param, ProgramaticInput)},
+            "settings": {param.key: _get_setting(param) for param in self.params if not isinstance(param, ProgramaticInput)},
             "params": self.params,
             "paramGroups": self.param_groups,
             "grid_dims": getattr(self, "grid_dims", None),

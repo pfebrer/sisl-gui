@@ -4,7 +4,6 @@ import InputField from "../InputField"
 import { IconButton } from '@material-ui/core'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { MdDragHandle, MdPlaylistAdd } from "react-icons/md"
-import _ from "lodash"
 import {
     sortableContainer,
     sortableElement,
@@ -31,47 +30,46 @@ const SortableContainer = sortableContainer(({ children }) => {
 export default class ListInput extends Component {
 
     changeValue = (newVal, i) => {
-        let value = _.cloneDeep(this.sanitizeVal())
+        let value = [...this.sanitizeVal(this.props.value)]
 
         value[i] = newVal
 
         this.props.onChange(value)
     }
 
-    sanitizeVal = () => {
-        if(!this.props.value){
+    sanitizeVal = (value) => {
+
+        if(!value){
             return this.handleNone()
+        } else if (! Array.isArray(value)){
+            return [value]
         } else {
-            return this.props.value
+            return value
         }
     }
 
-    handleNone = () => {
-
-        return []
-        
-    }
+    handleNone = () => []
 
     addItem = () => {
 
-        this.props.onChange([...this.sanitizeVal(), this.props.setting.default || null])
+        this.props.onChange([...this.sanitizeVal(this.props.value), this.props.setting.default || null])
     }
 
     removeItem = (i) => {
-        this.props.onChange(this.sanitizeVal().filter((val, index) => index !== i))
+        this.props.onChange(this.sanitizeVal(this.props.value).filter((val, index) => index !== i))
     }
 
     onSortEnd = ({ oldIndex, newIndex }) => {
 
         this.props.onChange(
-            arrayMove(this.sanitizeVal(), oldIndex, newIndex)
+            arrayMove(this.sanitizeVal(this.props.value), oldIndex, newIndex)
         )
 
     };
 
     render() {
 
-        let value = this.sanitizeVal()
+        let value = this.sanitizeVal(this.props.value)
 
         return (
             <div className="ListInput_container" style={this.props.style}>
