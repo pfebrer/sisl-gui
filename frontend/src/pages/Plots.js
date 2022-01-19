@@ -33,6 +33,7 @@ import NotConnected from '../components/loading/NotConnected';
 import SislDocs from './SislDocs';
 
 configure({logLevel: "debug", simulateMissingKeyPressEvents: false})
+
 class Plots extends Component {
 
     constructor(props){

@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react'
+import { FC, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import PythonApi from '../../../apis/PythonApi'
+import { InputFieldProps } from '../InputField'
 
-function FilesInput() {
+const FilesInput:FC<InputFieldProps<string>> = () => {
     const onDrop = useCallback((acceptedFiles) => {
-        acceptedFiles.forEach((file) => {
+        acceptedFiles.forEach((file: any) => {
             console.warn("ACCEPTED FILE")
             PythonApi.sendFile(file)
         })
