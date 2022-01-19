@@ -1,4 +1,4 @@
-import { CLEAR_SESSION, SET_SESSION, CHANGE_SESSION_SETTINGS, SET_PLOTABLE_PLOTS, DEACTIVATE_PLOTABLE} from '../actions/actionTypes'
+import { CLEAR_SESSION, SET_SESSION, SET_PLOTABLE_PLOTS, DEACTIVATE_PLOTABLE} from '../actions/actionTypes'
 
 const defaultState = {}
 
@@ -12,19 +12,6 @@ const session = (state = defaultState, action) => {
             console.log(newState)
 
             return newState
-        
-        case CHANGE_SESSION_SETTINGS:
-            console.log("REDUX: Changing current session settings (not submitting yet)...")
-            newState = {
-                ...state,
-                settings: {
-                    ...state.settings,
-                    [action.settingKey]: action.value
-                }
-            }
-            console.log(newState)
-            return newState
-
         
         case CLEAR_SESSION:
             return defaultState

@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { InputFieldProps } from '../InputField'
 
 import Dropdown, {DropdownProps} from './Dropdown'
 

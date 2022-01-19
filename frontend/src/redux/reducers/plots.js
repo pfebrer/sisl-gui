@@ -1,6 +1,5 @@
-import { ADD_PLOTS, CLEAR_SESSION, REMOVE_PLOT, CHANGE_PLOT_SETTINGS } from '../actions/actionTypes'
+import { ADD_PLOTS, CLEAR_SESSION, REMOVE_PLOT } from '../actions/actionTypes'
 import _ from "lodash"
-import { toast } from 'react-toastify';
 
 const defaultState = {};
 
@@ -18,28 +17,6 @@ const plots = (state = defaultState, action) => {
         
         case REMOVE_PLOT:
             return _.omit(state, [action.plotID])
-        
-        case CHANGE_PLOT_SETTINGS:
-            console.log("REDUX: Changing plot settings (not submitting yet)...")
-
-            let plotID = action.extraParams.plotID
-            if (!state[plotID]) {
-                toast.error("You are trying to change the settings of a plot that does not exist")
-                return state
-            }
-
-            newState = {
-                ...state,
-                [plotID]: {
-                    ...state[plotID],
-                    unsubmittedSettings: {
-                        ...state[plotID].unsubmittedSettings,
-                        [action.settingKey]: action.value
-                    }
-                }
-            }
-            console.log(newState)
-            return newState
         
         case CLEAR_SESSION:
             return defaultState

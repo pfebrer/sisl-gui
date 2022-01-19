@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes } from 'react'
+import { FC } from 'react'
 
 //--Redux
 import { connect } from 'react-redux'
@@ -19,7 +19,7 @@ import DictInput from './inputFields/DictInput';
 import CreatableDictInput from './inputFields/CreatableDict';
 
 import "./input_styles.css"
-
+import { InputFieldInterface, ParamInterface } from '../../interfaces';
 
 export const INPUT_FIELDS:any = {
     textinput: TextInput,
@@ -58,24 +58,8 @@ export const changeSettingValue = (
 
 }
 
-export interface InputFieldInterface {
-    type: string,
-    params: {[key:string]: any},
-    style?: HTMLAttributes<HTMLDivElement>,
-    [key:string]: any
-}
-
-export interface SettingInterface {
-    key: string,
-    name: string,
-    default: any,
-    value: any,
-    help?: string
-    inputField: InputFieldInterface
-}
-
 export interface MasterInputFieldProps {
-    setting: SettingInterface,
+    setting: ParamInterface,
     value: any,
     onValueChange?: (value: any) => void,
     changeSettings?: (type: string, key: string, value: any, extraParams: any) => void,
@@ -88,7 +72,7 @@ export interface InputFieldProps<T> {
     inputField: InputFieldInterface,
     value: T,
     label: string,
-    setting: SettingInterface,
+    setting: ParamInterface,
     onChange: (value: T) => void,
     style?: Object
 }

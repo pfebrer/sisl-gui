@@ -3,14 +3,14 @@ import { FC } from 'react'
 import _ from 'lodash'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
-import { InputFieldInterface, SettingInterface } from '../InputField';
+import { ParamInterface, InputFieldInterface } from '../../../interfaces';
 
 export interface DropdownProps{
     id?: string,
     inputField: InputFieldInterface,
     value: any[]|any,
     label?: string,
-    setting?: SettingInterface,
+    setting?: ParamInterface,
     onChange: (value: any[]|any) => void,
     style?: Object
 }

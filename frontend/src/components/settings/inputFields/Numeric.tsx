@@ -1,13 +1,14 @@
 import { FC } from 'react'
-import {number, InputFieldInterface, SettingInterface} from '../InputField'
+import { number } from '../InputField'
 import TextField from '@material-ui/core/TextField'
+import { InputFieldInterface, ParamInterface } from '../../../interfaces'
 
 interface NumericProps {
     id?: string,
     inputField?: InputFieldInterface,
     value: number | string,
     label?: string,
-    setting?: SettingInterface,
+    setting?: ParamInterface,
     onChange: (value: number | string) => void,
     style: Object
 }
@@ -26,7 +27,7 @@ const Numeric:FC<NumericProps> = props => {
                 onChange={(e) => props.onChange( number(e.target.value) )}
                 style = {props.style}
                 variant="outlined"
-                {...additionalProps}/>
+                inputProps={additionalProps}/>
         </div>
     )
 }

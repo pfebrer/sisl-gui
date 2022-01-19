@@ -25,7 +25,7 @@ def _patch():
     def _remove_socket_from_plot(session, plot):
         plot.socketio = None
 
-    Session._on_plot_removed = _transmit_socket_to_plot
+    Session._on_plot_removed = _remove_socket_from_plot
 
     def _transmit_socket_change(session):
         """ Transmit the socketio change to all the plots """
