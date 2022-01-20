@@ -54,7 +54,9 @@ def create_app(get_session, set_session, async_mode="threading"):
         with_user_management(app)
 
     socketio = SocketIO(app, cors_allowed_origins="*",
-                        json=simplejson, manage_session=True, async_mode=async_mode)
+                        json=simplejson, manage_session=True, async_mode=async_mode, max_http_buffer_size=1e20)
+                        # We set max_http_buffer_size to 1e20 to in practice don't impose any limit on the size
+                        # This is because big files might be transferred.
                         # async_mode="threading" this option can not use websockets, therefore there is less communication performance
                         # however, it's the only way we can emit socket events from outside of the thread that is running the api
                         # Maybe instead of threading we can use socketio.start_background_task (see https://github.com/miguelgrinberg/Flask-SocketIO/issues/876)

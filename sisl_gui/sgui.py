@@ -17,6 +17,10 @@ def general_arguments(parser):
         " or someone else is running the API for you."
     )
 
+    parser.add_argument('-i', '--interactive', dest='interactive', action="store_true",
+        help="Pass this flag if you want to have an interactive python console where you can interact with the GUI."
+    )
+
 
 def sgui():
     """
@@ -59,4 +63,15 @@ def sgui():
     # Note that it doesn't matter if we include invalid settings. Configurable will just ignore them
     settings = {key: val for key, val in vars(args).items() if val is not None}
 
-    launch(interactive=True, load_session=args.load, session_settings=settings, session_cls=args.session_class, only_api=args.only_api, no_api=args.no_api)
+    
+    server_kwargs={}
+    if not args.interactive:
+        # Don't force threading async mode since we are not going to interact from a different python
+        # thread.
+        server_kwargs["async_mode"] = None
+
+    launch(
+        interactive=args.interactive, load_session=args.load, session_settings=settings, 
+        session_cls=args.session_class, only_api=args.only_api, no_api=args.no_api,
+        server_kwargs=server_kwargs
+    )
