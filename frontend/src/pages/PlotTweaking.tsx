@@ -19,6 +19,7 @@ interface PlotTweakingProps {
     session: SessionInterface,
     browser: any,
     style: {[key: string]: any},
+    goto?: (path: string) => void,
 }
 
 const PlotTweaking:FC<PlotTweakingProps> = (props) => {
@@ -35,8 +36,8 @@ const PlotTweaking:FC<PlotTweakingProps> = (props) => {
                         undoSettings={() => PythonApi.undoPlotSettings(activePlot.id)}/>
     
     return (
-        <div style={{...props.style}}>
-            <Grid container>
+        <div style={{...props.style, }}>
+            <Grid container style={{paddingLeft: "20px"}}>
                 <Grid item sm={12} md={4} style={{height:"90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems:"center"}}>
                     <PlotCard plot={activePlot} style={{height: "80vh"}}/>
                 </Grid>
@@ -44,7 +45,7 @@ const PlotTweaking:FC<PlotTweakingProps> = (props) => {
                     {props.browser.mediaType === "infinity" ? <div className="scrollView" style={{ maxHeight: "90vh"}}>{setsCont}</div> : setsCont}
                 </Grid>
             </Grid>
-            <ReactTooltip multiline disable={props.session.settings ? !props.session.settings.showTooltips : false}/>  
+            <ReactTooltip effect="solid" multiline disable={props.session.settings ? !props.session.settings.showTooltips : false}/>  
         </div>
         
     )

@@ -1,4 +1,5 @@
 import ConfigurableObjectInterface from "./configurable";
+import { ShortcutsInterface } from "./shortcuts";
 
 export interface PlotlyFigureInterface { // Until I find out that plotly provides this.
     data: {[key: string]: any}[]
@@ -11,12 +12,7 @@ export interface PlotInterface extends ConfigurableObjectInterface {
     struct: string | undefined,
     figure: PlotlyFigureInterface | undefined,
     grid_dims?: any,
-    shortcuts: {
-        [key: string]: {
-            name: string,
-            description: string,
-        },
-    }
+    shortcuts: ShortcutsInterface,
 }
 
 export default PlotInterface;

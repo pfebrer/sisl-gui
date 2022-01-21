@@ -13,6 +13,7 @@ import StructuresGroup from './StructuresGroup';
 import { MdClose, MdDone } from 'react-icons/md'
 import { Button } from '@material-ui/core'
 import PlotableRow from './PlotableRow'
+import StructurePicker from '../structures/StructurePicker'
 
 class PlotInitializer extends Component {
 
@@ -262,10 +263,13 @@ class PlotInitializer extends Component {
         const plotables = this.selectedPlotables
 
         return (
-            <div className="plotInitializer" style={this.props.style}>
-
+            <div className="plotInitializer" style={{...this.props.style, display:"flex"}}>
+                <StructurePicker 
+                    style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}
+                    pickerState={this.props.structPickerState}
+                    setPickerState={this.props.setStructPickerState}/>
                 <Card
-                    style={{margin: 20, padding: 20, background: "aliceblue", overflow: "visible"}}>
+                    style={{flex: 1, margin: 20, padding: 20, background: "aliceblue", overflow: "visible"}}>
                     {this.selectedStructs.length > 0 ? <div>
                         <div className="sectionHeader">
                             Structures

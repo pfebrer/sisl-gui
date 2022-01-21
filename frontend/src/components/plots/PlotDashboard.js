@@ -19,6 +19,8 @@ import'react-resizable/css/styles.css'
 import { withHotKeys, GlobalHotKeys } from "react-hotkeys";
 import { PLOTS_HOT_KEYS } from "../../utils/hotkeys";
 import Tabs from "../tabs/Tabs";
+import FilesInput from "../settings/inputFields/Files";
+import StructurePicker from "../structures/StructurePicker";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -145,6 +147,12 @@ class PlotDashboard extends React.Component {
     alert(`Element parameters: ${JSON.stringify(elemParams)}`);
   };
 
+  plotFiles = (acceptedFiles) => {
+    acceptedFiles.forEach(file => {
+        PythonApi.plotFile(file)
+    })
+  }
+
   getLayout = () => {
     if (!this.props.active.tab ) return this.noTabsMessage()
 
@@ -212,8 +220,6 @@ class PlotDashboard extends React.Component {
     let iTab = _.findIndex(this.props.tabs, ["id", this.props.active.tab ]) + 1
     if (this.props.tabs.length === iTab) iTab = 0
 
-    console.warn(iTab)
-
     this.state.selected.forEach(plotID => PythonApi.movePlot(plotID, this.props.tabs[iTab].id ))
     this.setState({ selected: [] })
   }
@@ -246,13 +252,27 @@ class PlotDashboard extends React.Component {
     const tabs = <Tabs/>
     const handlers = {...this.hotKeysHandler, ..._.pick(tabs.hotKeysHandler, ["MOVE_TO_NEXT_TAB", "MOVE_TO_PREVIOUS_TAB"]) }
 
-    // eslint-disable-next-line no-unused-vars
     return (
-      <div style={{padding: 10, ...this.props.style}} className="scrollView">
-        <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/>
-        {this.renderSelectedManager()}
-        {this.getLayout()}
-      </div>
+        // Note that 40vh here makes no sense, but if I don't set
+            // some (nonsense) height value, the content overflows vertically
+            // (to be solved)
+        <div style={{...this.props.style, display: "flex", flexWrap: "wrap", height: "40vh"}}>
+            <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/>
+            <StructurePicker 
+                style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}
+                pickerState={this.props.structPickerState}
+                setPickerState={this.props.setStructPickerState}
+            />
+            <div style={{flex: 1, height: "100%", display: "flex", flexDirection:"column"}}>
+                {tabs}
+                <div style={{padding: 10, flex: 1}} className="scrollView">
+                    {this.renderSelectedManager()}
+                    {this.getLayout()}
+                </div>
+                <FilesInput placeholder="Drop a file to plot, or click to select one." onChange={this.plotFiles}/>
+            </div>
+        </div>
+      
     );
   }
 }

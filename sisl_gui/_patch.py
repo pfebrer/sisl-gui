@@ -51,7 +51,8 @@ def _patch():
                 for subclass in self.get_plot_classes()
             ],
             "structures": self.get_structures(),
-            "plotables": self.get_plotables()
+            "plotables": self.get_plotables(),
+            "shortcuts": self.shortcuts_for_json
         }
 
         return info_dict

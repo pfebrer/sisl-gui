@@ -226,7 +226,7 @@ class PlotCard extends Component {
                         <IconButton size="small" data-tip="Remove (supr)" onClick={this.removePlot}><AiOutlineDelete color="red"/></IconButton>
                     </div> 
                 </IconContext.Provider>
-                <ReactTooltip disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} /> 
+                <ReactTooltip effect="solid" place="bottom" disable={this.props.session.settings ? !this.props.session.settings.showTooltips : false} /> 
             </div>
         </HotKeys>
     }

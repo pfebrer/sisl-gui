@@ -18,7 +18,10 @@ export default class ConnectionStatus extends Component {
     render() {
 
         const style = this.state.connected ? { backgroundColor: "lightgreen" } : { backgroundColor: "salmon" }
-        return <div {...this.props} style={{...style, ...this.props.style}} 
+
+        const addStyles = this.state.connected ? this.props.connectedStyle : this.props.disconnectedStyle
+
+        return <div {...this.props} style={{...style, ...this.props.style, ...addStyles}}
                 data-tip={this.state.connected ? `Connected to ${PythonApi.apiAddress}` : "Currently not connected"} 
                 data-place="left"
                 data-background-color={style.backgroundColor}>

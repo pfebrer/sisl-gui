@@ -1,4 +1,5 @@
 import ConfigurableObjectInterface from "./configurable";
+import { ShortcutsInterface } from "./shortcuts";
 
 export interface TabInterface {
     id: string,
@@ -30,6 +31,7 @@ export interface SessionInterface extends ConfigurableObjectInterface{
     plotOptions: {value: string, label:string}[],
     structures: {[key:string]: StructureInterface},
     plotables: PlotableInterface[],
+    shortcuts: ShortcutsInterface,
 }
 
 export default SessionInterface;

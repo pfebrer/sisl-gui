@@ -1,22 +1,22 @@
 import { FC, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import PythonApi from '../../../apis/PythonApi'
-import { InputFieldProps } from '../InputField'
 
-const FilesInput:FC<InputFieldProps<string>> = () => {
-    const onDrop = useCallback((acceptedFiles) => {
-        acceptedFiles.forEach((file: any) => {
-            console.warn("ACCEPTED FILE")
-            PythonApi.sendFile(file)
-        })
+// Files input is not yet an input field supported for parameters
 
-    }, [])
+interface FilesInputProps {
+    placeholder: string,
+    onChange: (files: File[]) => void,
+    style?: {[key:string]: any},
+}
+
+const FilesInput:FC<FilesInputProps> = ({placeholder, onChange, style }) => {
+    const onDrop = useCallback((files: File[]) => onChange(files), [onChange])
     const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
     return (
-        <div {...getRootProps()}>
+        <div {...getRootProps()} style={style}>
             <input {...getInputProps()} />
-            <p>Drag 'n' drop some files here, or click to select files</p>
+            <p>{placeholder}</p>
         </div>
     )
 }

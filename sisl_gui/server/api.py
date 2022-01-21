@@ -1,4 +1,3 @@
-import shutil
 import pathlib
 
 from plotly.graph_objects import Figure
@@ -11,6 +10,7 @@ from flask import Flask
 from flask_socketio import SocketIO
 
 from sisl.viz.plotutils import load
+from sisl.viz import Session
 
 from .emiters import emit_plot, emit_session, emit_error, emit
 from .user_management import with_user_management, if_user_can, listen_to_users
@@ -90,10 +90,19 @@ def create_app(get_session, set_session, async_mode="threading"):
 
     @on("apply_method_on_session")
     @if_user_can("edit")
-    def apply_method(method_name, kwargs = {}, *args):
+    def apply_method(method_name, kwargs={}, *args):
 
         if __DEBUG:
             print(f"Applying {method_name}. Args: {args}. Kwargs: {kwargs}")
+
+        # If the user wants to save the session, we need to first remove
+        # the socketio object, which is not serializable (also, we don't want to save it)
+        if method_name == "save":
+            session = get_session()
+            session.socketio = None
+            session.save(*args, **kwargs)
+            session.socketio = socketio
+            return
 
         if kwargs is None:
             # This is because the GUI might send None
@@ -120,11 +129,8 @@ def create_app(get_session, set_session, async_mode="threading"):
 
         emit_plot(plotID, get_session(), broadcast=False)
 
-    @on("upload_file")
-    @if_user_can("edit")
-    def plot_uploaded_file(file_bytes, name):
-        session = get_session()
-
+    # Functions to receive uploaded files:
+    def _write_file(session, file_bytes, name):
         dirname = session.get_setting("file_storage_dir")
         if not dirname.exists():
             dirname.mkdir()
@@ -133,13 +139,64 @@ def create_app(get_session, set_session, async_mode="threading"):
         with open(file_name, "wb") as fh:
             fh.write(file_bytes)
 
-        # file_name = name
-        # file_contents = {name: file_bytes}
+        keep = session.get_setting("keep_uploaded")
 
-        plot = Plot(file_name)#, attrs_for_plot={"_file_contents": file_contents}, _debug=True) #
+        return file_name, dirname, keep
+
+    def _remove_temp_file(file_name, dirname):
+        # Remove the file
+        file_name.unlink()
+        # If the directory is empty, remove it as well
+        try:
+            dirname.rmdir()
+        except:
+            pass
+
+    @on("plot_file")
+    @if_user_can("edit")
+    def plot_uploaded_file(file_bytes, name):
+        session = get_session()
+
+        file_name, dirname, keep = _write_file(session, file_bytes, name)
+
+        plot = Plot(file_name)
         session.autosync.add_plot(plot, session.tabs[0]["id"])
 
-        if not session.get_setting("keep_uploaded"):
-            shutil.rmtree(str(dirname))
+        if not keep:
+            _remove_temp_file(file_name, dirname)
+
+    @on("load_session_from_file")
+    @if_user_can("edit")
+    def load_session_from_file(file_bytes, name):
+        session = get_session()
+
+        file_name, dirname, keep = _write_file(session, file_bytes, name)
+
+        session = load(file_name)
+        if isinstance(session, Session):
+            set_session(session)
+            emit_session(session, broadcast=True)
+
+        _remove_temp_file(file_name, dirname)
+
+        if not isinstance(session, Session):
+            raise ValueError("A session could not be loaded from the file provided.")
+    
+    @on("get_session_file")
+    @if_user_can("see")
+    def send_session_file():
+        session = get_session()
+
+        dirname = session.get_setting("file_storage_dir")
+        if not dirname.exists():
+            dirname.mkdir()
+
+        file_name = dirname / "__temp_session"
+        apply_method("save", {"path": file_name})
+
+        with open(file_name, "rb") as fh:
+            session_bytes = fh.read()
+        
+        emit("session_file", session_bytes, broadcast=False)
 
     return app, socketio

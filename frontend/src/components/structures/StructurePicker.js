@@ -14,6 +14,8 @@ function wildTest(wildcard, str) {
     return re.test(str); // remove last 'i' above to have case sensitive
 }
 
+
+
 export class StructurePicker extends Component {
 
     constructor(props){
@@ -28,6 +30,18 @@ export class StructurePicker extends Component {
             displayPlotables: false,
         }
 
+    }
+
+    get pickerState(){
+        return this.props.pickerState || this.state 
+    }
+
+    setPickerState(newState){
+        if (this.props.pickerState){
+            this.props.setPickerState({...this.props.pickerState, ...newState})
+        } else {
+            this.setState(newState)
+        }
     }
 
     togglePlotInitializer = (selectedStructs, selectedPlotables) => {
@@ -64,7 +78,7 @@ export class StructurePicker extends Component {
 
     toggleStruct = ({id: structID}) => {
         
-        //this.setState({selectedStructures: _.xor(this.selectedStructs, [structID])})
+        //this.setPickerState({selectedStructures: _.xor(this.selectedStructs, [structID])})
 
         this.selectStructs(_.xor(this.selectedStructs, [structID]))
       
@@ -72,33 +86,33 @@ export class StructurePicker extends Component {
 
     togglePlotable = ({id: plotableID}) => {
         
-        //this.setState({selectedPlotableures: _.xor(this.selectedPlotables, [PlotableID])})
+        //this.setPickerState({selectedPlotableures: _.xor(this.selectedPlotables, [PlotableID])})
 
         this.selectPlotables(_.xor(this.selectedPlotables, [plotableID]))
       
     }
 
     toggleStructDisplay = () => {
-        this.setState({displayStructures: !this.state.displayStructures})
+        this.setPickerState({displayStructures: !this.pickerState.displayStructures})
     }
 
     togglePlotablesDisplay = () => {
-        this.setState({displayPlotables: !this.state.displayPlotables})
+        this.setPickerState({displayPlotables: !this.pickerState.displayPlotables})
     }
 
     toggleAlphabeticSorting = () => {
 
         const toggles = { [false]: "asc", asc: "desc", desc: false}
-        this.setState({alphabeticSorting: toggles[this.state.alphabeticSorting]})
+        this.setPickerState({alphabeticSorting: toggles[this.pickerState.alphabeticSorting]})
     }
 
     toggleSearchByFolder = () => {
 
-        this.setState({searchByFolder: !this.state.searchByFolder})
+        this.setPickerState({searchByFolder: !this.pickerState.searchByFolder})
     }
 
     toggleSelectedSorting = () => {
-        this.setState({selectedSorting: !this.state.selectedSorting})
+        this.setPickerState({selectedSorting: !this.pickerState.selectedSorting})
     }
 
     toggleAll = () => {
@@ -126,14 +140,14 @@ export class StructurePicker extends Component {
 
     filterStructs = (searchString) => {
 
-        searchString = searchString || this.state.searchString
+        searchString = searchString || this.pickerState.searchString
 
         console.warn(searchString)
         searchString = searchString.includes("*") || searchString.includes("?") ? searchString : "*"+searchString+"*"
 
         let structs = {}
 
-        let toggles = [this.state.displayStructures, this.state.displayPlotables]
+        let toggles = [this.pickerState.displayStructures, this.pickerState.displayPlotables]
         
         const structures = this.props.structures || []
         const plotables = this.props.plotables || []
@@ -150,7 +164,7 @@ export class StructurePicker extends Component {
 
                 const struct = object[structID]
     
-                const toTest = this.state.searchByFolder ? struct.path.split("/").slice(-2,-1)[0] : struct.name.replace(".fdf", "")
+                const toTest = this.pickerState.searchByFolder ? struct.path.split("/").slice(-2,-1)[0] : struct.name.replace(".fdf", "")
     
                 if (wildTest(searchString, toTest)){
     
@@ -175,7 +189,7 @@ export class StructurePicker extends Component {
 
     newSearchString = (searchString) => {
 
-        this.setState({searchString: searchString})
+        this.setPickerState({searchString: searchString})
     }
 
     noStructuresMessage = () => {
@@ -199,45 +213,45 @@ export class StructurePicker extends Component {
 
         let structsAndPlotables = this.filterStructs()
 
-        if (this.state.alphabeticSorting){
-            structsAndPlotables = _.orderBy(structsAndPlotables, "name", this.state.alphabeticSorting)
+        if (this.pickerState.alphabeticSorting){
+            structsAndPlotables = _.orderBy(structsAndPlotables, "name", this.pickerState.alphabeticSorting)
         }
-        if (this.state.selectedSorting){
+        if (this.pickerState.selectedSorting){
             structsAndPlotables = _.orderBy(structsAndPlotables, "selected", "desc")
         }
         
         return (
-            <div style={{height: "100vh", overflow: "hidden", display: "flex", flexDirection: "column", backgroundColor: "white", ...this.props.style}}>
+            <div style={{height: "100%", display: "flex", flexDirection: "column", backgroundColor: "white", ...this.props.style}}>
                 <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20, marginBottom: 20 }}>
                     <TextInput
                         label="Search string"
                         autocomplete="off"
                         placeholder="Enter your search string..."
                         style={{marginRight: 10}}
-                        value={this.state.searchString} 
+                        value={this.pickerState.searchString} 
                         onChange={this.newSearchString}/>
                     <div
                         data-tip="Search by folder"
-                        className={"structPickerToggle " + (this.state.searchByFolder ? "active" : "")}
-                        onClick={this.toggleSearchByFolder} style={{cursor: "pointer"}}>{this.state.searchByFolder ? <MdFolder/> : <MdFolderOpen/>}</div>
+                        className={"structPickerToggle " + (this.pickerState.searchByFolder ? "active" : "")}
+                        onClick={this.toggleSearchByFolder} style={{cursor: "pointer"}}>{this.pickerState.searchByFolder ? <MdFolder/> : <MdFolderOpen/>}</div>
                 </div>
                 <div style={{display: "flex", justifyContent: "space-between", marginBottom: 5}}>
                     <span
                         data-tip="Show structures"
-                        className={"structPickerToggle " + (this.state.displayStructures ? "active" : "")} 
+                        className={"structPickerToggle " + (this.pickerState.displayStructures ? "active" : "")} 
                         onClick={this.toggleStructDisplay} style={{cursor: "pointer"}}>Struct</span>
                     <span
                         data-tip="Show plotables"
-                        className={"structPickerToggle " + (this.state.displayPlotables ? "active" : "")}
+                        className={"structPickerToggle " + (this.pickerState.displayPlotables ? "active" : "")}
                         onClick={this.togglePlotablesDisplay} style={{cursor: "pointer"}}>Plotables</span>
                 </div>
                 <div style={{display: "flex", justifyContent: "space-between", marginBottom: 5}}>
                     <span 
-                        className={"structPickerToggle " + (this.state.alphabeticSorting ? "active" : "")} 
+                        className={"structPickerToggle " + (this.pickerState.alphabeticSorting ? "active" : "")} 
                         onClick={this.toggleAlphabeticSorting} style={{cursor: "pointer"}}>A-Z</span>
                     <span
                         data-tip="Show selected first"
-                        className={"structPickerToggle " + (this.state.selectedSorting ? "active" : "")}
+                        className={"structPickerToggle " + (this.pickerState.selectedSorting ? "active" : "")}
                         onClick={this.toggleSelectedSorting} style={{cursor: "pointer"}}>sel</span>
                     <span 
                         className="structPickerToggle" 
@@ -249,7 +263,7 @@ export class StructurePicker extends Component {
                         this.noMatchingStructuresMessage() : null
                 }
 
-                <div className="scrollView" >
+                <div style={{flex: 1}} className="scrollView" >
                     {Object.values(structsAndPlotables).map(obj => {
                         if (obj.isPlotable) {
                             return <PlotableTag id={obj.id} 

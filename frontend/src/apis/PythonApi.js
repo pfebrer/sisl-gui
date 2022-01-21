@@ -138,6 +138,19 @@ export class PythonApi {
         this.requestSession(path)
     }
 
+    loadSessionFromFile = (file) => {
+        this.socket.emit('load_session_from_file', file, file.name)
+    }
+
+    getSessionFile = (callback) => {
+
+        this.socket.once("session_file", (sessionfile) => {
+            callback(sessionfile)
+        })
+
+        this.socket.emit('get_session_file')
+    }
+
     newProcessId = uuidv4
 
     _sessionMethod = (methodName, kwargs, callback, ...args) => {
@@ -159,6 +172,10 @@ export class PythonApi {
         }
 
         this.socket.emit("apply_method_on_session", methodName, kwargs, ...args)
+    }
+
+    callSessionShortcut = (sequence) => {
+        this._sessionMethod("call_shortcut", null, null, sequence)
     }
 
     updateSessionSettings = (newSettings) => {
@@ -246,9 +263,8 @@ export class PythonApi {
         this._plotMethod(plotID, "save", { path: path })
     }
 
-    sendFile = (file) => {
-        console.log("TRYING TO SEND")
-        this.socket.emit("upload_file", file, file.name)
+    plotFile = (file) => {
+        this.socket.emit("plot_file", file, file.name)
     }
 
 }

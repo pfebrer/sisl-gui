@@ -70,7 +70,11 @@ class PlotEditor extends Component {
         if (!activePlot) return null
 
         return (
-            <PlotlyEditor
+            // Note that 40vh here makes no sense, but if I don't set
+            // some (nonsense) height value, the content overflows vertically
+            // (to be solved)
+            <div style={{...this.props.style, height: "40vh"}}>
+                <PlotlyEditor
                 data={this.state.data}
                 layout={this.state.layout}
                 config={config}
@@ -84,6 +88,8 @@ class PlotEditor extends Component {
                 debug
                 advancedTraceTypeSelector
             />
+            </div>
+            
         )
     }
 }
