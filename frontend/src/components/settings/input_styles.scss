@@ -1,0 +1,122 @@
+$input_field: "SISL_INPUTFIELD";
+$input_group: "SISL_INPUTGROUP";
+$input_subgroup: "SISL_INPUTSUBGROUP";
+
+.#{$input_group}{
+    width: 100%
+}
+
+.#{$input_group}{
+    > .subgroupscontainer {
+        width: 100%
+    }
+}
+
+.#{$input_subgroup}{
+    width: 100%;
+
+    > .fieldscontainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+}
+
+/*Generic input field container*/
+.#{$input_field}{
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 3px;
+    margin: 20px 0px;
+
+    // How to style the input field when its value is None
+    &.inputvalue_None {
+        border-left: 6px solid;
+        border-right: 6px solid;
+        border-color: rgb(224, 224, 224);
+        background-color: rgb(255, 239, 239);
+    }
+}
+
+.#{$input_field}_{
+
+/* List input*/
+&list{
+    > .container {
+        border-style: solid; 
+        border-color: gray;
+        border-width: 1px; 
+        padding: 20px;
+        border-radius: 1px;
+
+        > .listcontainer {
+            width: 100%;
+
+            > .listitem {
+                width: 100%;
+                display: flex;
+                align-items: center;
+
+                > .#{$input_field}{
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    
+
+}
+
+/*Dictionary input*/
+&dict {
+    > .container {
+        flex: 1;
+        border-radius: 5px;
+        padding: 10px 0px;
+        background-color:whitesmoke;
+
+        > .namediv {
+            padding-bottom: 10px;
+        }
+    
+        > .fieldscontainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+    }
+    
+}
+
+/* Creatable dictionary input*/
+&creatable_dict{
+    > .container {
+        > .namediv {
+            padding-bottom: 10px;
+        }
+        > .listcontainer {
+            > fieldset {
+                border: dashed #ccc 1px;
+                border-radius: 5px;
+                padding: 0px;
+                margin: 2px 0px;
+                > .#{$input_field}{
+                    width: auto;
+                }
+            }
+        }
+        > .newfielddiv {
+            display: flex;
+            > .#{$input_field}{
+                flex: 1;
+                padding-left: 5px;
+            }
+        }
+
+    }
+    
+}
+
+}

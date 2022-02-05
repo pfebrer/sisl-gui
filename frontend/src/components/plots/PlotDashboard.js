@@ -249,22 +249,20 @@ class PlotDashboard extends React.Component {
   render() {
 
     // We will reuse some of the tabs hot keys handlers
-    const tabs = <Tabs/>
-    const handlers = {...this.hotKeysHandler, ..._.pick(tabs.hotKeysHandler, ["MOVE_TO_NEXT_TAB", "MOVE_TO_PREVIOUS_TAB"]) }
+    //const handlers = {...this.hotKeysHandler, ..._.pick(tabs.hotKeysHandler, ["MOVE_TO_NEXT_TAB", "MOVE_TO_PREVIOUS_TAB"]) }
 
     return (
         // Note that 40vh here makes no sense, but if I don't set
             // some (nonsense) height value, the content overflows vertically
             // (to be solved)
         <div style={{...this.props.style, display: "flex", flexWrap: "wrap", height: "40vh"}}>
-            <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/>
+            {/* <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/> */}
             <StructurePicker 
                 style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}
                 pickerState={this.props.structPickerState}
                 setPickerState={this.props.setStructPickerState}
             />
             <div style={{flex: 1, height: "100%", display: "flex", flexDirection:"column"}}>
-                {tabs}
                 <div style={{padding: 10, flex: 1}} className="scrollView">
                     {this.renderSelectedManager()}
                     {this.getLayout()}

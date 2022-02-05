@@ -11,7 +11,7 @@ const RangeSlider:FC<InputFieldProps<number|number[]>> = props => {
     const value = props.value || [0,0]
 
     return (
-        <div>
+        <div className="container">
             <div style={{paddingBottom: 10}}>{props.setting.name}</div>
             <Slider
                 getAriaLabel={() => props.setting.name}

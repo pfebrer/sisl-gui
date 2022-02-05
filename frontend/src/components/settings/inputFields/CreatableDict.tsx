@@ -52,7 +52,7 @@ const CreatableDictInput:FC<InputFieldProps<Value>> = props => {
         if (!param) return null
 
         // And render it
-        return <fieldset className="CreatableDictInput_fieldset">
+        return <fieldset>
             <legend style={{
                 paddingLeft: 10, paddingRight: 10, paddingTop: 2, paddingBottom: 2, borderRadius: 3,
                 backgroundColor: "white"
@@ -68,26 +68,24 @@ const CreatableDictInput:FC<InputFieldProps<Value>> = props => {
     }
 
     return (
-        <div>
-            <div>
+        <div className="container">
+            <div className="namediv">
                 {label}
             </div>
-            <div>
+            <div className="listcontainer">
                 {Object.keys(value).map(key => renderItem(key, value[key]))}
             </div>
-            <div style={{display: "flex"}}>
-                <div style={{flex: 1, paddingLeft: 5}}>
-                    <Dropdown
-                        value={new_cat_value}
-                        onChange={(val) => setNewCatValue(val)}
-                        label="Add a new selection..."
-                        inputField={{
-                            type: "",
-                            params: {
-                                options: creatable_fields.map((param: {name:string, key:string}) => ({ label: param.name, value: param.key })),
-                            }
-                        }} />
-                </div>
+            <div className="newfielddiv">
+                <Dropdown
+                    value={new_cat_value}
+                    onChange={(val) => setNewCatValue(val)}
+                    label="Add a new selection..."
+                    inputField={{
+                        type: "",
+                        params: {
+                            options: creatable_fields.map((param: {name:string, key:string}) => ({ label: param.name, value: param.key })),
+                        }
+                    }} />
                 <IconButton onClick={() => addNewItem(new_cat_value)}><MdPlaylistAdd color="green" /></IconButton>
             </div>
         </div>

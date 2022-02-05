@@ -17,9 +17,9 @@ const DictInput:FC<InputFieldProps<Value>> = props => {
         const fields = props.setting.inputField.fields || []
 
         return (
-            <div className="DictInput_container" style={props.style}>
-                <div style={{paddingBottom: 10}}>{props.setting.name}</div>
-                <div>
+            <div className="container" style={props.style}>
+                <div className="namediv">{props.setting.name}</div>
+                <div className="fieldscontainer">
                     {fields.map((field:ParamInterface) => <InputField
                         //id={field.key}
                         key={field.key}

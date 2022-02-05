@@ -54,23 +54,22 @@ const SettingsForm:FC<SettingsFormProps> = props => {
             }}
             >
                 {({values, handleChange, handleSubmit, setFieldValue}) => (
-                    <form onSubmit={handleSubmit} style={{width: "100%"}}>
+                    <form className={`SISL_INPUTGROUP SISL_INPUTGROUP_${paramGroup.key}`} onSubmit={handleSubmit}>
                         <blockquote style={{ textAlign: "left" }}>
                             {parse(paramGroup.description)}
                         </blockquote>
-                        <div>
+                        <div className="subgroupscontainer">
                             {subGroups.map(({key, name}) => {
 
                                 if ( ! subGrouped[key] ) return null
 
-                                return <div key={key}>
-                                    <div style={{paddingBottom: 20, fontWeight:"bold", fontSize: "1.3em", textAlign: "left"}}>{name}</div>
-                                    <div>{ subGrouped[key].map(setting => {
+                                return <div key={key} className={`SISL_INPUTSUBGROUP SISL_INPUTSUBGROUP_${key}`}>
+                                    <div className="namediv" style={{paddingBottom: 20, fontWeight:"bold", fontSize: "1.3em", textAlign: "left"}}>{name}</div>
+                                    <div className="fieldscontainer">{ subGrouped[key].map(setting => {
 
                                     if (!setting.inputField) return null
 
-                                    return <div> 
-                                        <InputField 
+                                    return <InputField 
                                             key={setting.key}
                                             onValueChange={(value) => {
                                                 setChangedFields([...changedFields, setting.key])
@@ -78,7 +77,6 @@ const SettingsForm:FC<SettingsFormProps> = props => {
                                             }}
                                             setting={setting} 
                                             value={values[setting.key]} />
-                                    </div>
                                     })}
                                     </div>
                                 </div>
@@ -134,6 +132,7 @@ const SettingGroupsCollapse:FC<SettingGroupsCollapseProps> = props => {
 }
 
 interface SettingsContainerProps {
+    className?: string,
     settings: {[key:string]: any}
     params: ParamInterface[],
     paramGroups: ParamGroupInterface[],
@@ -146,9 +145,9 @@ const SettingsContainer:FC<SettingsContainerProps> = props => {
     let groupedParams = _.groupBy(props.params, "group")
 
     return (
-        <div style={props.style}>
+        <div style={props.style} className={props.className}>
             {props.paramGroups.map((paramGroup, iParamGroup) => (
-                <SettingGroupsCollapse 
+                <SettingGroupsCollapse
                     key={iParamGroup} 
                     index={iParamGroup}
                     paramGroup={paramGroup} 

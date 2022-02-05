@@ -79,7 +79,7 @@ const Dropdown:FC<DropdownProps> = props => {
                 getOptionLabel={(option) => option.label}
                 options={options}
                 //helperText={this.props.setting.help}
-                renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+                renderInput={(params) => <TextField style={{width: "100%"}} {...params} label={label} variant="outlined" />}
             />
         
     )

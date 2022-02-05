@@ -220,7 +220,6 @@ div[tabindex="-1"]:focus {
 }
 
 .removeTabBut{
-  margin-left: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -232,7 +231,7 @@ div[tabindex="-1"]:focus {
 
 .removeTabBut:hover{ 
   transform: scale(1.1);
-  color: red
+  color: salmon
 }
 
 .newTabIcon{

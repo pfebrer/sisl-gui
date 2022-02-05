@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, MouseEvent } from 'react'
 
 //--Redux
 import { connect } from 'react-redux'
@@ -18,7 +18,8 @@ import CreatableDropdown from './inputFields/CreatableDropown';
 import DictInput from './inputFields/DictInput';
 import CreatableDictInput from './inputFields/CreatableDict';
 
-import "./input_styles.css"
+import "./input_styles.scss"
+import "./settings_styles.scss"
 import { InputFieldInterface, ParamInterface } from '../../interfaces';
 
 export const INPUT_FIELDS:any = {
@@ -65,6 +66,7 @@ export interface MasterInputFieldProps {
     changeSettings?: (type: string, key: string, value: any, extraParams: any) => void,
     onSettingChangeType?: string,
     onSettingChangeExtraParams?: any,
+    style?: any
 }
 
 export interface InputFieldProps<T> {
@@ -92,6 +94,13 @@ const InputField:FC<MasterInputFieldProps> = (props) => {
         onChange={(value: any) => changeSettingValue(value, props)}
     />
 
+    const handleClick = (e:MouseEvent) => {
+        if (e.ctrlKey) {
+            e.stopPropagation()
+            changeSettingValue(props.value == null ? props.setting.default : null, props)
+        }
+    }
+
     let tooltipParams = {
         "data-tip": (props.setting.help ? props.setting.help + "<br>" : "") + "Default: " + (props.setting.default || "None"),
         "data-multiline": true,
@@ -99,14 +108,15 @@ const InputField:FC<MasterInputFieldProps> = (props) => {
         "data-place": inputField.type === "color" ? "bottom" : "top", 
     }
 
-    let className = "InputField_container"
+    let className = `SISL_INPUTFIELD SISL_INPUTFIELD_${inputField.type.replace(/ /g, "_")} SISL_SETTING_${props.setting.key} `
     if (props.value == null) className = className + " inputvalue_None"
 
     return <div
         className={className}
-        onClick={(e) => inputField.type !== "queries" && e.ctrlKey ? changeSettingValue(props.value == null ? props.setting.default : null, props) : null}
-        style={{...inputField.style}}
+        onClick={handleClick}
+        style={props.style}
         {...tooltipParams}>
+            {/* <div>{props.setting.key}</div> */}
             {fieldLayout}
         </div>
 

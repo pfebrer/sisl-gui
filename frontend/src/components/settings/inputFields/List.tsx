@@ -20,12 +20,10 @@ interface SortableItemProps extends MasterInputFieldProps{
 }
 
 const SortableItem = SortableElement((props: SortableItemProps) => (
-    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-        {props.sortable ? <DragHandle /> : null}
-        <div style={{flex: 1}}>
-            <InputField {...props} />
-        </div>
-        {props.remove ? <IconButton onClick={props.remove}><AiOutlineDelete color="red"/></IconButton> : null }
+    <div className="listitem">
+        {props.sortable ? <DragHandle/> : null}
+        <InputField {...props} />
+        {props.remove ? <IconButton className="removebutton" onClick={props.remove}><AiOutlineDelete color="red"/></IconButton> : null }
     </div>
 ));
 
@@ -34,7 +32,7 @@ interface SortableContainerProps {
 }
 
 const SortableList = SortableContainer((props: SortableContainerProps) => {
-    return <div style={{ width: "100%"}}>{props.children}</div>;
+    return <div className="listcontainer">{props.children}</div>;
 });
 
 const handleNone = () => []
@@ -78,8 +76,8 @@ const ListInput:FC<InputFieldProps<Object[]>> = props => {
     };
 
     return (
-        <div className="ListInput_container" style={props.style}>
-            <div style={{ paddingBottom: 10 }}>{props.setting.name}</div>
+        <div className="container" style={props.style}>
+            <div className="namediv" style={{ paddingBottom: 10 }}>{props.setting.name}</div>
             <SortableList onSortEnd={onSortEnd} useDragHandle>
                 {value.map((val, i) => (
                     <SortableItem 

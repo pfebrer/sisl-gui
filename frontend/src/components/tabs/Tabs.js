@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import Tab from './Tab'
 import { setActiveTab } from '../../redux/actions'
 import PythonApi from '../../apis/PythonApi'
 import { connect } from 'react-redux'
-import { MdAddCircle} from 'react-icons/md'
 
 import _ from "lodash"
 import { GlobalHotKeys } from 'react-hotkeys'
@@ -53,16 +52,26 @@ export class Tabs extends Component {
     render() {
 
         const tabs = this.props.tabs || []
+        const TabComponent = this.props.tabComponent || Tab
+        const NewTabComponent = this.props.newTabComponent || ((props) => null)
 
         return (
-            <div style={{display: "flex", flexWrap: "wrap", alignItems:"center", marginTop: 10, marginBottom: 5}}>
+            <div style={{display: "flex", flexWrap: "wrap", alignItems:"center", ...this.props.style}}>
                 <GlobalHotKeys keyMap={TABS_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
                 {tabs.length === 0 ? 
                     this.noTabsMessage()
                     :
-                    tabs.map( tab => <Tab tab={tab}/>)
+                    tabs.map( 
+                        tab => <TabComponent 
+                            tab={tab} 
+                            selected={this.props.active.tab === tab.id}
+                            selectTab={() => this.props.setActiveTab(tab.id)}
+                            removeTab={() => PythonApi.removeTab(tab.id)}
+                            updateTabName={(name) => PythonApi.updateTab(tab.id, {name: name})}
+                        />
+                    )
                 }
-                <MdAddCircle onClick={this.newTab} data-tip="New tab" data-place="right" color="green" size={20} className="newTabIcon"/>
+                <NewTabComponent onClick={this.newTab}/>
             </div>
         )
     }
