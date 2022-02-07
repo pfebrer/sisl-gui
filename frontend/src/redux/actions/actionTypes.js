@@ -1,8 +1,6 @@
 export const ADD_PLOTS = 'ADD_PLOTS'
 export const REMOVE_PLOT = 'REMOVE_PLOT'
 export const ADD_TABS = 'ADD_TABS'
-export const SET_STRUCTURES = 'SET_STRUCTURES'
-export const SET_PLOTABLES = 'SET_PLOTABLES'
 export const SET_TAB_PLOTS = 'SET_TAB_PLOTS'
 export const SET_SESSION_TABS = 'SET_SESSION_TABS'
 //Activate

@@ -3,8 +3,6 @@ import {
     SET_ACTIVE_TAB,
     CLEAR_SESSION,
     SET_ACTIVE_PAGE,
-    SET_STRUCTURES,
-    SET_PLOTABLES,
     SET_SESSION
 } from '../actions/actionTypes'
 
@@ -46,10 +44,6 @@ const active = (state = defaultState, action) => {
                 return { ...state, tab: null}
             }
         
-        case SET_STRUCTURES:
-
-            return { ...state, structs: []}
-        
         case SET_ACTIVE_PAGE:
 
             newState = {
@@ -58,10 +52,6 @@ const active = (state = defaultState, action) => {
             }
 
             return newState
-        
-        case SET_PLOTABLES:
-
-            return { ...state, plotables: [] }
         
         case CLEAR_SESSION:
             return defaultState

@@ -1,10 +1,7 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import PythonApi from '../apis/PythonApi'
-import {
-    addPlots, setNewStructures, setActiveTab, setActivePlot,
-    setSessionTabs, setCurrentSession, setNewPlotables, setActivePage
-} from "../redux/actions"
+import { addPlots, setCurrentSession } from "../redux/actions"
 
 class Syncronizer extends Component {
 
@@ -53,23 +50,9 @@ class Syncronizer extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-    plots: state.plots,
-    structures: state.session.structures,
-    tabs: state.session.tabs,
-    active: state.active,
-    session: state.session
-})
-
 const mapDispatchToProps = {
     setCurrentSession,
-    setActiveTab,
-    setSessionTabs,
-    setActivePlot,
     addPlots,
-    setNewStructures,
-    setNewPlotables,
-    setActivePage
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Syncronizer);
+export default connect(null, mapDispatchToProps)(Syncronizer);

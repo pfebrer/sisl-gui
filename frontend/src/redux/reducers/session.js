@@ -8,6 +8,8 @@ const session = (state = defaultState, action) => {
         case SET_SESSION:
             newState = action.session
 
+            console.warn("REDUX: Setting session...", Object.keys(newState.plotables || {}).length)
+
             return newState
         
         case CLEAR_SESSION:

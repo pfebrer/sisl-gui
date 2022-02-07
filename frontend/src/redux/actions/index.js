@@ -2,7 +2,6 @@ import {
     ADD_PLOTS,
     REMOVE_PLOT,
     ADD_TABS,
-    SET_STRUCTURES,
     SET_TAB_PLOTS,
     SET_SESSION_TABS,
     SET_ACTIVE_PLOT,
@@ -12,7 +11,6 @@ import {
     START_LOADING_PLOT,
     END_LOADING_PLOT,
     SET_ACTIVE_PAGE,
-    SET_PLOTABLES,
 } from './actionTypes'
 
 export const setCurrentSession = (session) => {
@@ -45,11 +43,6 @@ export const changeSettings = (actionType, settingKey, value, extraParams) => ({
 export const addTabs = (newTabs) => ({
     type: ADD_TABS,
     newTabs
-})
-
-export const setNewStructures = (newStructures) => ({
-    type: SET_STRUCTURES,
-    newStructures
 })
 
 export const setTabPlots = (tabID, plots) => ({
@@ -90,11 +83,6 @@ export const informLoadedPlot = (plotID) => ({
 export const setActivePage = (pageName) => ({
     type: SET_ACTIVE_PAGE,
     pageName
-})
-
-export const setNewPlotables = (newPlotables) => ({
-    type: SET_PLOTABLES,
-    newPlotables
 })
 
 

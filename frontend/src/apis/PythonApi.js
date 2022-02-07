@@ -96,7 +96,6 @@ export class PythonApi {
         this.on('server_error', (err) => this.handleError(err, "server"));
         
         this.on('current_session', (session) => {
-            console.error(session)
             document.dispatchEvent(new CustomEvent("syncWithSession", { detail: { session } }))
         })
 

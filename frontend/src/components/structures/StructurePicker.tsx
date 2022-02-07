@@ -30,7 +30,7 @@ const filterStructs = (
     let toggles = [pickerParams.displayStructures, pickerParams.displayPlotables]
     let objs: { [key: string]: StructureInterface | PlotableInterface }[] = [structures, plotables]
 
-    //Filter both structures and plotables
+    // Filter both structures and plotables
     return objs.reduce<{ [key: string]: FilteredObject }>((structs, object, index: number) => {
 
         if (!toggles[index]) return structs
@@ -83,9 +83,9 @@ interface StructurePickerProps {
 const StructurePicker:FC<StructurePickerProps> = (props) => {
     const {pickerParams, setPickerParams, toggleParam} = useContext(PickerParamsContext)
     const {pickerSelected, setPickerSelected, toggleSelectedObject} = useContext(PickerSelectedContext)
-    
-    const filteredObjs = filterStructs(props.structures || {}, props.plotables || {}, pickerParams)
 
+    const filteredObjs = filterStructs(props.structures || {}, props.plotables || {}, pickerParams)
+    
     let structsAndPlotables = Object.values(filteredObjs)
     if (pickerParams.alphabeticSorting) {
         structsAndPlotables = _.orderBy(structsAndPlotables, "name", pickerParams.alphabeticSorting)
