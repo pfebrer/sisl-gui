@@ -16,9 +16,8 @@ import { Paper, Button } from '@material-ui/core';
 import 'react-grid-layout/css/styles.css'
 import'react-resizable/css/styles.css'
 
-import { withHotKeys, GlobalHotKeys } from "react-hotkeys";
-import { PLOTS_HOT_KEYS } from "../../utils/hotkeys";
-import Tabs from "../tabs/Tabs";
+import { withHotKeys } from "react-hotkeys"; //GlobalHotKeys
+//import { PLOTS_HOT_KEYS } from "../../utils/hotkeys";
 import FilesInput from "../settings/inputFields/Files";
 import StructurePicker from "../structures/StructurePicker";
 
@@ -259,8 +258,7 @@ class PlotDashboard extends React.Component {
             {/* <GlobalHotKeys keyMap={PLOTS_HOT_KEYS.global} handlers={handlers}/> */}
             <StructurePicker 
                 style={{ paddingLeft: 15, paddingRight: 15, width: "10vw", minWidth: 200, borderRight: "#ccc solid 1px"}}
-                pickerState={this.props.structPickerState}
-                setPickerState={this.props.setStructPickerState}
+                structures={this.props.structures} plotables={this.props.plotables}
             />
             <div style={{flex: 1, height: "100%", display: "flex", flexDirection:"column"}}>
                 <div style={{padding: 10, flex: 1}} className="scrollView">
@@ -277,10 +275,10 @@ class PlotDashboard extends React.Component {
 
 const mapStateToProps = state => ({
   plots: state.plots,
+  plotables: state.session.plotables,
   structures: state.session.structures,
   tabs: state.session.tabs,
   active: state.active,
-  session: state.session
 })
 
 const mapDispatchToProps = {

@@ -7,7 +7,11 @@ interface Value {
     [key: string]: any
 }
 
-const DictInput:FC<InputFieldProps<Value>> = props => {
+interface DictInputProps extends InputFieldProps<Value> {
+    setting: ParamInterface
+}
+
+const DictInput:FC<DictInputProps> = props => {
 
     const changeSettingValue = (paramKey:string, paramValue:any) => {
         props.onChange({ ...props.value, [paramKey]: paramValue })

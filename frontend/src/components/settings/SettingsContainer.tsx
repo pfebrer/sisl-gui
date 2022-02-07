@@ -5,7 +5,7 @@ import Icon from '@material-ui/core/Icon'
 import MuiExpansionPanel from '@material-ui/core/ExpansionPanel';
 import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa'
+import { FaAngleRight } from 'react-icons/fa'
 import { MdRestore } from 'react-icons/md'
 
 import InputField from "./InputField"
@@ -46,6 +46,7 @@ const SettingsForm:FC<SettingsFormProps> = props => {
 
     return (
         <Formik
+            enableReinitialize
             initialValues={props.settings}
             onSubmit={(values) => {
                 props.submitSettings(Object.fromEntries(
@@ -53,7 +54,7 @@ const SettingsForm:FC<SettingsFormProps> = props => {
                 ))
             }}
             >
-                {({values, handleChange, handleSubmit, setFieldValue}) => (
+                {({values, handleChange, handleSubmit, setFieldValue, resetForm}) => (
                     <form className={`SISL_INPUTGROUP SISL_INPUTGROUP_${paramGroup.key}`} onSubmit={handleSubmit}>
                         <blockquote style={{ textAlign: "left" }}>
                             {parse(paramGroup.description)}
@@ -83,23 +84,22 @@ const SettingsForm:FC<SettingsFormProps> = props => {
                             })}
                         </div>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
-                            <Button
+                            {/* <Button
                                 onClick={props.undoSettings}
                                 data-tip="This will roll back to previous settings.<br> IT AFFECTS ALL GROUPS OF PARAMETERS, not only this one."
                                 className="orange"
                                 style={{ margin: 20 }}>
                                 <FaAngleLeft />Previous settings
-                            </Button>
+                            </Button> */}
 
                             <Button
-                                data-tip="This will restore all settings to the plot's defaults"
-                                className="red" style={{ margin: 20 }}><MdRestore />Restore defaults</Button>
+                                onClick={() => resetForm()}
+                                data-tip="This will restore the settings to the current ones"
+                                style={{ margin: 20 }}><MdRestore />Restore</Button>
 
                             <Button
                                 type="submit"
                                 data-tip="This will change the settings and will update everything accordingly.<br> IT ONLY AFFECTS THIS GROUP OF SETTINGS, not all settings"
-                                //onClick={submitSettings}
-                                className="blue"
                                 style={{ margin: 20 }}>
                                 Submit settings<FaAngleRight />
                             </Button>

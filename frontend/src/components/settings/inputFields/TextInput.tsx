@@ -5,14 +5,12 @@ import { InputFieldProps } from '../InputField'
 const Text:FC<InputFieldProps<string>> = props => {
     const value = props.value || ""
 
-    const label = props.label || (props.setting ? props.setting.name : "")
-
     return (
         <TextField
             variant="outlined"
             value={value}
             onChange={(e) => props.onChange(e.target.value)}
-            label={label}
+            label={props.label}
             style={{width: "100%", ...props.style}}
             {...(props.inputField ? props.inputField.params : {})}/>
     )

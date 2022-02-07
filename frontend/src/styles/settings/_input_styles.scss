@@ -1,18 +1,16 @@
-$input_field: "SISL_INPUTFIELD";
-$input_group: "SISL_INPUTGROUP";
-$input_subgroup: "SISL_INPUTSUBGROUP";
+@use "constants" as c;
 
-.#{$input_group}{
+.#{c.$input_group}{
     width: 100%
 }
 
-.#{$input_group}{
+.#{c.$input_group}{
     > .subgroupscontainer {
         width: 100%
     }
 }
 
-.#{$input_subgroup}{
+.#{c.$input_subgroup}{
     width: 100%;
 
     > .fieldscontainer {
@@ -24,22 +22,31 @@ $input_subgroup: "SISL_INPUTSUBGROUP";
 }
 
 /*Generic input field container*/
-.#{$input_field}{
-    width: 100%;
-    padding: 10px 20px;
+.#{c.$input_field}{
+    flex: 100%;
+    padding: 10px 10px;
     border-radius: 3px;
-    margin: 20px 0px;
+    margin: 10px 0px;
 
     // How to style the input field when its value is None
     &.inputvalue_None {
-        border-left: 6px solid;
-        border-right: 6px solid;
-        border-color: rgb(224, 224, 224);
-        background-color: rgb(255, 239, 239);
+        opacity: 0.5;
+        // border-left: 6px solid;
+        // border-right: 6px solid;
+        // border-color: rgb(224, 224, 224);
+        // background-color: rgb(255, 239, 239);
     }
 }
 
-.#{$input_field}_{
+.#{c.$input_field}_{
+
+/* Boolean input */
+&bool{
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 /* List input*/
 &list{
@@ -58,7 +65,7 @@ $input_subgroup: "SISL_INPUTSUBGROUP";
                 display: flex;
                 align-items: center;
 
-                > .#{$input_field}{
+                > .#{c.$input_field}{
                     flex: 1;
                 }
             }
@@ -74,7 +81,7 @@ $input_subgroup: "SISL_INPUTSUBGROUP";
     > .container {
         flex: 1;
         border-radius: 5px;
-        padding: 10px 0px;
+        padding: 10px;
         background-color:whitesmoke;
 
         > .namediv {
@@ -102,14 +109,14 @@ $input_subgroup: "SISL_INPUTSUBGROUP";
                 border-radius: 5px;
                 padding: 0px;
                 margin: 2px 0px;
-                > .#{$input_field}{
+                > .#{c.$input_field}{
                     width: auto;
                 }
             }
         }
         > .newfielddiv {
             display: flex;
-            > .#{$input_field}{
+            > .#{c.$input_field}{
                 flex: 1;
                 padding-left: 5px;
             }

@@ -9,15 +9,10 @@ import {
     SET_ACTIVE_TAB,
     CLEAR_SESSION,
     SET_SESSION,
-    SET_ACTIVE_STRUCTS,
-    DEACTIVATE_STRUCT,
     START_LOADING_PLOT,
     END_LOADING_PLOT,
     SET_ACTIVE_PAGE,
-    DEACTIVATE_PLOTABLE,
-    SET_ACTIVE_PLOTABLES,
     SET_PLOTABLES,
-    SET_PLOTABLE_PLOTS
 } from './actionTypes'
 
 export const setCurrentSession = (session) => {
@@ -82,16 +77,6 @@ export const clearSession = () => ({
     type: CLEAR_SESSION,
 })
 
-export const setActiveStructs = (structs) => ({
-    type: SET_ACTIVE_STRUCTS,
-    structs: structs
-})
-
-export const deactivateStruct = (structID) => ({
-    type: DEACTIVATE_STRUCT,
-    structID
-})
-
 export const informLoadingPlot = (plot) => ({
     type: START_LOADING_PLOT,
     plot
@@ -110,22 +95,6 @@ export const setActivePage = (pageName) => ({
 export const setNewPlotables = (newPlotables) => ({
     type: SET_PLOTABLES,
     newPlotables
-})
-
-export const setActivePlotables = (plotables) => ({
-    type: SET_ACTIVE_PLOTABLES,
-    plotables
-})
-
-export const deactivatePlotable = (plotableID) => ({
-    type: DEACTIVATE_PLOTABLE,
-    plotableID
-})
-
-export const setPlotablePlots = (plotableID, chosenPlots) => ({
-    type: SET_PLOTABLE_PLOTS,
-    plotableID,
-    chosenPlots
 })
 
 

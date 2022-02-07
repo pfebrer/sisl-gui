@@ -2,11 +2,7 @@ import {
     SET_ACTIVE_PLOT,
     SET_ACTIVE_TAB,
     CLEAR_SESSION,
-    SET_ACTIVE_STRUCTS,
-    SET_ACTIVE_PLOTABLES,
-    DEACTIVATE_STRUCT,
     SET_ACTIVE_PAGE,
-    DEACTIVATE_PLOTABLE,
     SET_STRUCTURES,
     SET_PLOTABLES,
     SET_SESSION
@@ -50,29 +46,9 @@ const active = (state = defaultState, action) => {
                 return { ...state, tab: null}
             }
         
-        case SET_ACTIVE_STRUCTS:
-            
-            newState = {
-                ...state,
-                structs: action.structs,
-            }
-
-            return newState
-        
         case SET_STRUCTURES:
 
             return { ...state, structs: []}
-        
-        case DEACTIVATE_STRUCT:
-
-            let structsToDeactivate = Array.isArray(action.structID) ? action.structID : [action.structID]
-
-            newState = {
-                ...state,
-                structs: state.structs.filter( structID => !structsToDeactivate.includes(structID) ),
-            }
-
-            return newState
         
         case SET_ACTIVE_PAGE:
 
@@ -83,29 +59,9 @@ const active = (state = defaultState, action) => {
 
             return newState
         
-        case SET_ACTIVE_PLOTABLES:
-        
-            newState = {
-                ...state,
-                plotables: action.plotables,
-            }
-
-            return newState
-        
         case SET_PLOTABLES:
 
             return { ...state, plotables: [] }
-        
-        case DEACTIVATE_PLOTABLE:
-
-            let plotablesToDeactivate = Array.isArray(action.plotableID) ? action.plotableID : [action.plotableID]
-    
-            newState = {
-                ...state,
-                plotables: state.plotables.filter( plotableID => !plotablesToDeactivate.includes(plotableID) ),
-            }
-
-            return newState
         
         case CLEAR_SESSION:
             return defaultState

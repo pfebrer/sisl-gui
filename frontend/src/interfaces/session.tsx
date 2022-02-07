@@ -25,12 +25,18 @@ export interface PlotableInterface {
     default_plot: string,
 }
 
+export interface StructOrPlotableInterface extends StructureInterface{
+    plots?: string[],
+    default_plot?: string,
+}
+
 export interface SessionInterface extends ConfigurableObjectInterface{
+    sessionClass: string,
     tabs: TabInterface[],
     updatesAvailable: boolean,
     plotOptions: {value: string, label:string}[],
     structures: {[key:string]: StructureInterface},
-    plotables: PlotableInterface[],
+    plotables: { [key: string]: PlotableInterface },
     shortcuts: ShortcutsInterface,
 }
 

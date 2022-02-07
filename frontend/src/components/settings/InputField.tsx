@@ -18,8 +18,6 @@ import CreatableDropdown from './inputFields/CreatableDropown';
 import DictInput from './inputFields/DictInput';
 import CreatableDictInput from './inputFields/CreatableDict';
 
-import "./input_styles.scss"
-import "./settings_styles.scss"
 import { InputFieldInterface, ParamInterface } from '../../interfaces';
 
 export const INPUT_FIELDS:any = {
@@ -37,9 +35,10 @@ export const INPUT_FIELDS:any = {
     list: ListInput,
 }
 
-export const number = (value: string | number) : (string | number) => {
+export const number = (value: string | number) : (string | number | null) => {
     if (typeof value === "string") {
-        if (["", "-"].includes(value)) return value
+        if (value === "") return null
+        if (["-", "."].includes(value)) return value
     }
     return Number(value)
 }
@@ -70,11 +69,11 @@ export interface MasterInputFieldProps {
 }
 
 export interface InputFieldProps<T> {
-    id: string,
-    inputField: InputFieldInterface,
+    id?: string,
+    inputField?: InputFieldInterface,
+    setting?: ParamInterface,
     value: T,
     label: string,
-    setting: ParamInterface,
     onChange: (value: T) => void,
     style?: Object
 }
@@ -88,8 +87,10 @@ const InputField:FC<MasterInputFieldProps> = (props) => {
     
     if (!InputComponent) return null
 
+    const label = props.setting ? props.setting.name : ""
     const fieldLayout = <InputComponent
         {...props}
+        label={label}
         inputField={inputField}
         onChange={(value: any) => changeSettingValue(value, props)}
     />

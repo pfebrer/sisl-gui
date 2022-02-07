@@ -9,20 +9,19 @@ interface NumericProps {
     value: number | string,
     label?: string,
     setting?: ParamInterface,
-    onChange: (value: number | string) => void,
+    onChange: (value: number | string | null) => void,
     style: Object
 }
 
 const Numeric:FC<NumericProps> = props => {
     const additionalProps = props.inputField ? props.inputField.params : {}
-    const value = props.value || ""
-    const label = props.label || (props.setting ? props.setting.name : "")
+    const value = props.value === undefined ? "" : props.value
 
     return (
         <div>
             <TextField
                 type="number"
-                label={label}
+                label={props.label}
                 value={value}
                 onChange={(e) => props.onChange( number(e.target.value) )}
                 style = {props.style}

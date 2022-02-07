@@ -11,6 +11,7 @@ import {
     SortEnd,
     arrayMove
 } from 'react-sortable-hoc';
+import { ParamInterface } from '../../../interfaces'
 
 const DragHandle = SortableHandle(() => <MdDragHandle size={20} color="gray"/>);
 
@@ -48,7 +49,11 @@ const sanitizeVal = (value: any):any[] => {
     }
 }
 
-const ListInput:FC<InputFieldProps<Object[]>> = props => {
+interface ListInputProps extends InputFieldProps<Object[]> {
+    setting: ParamInterface
+}
+
+const ListInput:FC<ListInputProps> = props => {
     let value = sanitizeVal(props.value)
 
     const addItem = () => {

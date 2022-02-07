@@ -1,5 +1,7 @@
 import React from 'react';
 import './App.css';
+import "./styles/main.scss";
+
 
 //--Redux
 import getStoreAndPersistor from './redux/store'

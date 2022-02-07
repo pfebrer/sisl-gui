@@ -41,6 +41,7 @@ def _patch():
         """
         info_dict = {
             "id": self.id,
+            "sessionClass": self.__class__.__name__,
             "tabs": self.tabs,
             "settings": self.settings,
             "params": self.params,

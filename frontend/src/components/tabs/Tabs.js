@@ -45,7 +45,6 @@ export class Tabs extends Component {
     noTabsMessage = () => {
         return <div style={{paddingLeft: 20}}>
             <span style={{color: "darkred"}}>You don't seem to have any tab. </span>
-            That's wierd, but if that's what you want...
         </div>
     }
 
@@ -54,12 +53,13 @@ export class Tabs extends Component {
         const tabs = this.props.tabs || []
         const TabComponent = this.props.tabComponent || Tab
         const NewTabComponent = this.props.newTabComponent || ((props) => null)
+        const noTabsComponent = this.props.noTabsComponent || this.noTabsMessage()
 
         return (
             <div style={{display: "flex", flexWrap: "wrap", alignItems:"center", ...this.props.style}}>
                 <GlobalHotKeys keyMap={TABS_HOT_KEYS.global} handlers={this.hotKeysHandlers}/>
                 {tabs.length === 0 ? 
-                    this.noTabsMessage()
+                    noTabsComponent
                     :
                     tabs.map( 
                         tab => <TabComponent 

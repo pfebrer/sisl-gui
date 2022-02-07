@@ -1,0 +1,132 @@
+@use "constants" as c;
+@use "sass:selector";
+
+.#{c.$settingplotclass}_{
+
+&BandsPlot .#{c.$setting}_{
+    &band_structure .#{c.$setting}_{
+        &x{ flex: 10% }
+        &y{ flex: 10% }
+        &z{ flex: 10% }
+        &divisions{ flex: 10% }
+        &name{ flex: 50% }
+        &jump{ flex: 20% }
+    }
+    
+    &Erange{flex: 50%}
+    &E0{flex: 30%}
+
+    &spin{flex: 40%}
+    &spin_texture_colorscale{flex: 40%}
+
+    &gap{flex: 20%}
+    &direct_gaps_only{flex: 20%}
+    &gap_tol{flex: 10%}
+    &gap_color{flex: 20%}
+
+    &bands_width{flex: 20%}
+    &bands_color{flex: 20%}
+    &spindown_color{flex: 20%}
+}
+
+&PdosPlot .#{c.$setting}_{
+
+    &distribution .#{c.$setting}_{
+        &method{flex: 30%}
+        &smearing{flex: 30%}
+        &x0 {flex: 20%}
+    }
+
+    &kgrid{flex: 40%}
+    &kgrid_displ{flex: 40%}
+
+    &Erange{flex: 40%}
+    &E0{flex: 20%}
+
+    &requests .#{c.$setting}_{
+        &name{flex: 30%}
+        &species{flex: 30%}
+        
+        &atoms {flex: 45%}
+        &orbitals {flex: 40%}
+        
+        &spin{flex: 40%}
+        &normalize{flex: 40%}
+
+        &color{flex: 30%}
+        &linewidth{flex: 10%}
+        &dash {flex: 30%}
+        
+        &split_on{flex: 40%}
+        &scale{flex: 20%}
+    }
+
+}
+
+&GeometryPlot .#{c.$setting}_{
+    &axes{flex: 30%}
+    &show_cell{flex: 20%}
+    
+    &cell_style .#{c.$setting}_{
+        &color{flex: 30%}
+        &width{flex: 20%}
+        &opacity{flex: 20%}
+    }
+
+    &atoms_style .#{c.$setting}_{
+        &color{flex: 20%}
+        &size{flex: 15%}
+        &opacity{flex: 20%}
+        &vertices{flex: 10%}
+    }
+
+    &arrows .#{c.$setting}_{
+        &data{flex: 50%}
+        &scale{flex: 20%}
+        
+        &color{flex: 20%}
+        &width{flex: 15%}
+        &name{flex: 30%}
+        
+        &arrowhead_scale{flex: 20%}
+        &arrowhead_angle{flex: 20%}
+    }
+
+    &atoms_scale{flex: 20%}
+    &atoms_colorscale{flex: 30%}
+    &show_atoms{flex: 30%}
+
+    &bind_bonds_to_ats{flex: 30%}
+    &points_per_bond{flex: 30%}
+}
+
+&GridPlot .#{c.$setting}_{
+    &axes{flex: 70%}
+
+    &interp{flex: 40%}
+    &nsc{flex: 40%}
+
+    &represent{flex: 20%}
+    &transforms{flex: 60%}
+
+    &zsmooth{flex: 40%}
+    &transform_bc{flex: 40%}
+
+    &crange{flex: 40%}
+    &cmid{flex: 20%}
+    &colorscale{flex: 20%}
+    
+    &isos .#{c.$setting}_{
+        &val{flex: 10%}
+        &frac{flex: 10%;}
+        &step_size {flex: 10%}
+        &color {flex: 10%}
+        &opacity {flex: 10%}
+    }
+
+    &offset{flex: 40%}
+    &trace_name{flex: 20%}
+    &plot_geom{flex: 20%}
+}
+
+}

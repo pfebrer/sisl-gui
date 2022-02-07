@@ -16,7 +16,6 @@ export interface DropdownProps{
 }
 
 const Dropdown:FC<DropdownProps> = props => {
-    const label = props.label || (props.setting ? props.setting.name : "")
     // Parameters that define the behavior of the dropdown
     const disableClearable = ! props.inputField.params.isClearable
     const freeSolo = props.inputField.params.isCreatable
@@ -45,7 +44,7 @@ const Dropdown:FC<DropdownProps> = props => {
     }
 
     const getObjFromValue = (value:any):any => {
-        let obj;
+        let obj = null;
         if (multiple && Array.isArray(value)) {
             obj = value.map(getObjFromValue)
         } else if (value != null) {
@@ -79,7 +78,7 @@ const Dropdown:FC<DropdownProps> = props => {
                 getOptionLabel={(option) => option.label}
                 options={options}
                 //helperText={this.props.setting.help}
-                renderInput={(params) => <TextField style={{width: "100%"}} {...params} label={label} variant="outlined" />}
+                renderInput={(params) => <TextField style={{width: "100%"}} {...params} label={props.label} variant="outlined" />}
             />
         
     )

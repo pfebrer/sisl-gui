@@ -1,4 +1,4 @@
-import { Component, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 
 import _ from "lodash"
 
@@ -22,6 +22,7 @@ import PlotEditor from './PlotEditor';
 import { GLOBAL_HOT_KEYS } from '../utils/hotkeys';
 import Tabs from '../components/tabs/Tabs';
 import { MdRemoveCircle, MdAddCircle } from 'react-icons/md';
+import StructurePickerProvider, { PickerSelectedContext } from '../components/structures/pickerContext';
 
 configure({logLevel: "debug", simulateMissingKeyPressEvents: false})
 
@@ -58,97 +59,76 @@ const NewTabButton = (props) => {
     </IconButton>
 }
 
-class Plots extends Component {
+const Plots = (props) => {
+    const {pickerSelected} = useContext(PickerSelectedContext)
 
-    state= {
-        structPickerState: {
-            searchString: "",
-            alphabeticSorting: false,
-            selectedSorting: false,
-            searchByFolder: false,
-            displayStructures: true,
-            displayPlotables: false,
+    const nSelected = Object.keys(pickerSelected).reduce((n, k) => n + pickerSelected[k].length, 0)
+    const selectedRef = useRef(nSelected)
+
+    // Selected objects have changed, toggle the plot initializer
+    if (selectedRef.current !== nSelected) {
+        console.warn(nSelected, props.active.page)
+        if (nSelected === 0 && props.active.page === "plotInitializer") {
+            props.setActivePage("plots")
+        } else if (nSelected > 0 && props.active.page !== "plotInitializer") {
+            props.setActivePage("plotInitializer")
         }
+        selectedRef.current = nSelected
     }
 
-    hotKeysHandlers = {
-        GO_TO_DASHBOARD: () => this.props.setActivePage("plots"),
-        SHOW_AVAIL_HOTKEYS: () => console.warn(getApplicationKeyMap())
-    }
-
-    componentDidMount(){
-
-        //this.props.setActivePlot(undefined)
-
-        //Add the listener to display or not the plot initializer
-        this.listener = document.addEventListener("togglePlotInitializer", this.togglePlotInitializer)
-
-    }
-
-    componentDidUpdate(){
-
-        let activeTab = _.find(this.props.tabs, ["id", this.props.active.tab]) 
-        
-        if (!activeTab) return
-
+    const activeTab = _.find(props.tabs, ["id", props.active.tab])
+    if (activeTab){
         //Get the missing plots if there are any
         activeTab.plots.forEach(plotID => {
 
-            if (!this.props.plots[plotID]){
+            if (!props.plots[plotID]) {
 
                 PythonApi.getPlot(plotID)
-                
+
             }
         })
-
     }
 
-    togglePlotInitializer = (e) => {
-
-        let currentlyShowing = this.props.active.page === "plotInitializer"
-
-        if (e !== undefined & e.detail !== undefined) {
-            if (e.detail.forceShow &&  !currentlyShowing){
-                this.props.setActivePage("plotInitializer")
-            } if (e.detail.forceHide && currentlyShowing){
-                this.props.setActivePage("plots")
-            }
-        } else {
-            this.props.setActivePage(currentlyShowing ? "plots" : "plotInitializer")
-        }
-
+    const hotKeysHandlers = {
+        GO_TO_DASHBOARD: () => props.setActivePage("plots"),
+        SHOW_AVAIL_HOTKEYS: () => console.warn(getApplicationKeyMap())
     }
 
-    render() {
-
-        if (!this.props.active.plot && !["plotInitializer", "plots"].includes(this.props.active.page)) {
-            this.props.setActivePage("plots")
-        }
-
-        const MainComponent = {
-            'plots': PlotDashboard,
-            'plotLayoutEditor': PlotEditor,
-            'plotTweaking': PlotTweaking,
-            'plotMethods': PlotMethods,
-            'plotInitializer': PlotInitializer,
-        }[this.props.active.page]
-
-        return <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
-                <GlobalHotKeys keyMap={{...GLOBAL_HOT_KEYS}} handlers={this.hotKeysHandlers}/>
-                <Toolbar style={{backgroundColor: "#cccccc"}}>
-                    {["plots", "plotInitializer"].includes(this.props.active.page) ? null :
-                        <Button color="inherit" onClick={() => this.props.setActivePage("plots")}>BACK TO DASHBOARD</Button>
-                    }
-                    {this.props.active.page === "plots" ? <Tabs tabComponent={Tab} newTabComponent={NewTabButton}/> : null}
-                </Toolbar>
-                <MainComponent 
-                    style={{flex: 1}} 
-                    structPickerState={this.state.structPickerState}
-                    setStructPickerState={(newState) => this.setState({structPickerState: newState})}
-                    goto={this.props.setActivePage}
-                />    
-            </div>
+    if (!props.active.plot && !["plotInitializer", "plots"].includes(props.active.page)) {
+        props.setActivePage("plots")
     }
+
+    const MainComponent = {
+        'plots': PlotDashboard,
+        'plotLayoutEditor': PlotEditor,
+        'plotTweaking': PlotTweaking,
+        'plotMethods': PlotMethods,
+        'plotInitializer': PlotInitializer,
+    }[props.active.page]
+
+    return (
+        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <GlobalHotKeys keyMap={{ ...GLOBAL_HOT_KEYS }} handlers={hotKeysHandlers} />
+            <Toolbar style={{ backgroundColor: "#cccccc" }}>
+                {["plots"].includes(props.active.page) ? null :
+                    <Button color="inherit" onClick={() => props.setActivePage("plots")}>BACK TO DASHBOARD</Button>
+                }
+                {props.active.page === "plots" ? <Tabs tabComponent={Tab} newTabComponent={NewTabButton} /> : null}
+            </Toolbar>
+            <MainComponent
+                style={{ flex: 1 }}
+                session={props.session}
+                goto={props.setActivePage}
+            />
+        </div>
+    )
+
+}
+
+const PlotsWithProvider = (props) => {
+    return <StructurePickerProvider>
+        <Plots {...props}/>
+    </StructurePickerProvider>
 }
 
 const mapStateToProps = state => ({
@@ -163,4 +143,4 @@ const mapDispatchToProps = {
     setActivePage
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Plots);
+export default connect(mapStateToProps, mapDispatchToProps)(PlotsWithProvider);

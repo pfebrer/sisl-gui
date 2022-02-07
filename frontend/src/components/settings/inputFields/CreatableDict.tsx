@@ -7,12 +7,17 @@ import { AiOutlineDelete } from 'react-icons/ai'
 import { MdPlaylistAdd } from 'react-icons/md'
 import { IconButton } from '@material-ui/core'
 import InputField, { InputFieldProps } from '../InputField'
+import { ParamInterface } from '../../../interfaces'
 
 interface Value {
     [key: string]: any
 }
 
-const CreatableDictInput:FC<InputFieldProps<Value>> = props => {
+interface CreatableDict extends InputFieldProps<Value> {
+    setting: ParamInterface
+}
+
+const CreatableDictInput:FC<CreatableDict> = props => {
     const [new_cat_value, setNewCatValue] = useState<string | undefined>(undefined)
 
     const label = props.label || (props.setting ? props.setting.name : "")

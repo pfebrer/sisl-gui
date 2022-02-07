@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC } from 'react'
 import Dropdown from '../settings/inputFields/Dropdown'
 
 const OPTIONS = [
@@ -8,7 +8,12 @@ const OPTIONS = [
     {label: "Animation for each", value:"separateAnimation"},
 ]
 
-const MergeMethodPicker = (props) => {
+interface MergeMethodPickerProps {
+    value: string,
+    onChange: (value: string) => void,
+}
+
+const MergeMethodPicker:FC<MergeMethodPickerProps> = (props) => {
 
     const value = props.value
     if (value == null) {
@@ -16,6 +21,7 @@ const MergeMethodPicker = (props) => {
     }
 
     const inputField = {
+        type: "dropdown",
         params: {
             options: OPTIONS,
             isClearable: false, isMulti: false,

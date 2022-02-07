@@ -12,13 +12,13 @@ const ColorPicker:FC<InputFieldProps<string>> = (props) => {
                 color={tempcolor || props.value || 'black'}
                 onChange={(color) => {setTempcolor(color.hex)}}
                 onChangeComplete={(color) => {props.onChange(color.hex); setTempcolor(undefined)}}
-                {...props.inputField.params}/>
+                {...(props.inputField ? props.inputField.params : undefined)}/>
         </div>
     ) : null;
 
     return (
         <div style={{position: "relative",display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
-            <div style={{paddingBottom: 10}}>{props.setting.name}</div>
+            <div style={{paddingBottom: 10}}>{props.label}</div>
             <div 
                 className="MuiPaper-elevation3"
                 onClick={() => setShowColorPicker(!showColorPicker)}

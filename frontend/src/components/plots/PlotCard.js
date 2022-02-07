@@ -25,6 +25,7 @@ class PlotCard extends Component {
         super(props)
         this.state = {
             isLoading: false,
+            editable: false,
         }
 
     }
@@ -193,12 +194,12 @@ class PlotCard extends Component {
                         useResizeHandler
                         style={{ width: "100%", height: "100%"}}
                         data={this.props.plot.figure.data}
-                        layout={{autosize: true, ...layout}}
+                        layout={{autosize: true, title: "", ...layout}}
                         frames={this.props.plot.figure.frames}
                         onClick={this.handlePlotClick}
                         onRelayout={this.handlePlotRelayout}
                         onUpdate={(figure) => {}}//PythonApi.updateFigure(this.props.plot.id, figure)}
-                    config={{editable: true, responsive: true}}
+                    config={{editable: this.state.editable, responsive: true}}
                     />
                 </div>
                 
@@ -217,6 +218,10 @@ class PlotCard extends Component {
                             size="small"
                             data-tip="Methods (m)"
                             onClick={this.goToPlotMethods}><FaHammer/></IconButton>
+                        <IconButton
+                            size="small"
+                            data-tip="Editable"
+                            onClick={() => this.setState({editable: !this.state.editable})}><MdSettings /></IconButton>
                         <IconButton
                             size="small"
                             data-tip="Edit layout (e)"

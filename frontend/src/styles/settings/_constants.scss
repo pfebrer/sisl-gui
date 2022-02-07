@@ -1,0 +1,19 @@
+// Generic input field
+$input_field: "SISL_INPUTFIELD";
+// An input group container
+$input_group: "SISL_INPUTGROUP";
+// An input subgroup container. Fields are inside this container
+$input_subgroup: "SISL_INPUTSUBGROUP";
+// Prefix for settings. Adding "_key" gives you the class selector for the
+// input field container of setting "key"
+$setting: "SISL_SETTING";
+// Parent container that contains all settings for a plot
+$plotsettings: "SISL_SETTING_PLOT";
+// Prefix for plotclass. Adding "_name" gives you the class selector for the
+// settings container of the plot class "name".
+$settingplotclass: "SISL_SETTING_PLOTCLASS";
+// Parent container that contains all settings for a session.
+$sessionsettings: "SISL_SETTING_SESSION";
+// Prefix for sessionclass. Adding "_name" gives you the class selector for the
+// settings container of the session class "name".
+$settingsessionclass: "SISL_SETTING_SESSIONCLASS";

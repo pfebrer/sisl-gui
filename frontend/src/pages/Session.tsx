@@ -72,6 +72,7 @@ const SessionSettings:FC<SessionSettingsProps> = props => {
     if (tabKey === "settings") {
         component = <div style={{padding: 20, flex: 1}} className="scrollView">
             <SettingsContainer
+                className={`SISL_SETTING_SESSION SISL_SETTING_SESSIONCLASS_${props.session.sessionClass}`}
                 settings={props.session.settings}
                 params={props.session.params}
                 paramGroups={props.session.paramGroups}

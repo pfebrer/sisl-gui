@@ -1,0 +1,21 @@
+@use "constants" as c;
+
+.#{c.$settingsessionclass}_{
+
+    &BlankSession .#{c.$setting}_{
+        &showTooltips{flex: 20%}
+        &listenForUpdates{flex: 20%}
+        &plot_dims{flex: 20%}
+
+        &root_dir{flex: 45%}
+        &file_storage_dir{flex: 45%}
+
+        &keep_uploaded{flex: 30%}
+        &search_depth{flex: 30%}
+
+        &plot_preset{flex: 40%}
+        &plotly_template{flex: 40%}
+        
+    }
+
+}

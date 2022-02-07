@@ -3,13 +3,18 @@ import NumericInput from './Numeric'
 
 import _ from "lodash"
 import { InputFieldProps } from '../InputField'
+import { InputFieldInterface } from '../../../interfaces'
 
-const ArrayInput:FC<InputFieldProps<number[]>> = (props) => {
+interface ArrayInputProps extends InputFieldProps<number[]> {
+    inputField: InputFieldInterface
+}
 
-    const changeValue = (newVal:string|number|undefined, i:number) => {
+const ArrayInput:FC<ArrayInputProps> = (props) => {
+
+    const changeValue = (newVal:string|number|undefined|null, i:number) => {
         let value = _.cloneDeep(props.value)
 
-        if (typeof newVal === "string" || typeof newVal === "undefined") return
+        if (typeof newVal === "string" || newVal === null || newVal === undefined) return
 
         if(!value){
             value = handleNone()
@@ -40,7 +45,7 @@ const ArrayInput:FC<InputFieldProps<number[]>> = (props) => {
 
     return (
         <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-            <div style={{paddingBottom: 10}}>{props.setting.name}</div>
+            <div style={{paddingBottom: 10}}>{props.label}</div>
             <div style={{display: "flex", flexDirection: props.inputField.params.vertical ? "column" : "row", justifyContent: "center", alignItems: "center"}} className="arrayContainer">
                 {value.map((val, i) => <NumericInput key={i} value={val} onChange={(val) => changeValue(val, i)} style={inputStyle}/>)}
             </div>  
