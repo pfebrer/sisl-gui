@@ -31,7 +31,7 @@ const PlotTweaking:FC<PlotTweakingProps> = (props) => {
     console.warn(activePlot)
 
     let setsCont = <SettingsContainer
-                        className={"SISL_SETTING_PLOTCLASS_" + activePlot.plotClass} 
+                        className={"SISL_SETTING_PLOT SISL_SETTING_PLOTCLASS_" + activePlot.plotClass} 
                         settings={plotSettings}
                         params={activePlot.params}
                         paramGroups={activePlot.paramGroups}

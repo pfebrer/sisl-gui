@@ -175,7 +175,6 @@ const PlotInitializer:FC<PlotInitializerProps> = (props) => {
             newStructureGroups = markActiveGroup(newStructureGroups.length - 1, newStructureGroups)
         }
 
-        console.log("SETTING NEW GROUPS", newStructureGroups)
         setStructureGroups(newStructureGroups)
     }
 
@@ -214,8 +213,6 @@ const PlotInitializer:FC<PlotInitializerProps> = (props) => {
     }
 
     if (props.tabs.length === 0) return null
-
-    console.warn("STRUCTURE GROUPS", structureGroups)
 
     return (
         <div className="plotInitializer" style={{ ...props.style, display: "flex" }}>

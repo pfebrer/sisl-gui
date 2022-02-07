@@ -17,3 +17,7 @@ $sessionsettings: "SISL_SETTING_SESSION";
 // Prefix for sessionclass. Adding "_name" gives you the class selector for the
 // settings container of the session class "name".
 $settingsessionclass: "SISL_SETTING_SESSIONCLASS";
+
+:export {
+    input_field: $input_field;
+}

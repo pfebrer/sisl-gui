@@ -127,3 +127,19 @@
 }
 
 }
+
+// Defaults for input fields inside setting containers
+.#{c.$plotsettings} , .#{c.$sessionsettings}{
+.#{c.$input_field}_{
+    &textinput{flex: 40%}
+    &bool {flex: 20%}
+    &number{flex: 20%}
+    &options, &creatable_options{flex: 40%}
+    &dict, &creatable_dict{flex: 100%}
+    &color{flex: 30%}
+    &rangeslider{flex: 100%}
+    &range{flex: 40%}
+    &vector{flex: 40%}
+    &list{flex: 100%}
+}
+}
