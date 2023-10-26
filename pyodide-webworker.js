@@ -53,7 +53,8 @@ async function loadRuntime() {
 
     setStatus(104)
 
-    await pyodide.loadPackage(['simplejson', 'sisl-gui'])
+    await pyodide.loadPackage(['simplejson'])
+    await micropip.install("sisl-gui")
 
     setStatus(105)
 
