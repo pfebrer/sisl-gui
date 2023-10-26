@@ -54,7 +54,8 @@ async function loadRuntime() {
     setStatus(104)
 
     await pyodide.loadPackage(['simplejson'])
-    await micropip.install("sisl-gui")
+    // Install sisl-gui from PyPi without its dependencies
+    await micropip.install("sisl-gui", false, false)
 
     setStatus(105)
 
