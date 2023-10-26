@@ -1,8 +1,11 @@
 This is the graphical interface that you can use to interact with [sisl's](https://github.com/zerothi/sisl) visualization module.
 
 It consists of two parts:
-- [Back-end](sisl_gui): A python app, using `flask` (and `flask-socketio`) to connect `sisl` with the UI.
-- [Front-end](frontend): A javascript UI, which is developed using [React](https://reactjs.org/).
+- [Back-end](sisl_gui): The backend is implemented in python. The most important part is the `Session` class which stores
+and manages the app state. The `Session` can be connected to the frontend either using pyodide (it runs directly on the browser)
+or through sockets (implemented with `flask` and `flask-socketio`).
+- [Front-end](frontend): A javascript/typescript UI, which is developed using [React](https://reactjs.org/). The build is
+shipped with the python package and also available at https://pfebrer.github.io/sisl-gui/.
 
 # User guide
 
@@ -16,6 +19,11 @@ pip install sisl-gui
 
 ## Usage
 
+### From the browser
+
+This is the simplest way, since it doesn't have any requirements. **You don't even need to install it** as mentioned
+in the previous section, just go to https://pfebrer.github.io/sisl-gui/.
+
 ### From a terminal
 
 You can use the `sisl-gui` command.
@@ -25,7 +33,7 @@ You can use the `sisl-gui` command.
 ```python
 import sisl_gui
 
-sisl_gui.launch()
+app = sisl_gui.launch()
 ```
 
 # Info for developers
