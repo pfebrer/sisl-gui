@@ -53,7 +53,7 @@ async function loadRuntime() {
 
     setStatus(104)
 
-    await pyodide.loadPackage(['simplejson', 'sisl_gui-0.2.0-py3-none-any.whl'])
+    await pyodide.loadPackage(['simplejson', 'sisl_gui'])
 
     setStatus(105)
 

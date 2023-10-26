@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { PythonApi } from "./PythonApi";
 
-const PythonApiContext = createContext({pythonApi: new PythonApi(), setPythonApi: (api:PythonApi) => {}})
+const PythonApiContext = createContext({pythonApi: new PythonApi(), setPythonApi: (api) => {}})
 
 const PythonApiStatusContext = createContext(0)
 
