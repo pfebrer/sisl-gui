@@ -1,54 +1,183 @@
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
-import toastPrompt, {connectionPrompt} from '../components/prompts/Prompt';
 
-export class PythonApi {
+class PythonApi {
 
-    constructor() {
+    static defaultApiSettings = {}
 
-        this.apiAddress = 'http://localhost:4000'
-        this.user = undefined
+    status_codes = {
+        0: "Not initialized",
+        100: "Not connected",
+        200: "Connected",
+    }
+
+    type = "none"
+
+    constructor(settings) {
+
+        this.apiSettings = { ...this.constructor.defaultApiSettings, ...settings}
+
+        this.connectCallbacks = []
+        this.disconnectCallbacks = []
+        this.receiveSessionCallbacks = []
+
+        this.setStatus(100)
+    }
+
+    setApiSettings = (settings) => {
+        this.apiSettings = { ...this.apiSettings, ...settings}
+    }
+
+    connect = () => {}
+
+    onConnect = (callback, ...args) => {
+        this.connectCallbacks.push(callback)
+    }
+
+    onDisconnect = (callback, ...args) => {
+        this.disconnectCallbacks.push(callback)
+    }
+
+    onReceiveSession = (callback, ...args) => {
+        this.receiveSessionCallbacks.push(callback)
+    }
+
+    receivedSession = (session) => {
+        this.session = session
+        this.receiveSessionCallbacks.forEach(callback => callback(session))
+    }
+
+    get connected() {
+        return this.status >= 200
+    }
+
+    get loading () {
+        return this.status > 100 && this.status < 200
+    }
+
+    setStatus = (status) => {
+        this.status = status
+        if (status === 200) this.connectCallbacks.forEach(callback => callback())
+        this.onStatusChange(status)
+    }
+
+    onStatusChange = (status) => {
+        document.dispatchEvent(new CustomEvent("apiStatusChange", { detail: { status } }))
+    }
+
+    handleError = (err, type) => {
+        if (type === "server"){
+            toast.error("THERE WAS A PYTHON ERROR:\n" + err)
+        } else {
+            toast.error(err)
+        }
+        
+    }
+
+    _sessionMethod = (methodName, kwargs, callback, ...args) => {
+        // SHOULD BE OVERRIDEN BY CHILD CLASSES TO CALL A METHOD ON THE PYTHON SESSION
+    }
+
+    getFilePlotOptions = async (filename) => {
+        return this._sessionMethod("get_file_plot_options", { file_name: filename })
+    }
+
+    plotUploadedFile = async (file, method, plot_name, additional_files) => {
+
+        const additional_filesDict = {}
+        if (additional_files) {
+            additional_files.forEach(file => {
+                additional_filesDict[file.name] = file
+            })
+        }
+
+        return this._sessionMethod("plot_uploaded_file", { file_bytes: file, name: file.name, method: method , node_name: plot_name, additional_files: additional_filesDict })
+    }
+
+    getNode = async (name) => {
+        return this._sessionMethod("get_node", { key: name })
+    }
+
+    removeNode = async (name) => {
+        return this._sessionMethod("remove_node", { key: name })
+    }
+
+    initNode = async (node_class, kwargs, inputModes) => {
+        return this._sessionMethod("init_node",  {cls: node_class, kwargs: kwargs || {}, input_modes: inputModes || {}})
+    }
+
+    duplicateNode = async (name) => {
+        return this._sessionMethod("duplicate_node", { key: name })
+    }
+
+    computeNode = async (name) => {
+        return this._sessionMethod("compute_node", { key: name })
+    }
+
+    nodeToWorkflow = async (name) => {
+        return this._sessionMethod("node_to_workflow", { key: name })
+    }
+
+    renameNode = async (name, newName) => {
+        return this._sessionMethod("rename_node", { key: name, name: newName })
+    }
+
+    updateNodeInputs = async (name, kwargs, inputModes) => {
+        return this._sessionMethod("update_node_inputs", { key: name, kwargs: kwargs || {}, input_modes: inputModes || {} })
+    }
+
+    runPython = async (code) => {
+        console.error("It is not possible to run arbitrary python code with this backend")
+        return "It is not possible to run arbitrary python code with this backend."
+    }
+}
+
+class SocketPythonApi extends PythonApi {
+
+    static defaultApiSettings = {
+        apiAddress: 'http://localhost:4000',
+        user: null,
+    }
+
+    status_codes = {
+        0: "Not initialized",
+        100: "Not connected",
+        101: "Trying to connect",
+        200: "Connected",
+    }
+
+    type = "socket"
+
+    constructor(settings) {
+        super(settings)
 
         this.listeners = []
         this.setupListeners()
 
         this.connect()
 
-        /*This can be dangerous in the browser if the user let's other websites
-        access this tab. By default it is not possible, one would have to download
-        an extension to make it possible, but still. */ 
         document.api = this
-
     }
 
-    connect = (address) => {
+    get apiAddress() {
+        return this.apiSettings.apiAddress
+    }
 
-        if (address) this.apiAddress = address
+    connect = () => {
 
         this.externalListeners = {}
 
         this.socket = io(this.apiAddress);
         this.listeners.forEach(listener => this.socket.on(...listener))
 
-        // Timeout to prompt the user for a new api address if the socket fails to connect
-        this.connectionTimeOut = setTimeout(() => {
-
-            connectionPrompt(this.apiAddress, (newAddress) => {
-                if (newAddress) {
-                    this.apiAddress = newAddress.trim()
-                }
-                if (!this.socket.connected){
-                    this.disconnect()
-                    this.connect()
-                }
-
-            }, {controlClose: (close) => this.onConnect(close)})
-            
-        }, 3000)
-
         this.socket.connect()
 
+    }
+
+    setApiSettings = (settings) => {
+        this.apiSettings = { ...this.apiSettings, ...settings}
+        this.disconnect()
+        this.connect()
     }
 
     disconnect = () => {
@@ -77,12 +206,14 @@ export class PythonApi {
 
         this.on('connect', () => {
             //document.dispatchEvent(new Event('socket_connect'))
+            this.setStatus(200)
             clearTimeout(this.connectionTimeOut)
             this.requestSession()
         });
 
         this.on('disconnect', (reason) => {
-            console.warn(reason)
+            console.warn("DISCONNECT REASON", reason)
+            this.setStatus(100)
             this.disconnect()
             this.connect()
         });
@@ -96,7 +227,8 @@ export class PythonApi {
         this.on('server_error', (err) => this.handleError(err, "server"));
         
         this.on('current_session', (session) => {
-            document.dispatchEvent(new CustomEvent("syncWithSession", { detail: { session } }))
+            document.session = session
+            this.receivedSession(session)
         })
 
         this.on('loading_plot', (info) => {
@@ -109,48 +241,12 @@ export class PythonApi {
 
     }
 
-    handleError = (err, type) => {
-        if (type === "server"){
-            toast.error("THERE WAS A PYTHON ERROR:\n" + err)
-        } else {
-            toast.error(err)
-        }
-        
-    }
-
-    askForAuth = () => {
-
-        if (this.authenticating) return
-
-        this.authenticating = true
-        toastPrompt((username) => {
-            this.socket.emit("login", username)
-            this.authenticating = false
-        })
-    }
-
     requestSession = (path) => {
-        this.socket.emit('request_session', path)
-    }
-
-    loadSession = (path) => {
-        this.requestSession(path)
-    }
-
-    loadSessionFromFile = (file) => {
-        this.socket.emit('load_session_from_file', file, file.name)
-    }
-
-    getSessionFile = (callback) => {
-
-        this.socket.once("session_file", (sessionfile) => {
-            callback(sessionfile)
+        this.socket.emit('request_session', path, (session) => {
+            document.session = session
+            this.receivedSession(session)
         })
-
-        this.socket.emit('get_session_file')
     }
-
-    newProcessId = uuidv4
 
     _sessionMethod = (methodName, kwargs, callback, ...args) => {
         /* With this you can call any session method
@@ -170,102 +266,112 @@ export class PythonApi {
             
         }
 
-        this.socket.emit("apply_method_on_session", methodName, kwargs, ...args)
-    }
-
-    callSessionShortcut = (sequence) => {
-        this._sessionMethod("call_shortcut", null, null, sequence)
-    }
-
-    updateSessionSettings = (newSettings) => {
-        this._sessionMethod("update_settings", newSettings)
-    }
-
-    undoSessionSettings = () => {
-        this._sessionMethod("undo_settings")
-    }
-
-    addTab = (tabName) => {
-        this._sessionMethod("add_tab", {name: tabName})
-    }
-
-    removeTab = (tabID) => {
-        this._sessionMethod("remove_tab", {tabID})
-    }
-
-    updateTab = (tabID, newParams) => {
-        this._sessionMethod("update_tab", { tabID, newParams })
-    }
-
-    setTabLayouts = (tabID, layouts) => {
-        this.updateTab(tabID, {layouts})
-    }
-
-    saveSession = (path) => {
-        this._sessionMethod("save", {path})
-    }
-
-    getPlot = (plotID) => {
-        document.dispatchEvent(new CustomEvent("updatingPlot", {detail: {plot_id: plotID}}))
-        this.socket.emit("get_plot", plotID)
-    }
-
-    newPlot = (newPlotKwargs) => {
-        this._sessionMethod("new_plot", newPlotKwargs)
-    }
-
-    removePlot = (plotID) => {
-        this._sessionMethod("remove_plot", null, null, plotID)
-    }
-
-    movePlot = (plotID, tab) => {
-        this._sessionMethod("move_plot", null, null, plotID, tab)
-    }
-
-    mergePlots = (plotIDs, to) => {
-        this._sessionMethod("merge_plots", {to}, null, plotIDs)
-    }
-
-    _plotMethod = (plotID, methodName, kwargs, callback, ...args) => {
-        this._sessionMethod("_run_plot_method", kwargs, callback, plotID, methodName, ...args)
-    }
-
-    showPlotFullScreen = (plotID) => {
-        this._plotMethod(plotID, "show")
-    }
-
-    updatePlotSettings = (plotID, settings) => {
-        this._plotMethod(plotID, "update_settings", settings)
-    }
-
-    undoPlotSettings = (plotID) => {
-        this._plotMethod(plotID, "undo_settings")
-    }
-
-    updatePlotLayout = (plotID, layoutUpdates) => {
-        this._plotMethod(plotID, "update_layout", layoutUpdates)
-    }
-
-    updateFigure = (plotID, {layout, data, frames, overwrite}) => {
-        this._plotMethod(plotID, "update", {layout, data, frames, overwrite})
-    }
-
-    callPlotShortcut = (plotID, sequence) => {
-        this._plotMethod(plotID, "call_shortcut", null, null, sequence)
-    }
-
-    dispatchPlotEvent = (plotID, event, data) => {
-        this._plotMethod(plotID, 'dispatch_event', data, null, event)
-    }
-
-    savePlot = (plotID, path) => {
-        this._plotMethod(plotID, "save", { path: path })
-    }
-
-    plotFile = (file) => {
-        this.socket.emit("plot_file", file, file.name)
+        console.log("APPLYING METHOD", methodName, kwargs, args)
+        return this.socket.emitWithAck("apply_method_on_session", methodName, kwargs, ...args)
     }
 
 }
 
-export default new PythonApi();
+class PyodidePythonApi extends PythonApi {
+
+    type = "pyodide"
+
+    static defaultApiSettings = {
+        mounts: [],
+    }
+
+    status_codes = {
+        0: "Not initialized",
+        100: "Not connected",
+        101: "[1 / 5] Loading pyodide",
+        102: "[2 / 5] Loading sisl dependencies",
+        103: "[3 / 5] Loading sisl",
+        104: "[4 / 5] Loading sisl_gui",
+        105: "[5 / 5] Importing packages and initializing session",
+        200: "Connected",
+    }
+
+    constructor(settings) {
+        super(settings)
+
+        this.connect()
+
+        document.api = this
+    }
+
+    async loadPyodide() {
+        this.pyodide = await window.loadPyodide()
+    }
+
+    connect = async () => {
+
+        this.pyodide_worker = new Worker("pyodide-webworker.js")
+
+        this.pyodide_worker.onmessage = (event) => {
+            if (event.data.type === "status") {
+                this.setStatus(event.data.status)
+            } else if (event.data.type === "session") {
+                this.session = event.data.session
+
+                this.receivedSession(this.session)
+            }
+        }
+
+        this.pyodide_worker.postMessage({type: "loadRuntime"})
+
+    }
+
+    _sessionMethod = (methodName, kwargs, callback, ...args) => {
+
+        return new Promise((res, rej) => {
+            // create a channel
+            const channel = new MessageChannel(); 
+
+            channel.port1.onmessage = (event) => {
+                res(event.data.return)
+            }
+
+            this.pyodide_worker.postMessage({type: "sessionMethod", methodName, kwargs, args}, [channel.port2])
+        
+        });
+
+    }
+
+    requestSession = (path) => {
+
+        this.pyodide_worker.postMessage({type: "session"})
+    
+    }
+
+    plotUploadedFile = async (file, method, plot_name, additional_files) => {
+
+        return new Promise((res, rej) => {
+            // create a channel
+            const channel = new MessageChannel(); 
+
+            channel.port1.onmessage = (event) => {
+                res(this._sessionMethod("plot_uploaded_file", { file_bytes: null, name: file.name, method: method , node_name: plot_name }))
+            }
+        
+            this.pyodide_worker.postMessage({type: "writeFiles", files: [file, ...additional_files]}, [channel.port2])
+        });
+        
+    }
+
+    runPython = async (code) => {
+
+        return new Promise((res, rej) => {
+            // create a channel
+            const channel = new MessageChannel(); 
+
+            channel.port1.onmessage = (event) => {
+                res(event.data.result)
+            }
+        
+            this.pyodide_worker.postMessage({type: "runPython", code}, [channel.port2])
+        });
+
+    }
+}
+
+export {PythonApi, SocketPythonApi, PyodidePythonApi}

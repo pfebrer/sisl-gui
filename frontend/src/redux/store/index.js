@@ -1,12 +1,21 @@
-import { createStore } from 'redux'
-import {responsiveStoreEnhancer} from 'redux-responsive'
-import { persistStore} from 'redux-persist'
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import storage from 'redux-persist/lib/storage'
+import { persistStore, persistReducer} from 'redux-persist'
 
-import rootReducer from '../reducers'
+import session from '../reducers/session'
+
+var reducer = combineReducers({session})
+
+reducer = persistReducer({
+    key: 'root',
+    storage
+}, reducer)
 
 const getStoreAndPersistor = () => {
-  let store = createStore(rootReducer, responsiveStoreEnhancer)
-  let persistor = persistStore(store)
+  const store = configureStore({reducer})
+
+  document.store = store
+  const persistor = persistStore(store)
   //persistor.purge()
   return { store, persistor }
 }

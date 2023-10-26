@@ -1,77 +1,44 @@
 import argparse
 
-from sisl.viz.plotutils import get_session_classes
+#from sisl.viz.plotutils import get_session_classes
 
 from .launch import launch
 
-
-def general_arguments(parser):
-
-    parser.add_argument('--only-api', dest='only_api', action="store_true",
-        help="Pass this flag if all you want to do is initialize the API, but not the GUI. You can do this if you plan"+
-        "to access the graphical interface by some other means (e.g. https://sisl-siesta.xyz)"
-    )
-
-    parser.add_argument('--no-api', dest='no_api', action="store_true",
-        help="Pass this flag if all you want to is to open the GUI. This will probably make sense if you already have an api running"+
-        " or someone else is running the API for you."
-    )
-
-    parser.add_argument('-i', '--interactive', dest='interactive', action="store_true",
-        help="Pass this flag if you want to have an interactive python console where you can interact with the GUI."
-    )
-
-
 def sgui():
-    """
-    Command line interface for launching GUI related stuff
-    """
-    from sisl.viz import Session
-
-    avail_session_classes = get_session_classes()
-
+    """Command line interface for launching the GUI"""
     parser = argparse.ArgumentParser(prog='sgui',
                                      description="Command line utility to launch sisl's graphical interface.")
+    
+    parser.add_argument('--server', action='store_true')
+    parser.add_argument('--no-server', dest='server', action='store_false')
+    parser.set_defaults(server=True)
 
-    general_arguments(parser)
+    parser.add_argument('--frontend', action='store_true')
+    parser.add_argument('--no-frontend', dest='frontend', action='store_false')
+    parser.set_defaults(frontend=True)
 
-    parser.add_argument('--load', '-l', type=str, nargs="?", default=None,
-                        help='The path to the session that you want to open in the GUI. If not provided, a fresh new session will be used.')
+    parser.add_argument('--interactive', action='store_true')
+    parser.add_argument('--no-interactive', dest='interactive', action='store_false')
+    parser.set_defaults(interactive=True)
 
-    for param in Session._get_class_params()[0]:
-        if param.dtype is not None and not isinstance(param.dtype, str):
-            parser.add_argument(f'--{param.key}', type=param.parse, required=False, help=getattr(param, "help", ""))
+    parser.add_argument('--async-mode', type=str, default="threading")
+    parser.add_argument('--server-host', type=str, default=None)
+    parser.add_argument('--server-port', type=int, default=None)
 
-    subparsers = parser.add_subparsers(
-        help="YOU DON'T NEED TO PASS A SESSION CLASS. You can provide a session file to load a saved session (see the --load flag)."+
-        " However, if you want to start a new session and the default one (BlankSession) is not good for you"+
-        " you can pass a session class. By doing so, you will also get access to session-specific settings. Try sgui BlankSession -h, for example." +
-        " Note that you can also build your own sessions that will be automatically available here.",
-        dest="session_class"
-    )
-
-    for name, SessionClass in avail_session_classes.items():
-        doc = SessionClass.__doc__ or ""
-        specific_parser = subparsers.add_parser(name, help=doc.split(".")[0])
-        general_arguments(specific_parser)
-        for param in SessionClass._get_class_params()[0]:
-            if param.dtype is not None and not isinstance(param.dtype, str):
-                specific_parser.add_argument(f'--{param.key}', type=param.parse, required=False, help=getattr(param, "help", ""))
+    parser.add_argument('--server-debug', action='store_true')
+    parser.add_argument('--no-server-debug', dest='server_debug', action='store_false')
+    parser.set_defaults(server_debug=False)
 
     args = parser.parse_args()
 
-    # Note that it doesn't matter if we include invalid settings. Configurable will just ignore them
-    settings = {key: val for key, val in vars(args).items() if val is not None}
-
-    
-    server_kwargs={}
+    async_mode = args.async_mode
     if not args.interactive:
         # Don't force threading async mode since we are not going to interact from a different python
         # thread.
-        server_kwargs["async_mode"] = None
+        async_mode = None
 
     launch(
-        interactive=args.interactive, load_session=args.load, session_settings=settings, 
-        session_cls=args.session_class, only_api=args.only_api, no_api=args.no_api,
-        server_kwargs=server_kwargs
+        async_mode=async_mode, frontend=args.frontend, server=args.server,
+        server_host=args.server_host, server_port=args.server_port, server_debug=args.server_debug, 
+        interactive=args.interactive
     )

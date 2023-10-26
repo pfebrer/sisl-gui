@@ -1,43 +1,47 @@
-import ConfigurableObjectInterface from "./configurable";
-import { ShortcutsInterface } from "./shortcuts";
+export type ParameterKind = "POSITIONAL_ONLY" | "POSITIONAL_OR_KEYWORD" | "VAR_POSITIONAL" | "KEYWORD_ONLY" | "VAR_KEYWORD"
 
-export interface TabInterface {
-    id: string,
+export interface Parameter {
     name: string,
-    plots: string[],
-    layouts?: {
-        lg: any[],
-        [key:string]: any //More s
+    kind: ParameterKind,
+    type?: string,
+    default?: any,
+    help?: string
+}
+
+export interface NodeClass {
+    name: string,
+    parameters: {
+        [key: string]: Parameter
+    }
+    output_type?: any,
+    doc?: string
+}
+
+export interface Node {
+    class: number,
+    id: number,
+    inputs: { [key: string]: any },
+    output: any,
+    output_class: any,
+    logs: string,
+    outdated: boolean,
+    errored: boolean,
+    output_repr?: {
+        type: "text" | "plotlyfigure" | "html",
+        data: any
     }
 }
 
-export interface StructureInterface {
-    id: string,
-    name: string,
-    path: string,
+export interface Session {
+    nodes: {
+        [key: number]: {
+            name: string,
+            node: Node
+        }
+    },
+    node_classes: {
+        [key: number]: NodeClass
+    },
+    paths: string[],
+    logs: string
 }
-
-export interface PlotableInterface {
-    id: string,
-    name: string,
-    path: string,
-    plots: string[],
-    default_plot: string,
-}
-
-export interface StructOrPlotableInterface extends StructureInterface{
-    plots?: string[],
-    default_plot?: string,
-}
-
-export interface SessionInterface extends ConfigurableObjectInterface{
-    sessionClass: string,
-    tabs: TabInterface[],
-    updatesAvailable: boolean,
-    plotOptions: {value: string, label:string}[],
-    structures: {[key:string]: StructureInterface},
-    plotables: { [key: string]: PlotableInterface },
-    shortcuts: ShortcutsInterface,
-}
-
-export default SessionInterface;
