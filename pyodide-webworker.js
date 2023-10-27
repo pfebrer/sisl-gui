@@ -17,6 +17,7 @@ def CONSTANT(value):
     return value
 
 from sisl_gui.server.session import Session
+from sisl_gui.server.pyodide import for_js as sisl_gui_for_js
 
 session = Session()
 `
@@ -40,7 +41,7 @@ async function loadRuntime() {
 
     setStatus(102)
 
-    await pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", ])//"netCDF4"
+    await pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", "netCDF4" ])
     await pyodide.loadPackage("micropip")
         
     const micropip = pyodide.pyimport("micropip")
@@ -69,7 +70,8 @@ async function loadRuntime() {
 
 async function sendSession() {
     const session = pyodide.globals.get("session")
-    const session_obj = session.to_deep_json().toJs({dict_converter: Object.fromEntries})
+    const for_js = pyodide.globals.get("sisl_gui_for_js")
+    const session_obj = for_js(session).toJs({dict_converter: Object.fromEntries})
 
     globalThis.session = session
     globalThis.session_obj = session_obj
@@ -122,11 +124,13 @@ self.onmessage = async (event) => {
         const {methodName, args, kwargs} = event.data
         const ret = await applyMethod(methodName, args, kwargs)
 
+        const for_js = pyodide.globals.get("sisl_gui_for_js")
+
         try {
-            event.ports[0].postMessage({return: ret})
+            event.ports[0].postMessage({return: for_js(ret)})
         } catch (e) {
             try {
-                event.ports[0].postMessage({return: ret.toJs({dict_converter: Object.fromEntries})})
+                event.ports[0].postMessage({return: for_js(ret).toJs({dict_converter: Object.fromEntries})})
             } catch {
                 event.ports[0].postMessage({return: null})
             } 
