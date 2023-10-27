@@ -8,14 +8,14 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip'
-import TextField from '@mui/material/TextField'
 
 import NodeInputs from '../node_windows/NodeInputs';
+import NodeClassPicker from './NodeClassPicker';
 
 import type { RootState } from '../../App'
 
 import PythonApiContext from '../../apis/context';
+
 
 interface NewNodesProps {
     onFinish: () => void
@@ -124,50 +124,3 @@ const NewNodes: FC<NewNodesProps> = (props) => {
 }
 
 export default NewNodes;
-
-interface NodeClassPickerProps {
-    value?: number,
-    onChange?: (value: number) => void
-    style?: React.CSSProperties
-}
-
-const NodeClassPicker: FC<NodeClassPickerProps>= (props) => {
-
-    const [nameFilter, setNameFilter] = useState("")
-    const [selectedNode, setSelectedNode] = useState(0)
-
-    const value = props.value || selectedNode
-    const onChange = props.onChange || setSelectedNode
-
-    const session = useSelector((state: RootState) => state.session)
-
-    const node_classes = session.node_classes
-
-    var classes_ids = Object.keys(node_classes).map(Number)
-
-    if (nameFilter) {
-        classes_ids = classes_ids.filter(key => session.node_classes[key].name.includes(nameFilter))
-    }
-
-    return (
-        <div style={{display: "flex", flexDirection: "column", justifyContent: "space-between", ...props.style}}>
-            <div style={{padding: 20, borderBottom: "solid gray 1px"}}>
-                <TextField label="Search" value={nameFilter} size="small" onChange={(e) => setNameFilter(e.target.value)} />
-            </div>
-            <div className={"no-scrollbar"} style={{flex: 1, overflow: "scroll"}}>
-                {classes_ids.map((class_id, index) => (
-                    <Chip
-                        key={index}
-                        variant="outlined"
-                        label={node_classes[class_id].name}
-                        sx={{ margin: 2, backgroundColor: value === class_id ? "#ccc" : undefined }}
-                        onClick={() => onChange(class_id)}
-                    />
-                ))}
-            </div>
-            <div className="no-scrollbar" style={{padding: 20, maxHeight: "50%", overflowY: "scroll"}}>
-                <pre>{node_classes[value]?.doc || "No documentation"}</pre>
-            </div>
-        </div>
-    )
-}

@@ -10,17 +10,20 @@ export interface Parameter {
 
 export interface NodeClass {
     name: string,
+    id: number,
+    module: string,
     parameters: {
         [key: string]: Parameter
     }
     output_type?: any,
-    doc?: string
+    doc?: string,
 }
 
 export interface Node {
     class: number,
     id: number,
     inputs: { [key: string]: any },
+    inputs_mode: { [key: string]: string },
     output: any,
     output_class: any,
     logs: string,

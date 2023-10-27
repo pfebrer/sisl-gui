@@ -67,9 +67,13 @@ class Session:
             "keep_uploaded": False,
         }
 
-    def get_file_plot_options(self, file_name):
+    def get_file_plot_options(self, file_name: str) -> List[str]:
 
-        plot_handler = sisl.get_sile(file_name).plot
+        try:
+            plot_handler = sisl.get_sile(file_name).plot
+        except:
+            return []
+        
         options = list(plot_handler._dispatchs.keys())
 
         return options
@@ -444,19 +448,4 @@ class Session:
             nodes=self.nodes,
             node_classes=self._node_classes
         )
-    
-    def to_deep_json(self):
-
-        encoder = CustomJSONEncoder()
-
-        def encode(obj):
-
-            if isinstance(obj, dict):
-                return {k: encode(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [encode(v) for v in obj]
-            else:
-                return as_jsonable(encoder, obj)
-            
-        return encode(self.to_json())
     

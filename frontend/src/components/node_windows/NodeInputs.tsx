@@ -25,7 +25,7 @@ interface NodeInputsProps {
 const NodeInputs = (props: NodeInputsProps) => {
 
     const propsInputs = { ...props.node?.inputs, ...props.inputs}
-    const propsInputsMode = { ...props.inputsMode}
+    const propsInputsMode = { ...props.node?.inputs_mode, ...props.inputsMode}
 
     const [stateInputs, setStateInputs] = useState(propsInputs || {})
     const [stateInputsMode, setStateInputsMode] = useState<{[key: string]: string}>({})

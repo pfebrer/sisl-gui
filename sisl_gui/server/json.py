@@ -106,8 +106,14 @@ def annotation_to_input_type(annotation):
     return input_type
 
 def as_jsonable(encoder, obj):
-    if not isinstance(obj, (tuple, float, str, int, bool, type(None), np.ndarray)):
-        return encoder.default(obj)
+    if isinstance(obj, np.ndarray) and not np.issubdtype(obj.dtype, np.number):
+        return as_jsonable(encoder, obj.tolist())
+    elif isinstance(obj, (list, tuple)):
+        return type(obj)([as_jsonable(encoder, v) for v in obj])
+    elif isinstance(obj, dict):
+        return {k: as_jsonable(encoder, v) for k, v in obj.items()}
+    elif not isinstance(obj, (tuple, float, str, int, bool, type(None), np.ndarray)):
+        return as_jsonable(encoder, encoder.default(obj))
     else:
         return obj
 
@@ -121,6 +127,7 @@ def node_class_to_json(encoder, node_class: Type[Node]):
     """
     json_node_cls = {}
 
+    json_node_cls['module'] = node_class.__module__
     json_node_cls['id'] = id(node_class)
     json_node_cls['name'] = node_class.__name__
     json_node_cls['doc'] = node_class.__doc__
@@ -243,12 +250,12 @@ class CustomJSONEncoder(JSONEncoder):
         elif isinstance(obj, type) and issubclass(obj, Node):
             return node_class_to_json(self, obj)
         elif isinstance(obj, type):
-            return str(obj)
+            return repr(obj)
         
         try:
             return super().default(obj)
         except Exception as e:
-            return str(obj)
+            return repr(obj)
         
 class CustomJsonModule:
     """Class that mimics the simplejson module, but with a custom JSON encoder

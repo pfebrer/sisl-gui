@@ -1,12 +1,8 @@
 import { useContext, useRef, useState } from "react"
 import { useSelector } from 'react-redux'
 
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import DeleteIcon from '@mui/icons-material/Delete';
-
 import PythonApiContext from "../../apis/context"
-import { Button, FormControl, IconButton, InputLabel, List, ListItem, MenuItem, Paper, Select, TextField, Typography } from "@mui/material"
+import { Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, TextField, Typography, Grid, Chip} from "@mui/material"
 import NodeDashboard from "../node_windows/NodeDashboard";
 
 import type { RootState } from "../../App";
@@ -62,15 +58,23 @@ const FilePlotter = (props: FilePlotterProps) => {
 
     const removeFile = (file: File) => {
         const files = uploadedFiles.filter(f => f !== file)
+        if (file === selectedFile){
+            setSelectedFile(null)
+            setPlotOptions([])
+        
+        }
         setUploadedFiles(files)
     }
 
     const updatePlotOptions = async (filename: string) => {
 
-        const options = await pythonApi.getFilePlotOptions(filename) as unknown as string[]
-
-        setPlotOptions(options)
-        setSelectedPlotMethod(options[0])
+        pythonApi.getFilePlotOptions(filename).then((options) => {
+            const opts = options as unknown as string[]
+            setPlotOptions(opts)
+            setSelectedPlotMethod(opts[0])
+        }).catch((e) => {
+            setPlotOptions([])
+        })
 
     }
 
@@ -129,11 +133,10 @@ const FilePlotter = (props: FilePlotterProps) => {
     }
 
 
-    return <div id="content" style={{ display: "flex", height: "100%"}}>
+    return <Grid container style={{height: "100%", overflow: "hidden"}}>
 
-        <div style={{ flex: 1, padding: 20}}>
-            
-            <List style={{display: "flex", flexDirection: "column", height: "100%"}} component="nav" aria-label="mailbox folders">
+        <Grid item xs={12} md={6} lg={6}>
+            <List style={{display: "flex", flexDirection: "column", height: "100%", padding: 20}} component="nav" aria-label="mailbox folders">
                 <ListItem divider style={{flex: 1}}>
                     <div style={{width: "100%", height: "100%", display: "flex", flexDirection: "column"}}>
                     <Typography style={{marginTop: 10, marginBottom: 10}}><b>Step 1:</b> Upload files and select the main one.</Typography>
@@ -143,27 +146,20 @@ const FilePlotter = (props: FilePlotterProps) => {
                             <Button onClick={clickFileInput}>Drag files or click here to upload</Button>
                         </div>
                         <div>
-                        <ToggleButtonGroup
-                            value={selectedFile}
-                            exclusive
-                            onChange={(e, value) => onFileSelect(value)}
-                            aria-label="select file"
-                            style={{display: "flex", flexFlow: "row wrap"}}
-                            >
-                                {uploadedFiles.map(up_file => (
-                                    <ToggleButton style={{backgroundColor: up_file === selectedFile? "" : "white", border: "solid 0px", borderRadius: 2, margin: 5, padding: 0}} value={up_file} aria-label="left aligned">
-                                        <Paper style={{backgroundColor: "inherit", padding: 5, paddingRight: 15, paddingLeft: 10, display: "flex", alignItems: "center"}}>
-                                        <IconButton
-                                            style={{marginRight: 5}} 
-                                        size="small" color="error" aria-label="delete" onClick={() => removeFile(up_file)}>
-                                            <DeleteIcon fontSize="inherit" />
-                                        </IconButton>
-                                        <div>{up_file.name}</div>
-                                        </Paper>
-                                    </ToggleButton>)
-                                    
-                                )}
-                            </ToggleButtonGroup>
+                        <Grid container spacing={1} justifyContent={"flex-start"}>
+                        {uploadedFiles.map((up_file) => <Grid item xs={12} md={6} lg={6} xl={4}>
+                            <Chip
+                            style={{
+                                width: "100%",
+                                borderRadius: 3
+                            }}
+                            label={up_file.name} 
+                            variant={up_file === selectedFile ? "filled" : "outlined"}
+                            onDelete={() => removeFile(up_file)}
+                            onClick={() => onFileSelect(up_file)}/>
+                        </Grid>
+                        )}
+                        </Grid>
                         </div>
                     </div>
                     <input style={{display: "none"}} multiple id="file-selector" name="file-selector" type="file" ref={fileInputRef} className="sr-only" onChange={onFileUpload}/>
@@ -209,19 +205,20 @@ const FilePlotter = (props: FilePlotterProps) => {
                     </div>
                 </ListItem>
             </List>
-
-        </div>
-        <div style={{flex: 1, backgroundColor: "rgb(238, 242, 246)", display: "flex", flexDirection: "column"}}>
+        </Grid>
+        <Grid item xs={12} md={6} lg={6} style={{height: "100%"}}>
+        <div style={{height: "100%", overflow: "hidden", backgroundColor: "rgb(238, 242, 246)", display: "flex", flexDirection: "column"}}>
             {loadingPlot && <div style={{display: "flex", alignItems: "center", padding: 10, justifyContent: "center"}}>
                 <Typography variant="h6" style={{paddingLeft: 10}}>The backend is computing the new plot...</Typography>
                 <EllipsisLoader style={{marginLeft: 50}} dotStyle={{backgroundColor: "rgb(182, 213, 245)"}}/>
             </div>}
-            <div style={{flex: 1}}>
+            <div style={{flex: 1, overflow: "hidden"}}>
                 <NodeDashboard node={node} name={nodeName} node_id={node_id} defaultWindows={["Output"]}/>
             </div>
         </div>
+        </Grid>
+    </Grid>
 
-    </div>
 }
 
 export default FilePlotter;
