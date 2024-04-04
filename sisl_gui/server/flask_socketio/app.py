@@ -32,8 +32,12 @@ register_environ_variable("SISL_GUI_SERVER_PORT", 4000,
                           "The port where the GUI will run when self-hosted by the user.",
                           process=int)
 
-
 __all__ = ["SocketioApp"]
+
+class SocketioLastUpdateEmiter(SocketioConnection):
+
+    def after_modification(self, obj):
+        return emit("session_last_update", obj.last_update, broadcast=True)
 
 class SocketioApp(App):
 
@@ -65,7 +69,7 @@ class SocketioApp(App):
         if False:
             listen_to_users(on, emit_session)
 
-        connection = SocketioConnection(socketio)
+        connection = SocketioLastUpdateEmiter(socketio)
 
         self.socketio = socketio
 
@@ -87,22 +91,21 @@ class SocketioApp(App):
             emit_session(self.session, broadcast=True)
             raise err
 
-        @on("request_session")
+        @on("request_last_updates")
         @if_user_can("see")
         def send_session(path=None):
-            print("SEND SESSION", self.session)
-            return self.session
+            return self.session.last_update if self.session else {}
 
         @on("apply_method_on_session")
         @if_user_can("edit")
         def apply_method(method_name, kwargs={}, *args):
-            print("APPLYING METHOD ON SESSION", self.session)
 
             session = self.session
 
             if session is None:
                 raise Exception("The app is not associated with any session.")
             
+            session.logger.info(f"Applying method {method_name}")
             session.logger.debug(f"Applying method {method_name} with args {args} and kwargs {kwargs}")
 
             if kwargs is None:

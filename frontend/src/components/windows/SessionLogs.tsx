@@ -1,12 +1,16 @@
-import { useSelector } from 'react-redux'
-
-import { RootState } from '../../App'
 import LogsWindow from './LogsWindow';
+import { useContext, useEffect, useState } from 'react';
+import PythonApiContext from '../../apis/context';
 
-type Props = {}
+const SessionLogs = () => {
+    const [session_logs, setSessionLogs] = useState<string>("")
+    
+    const {pythonApi} = useContext(PythonApiContext)
 
-const SessionLogs = (props: Props) => {
-    const session_logs = useSelector((state: RootState) => state.session.logs)
+    useEffect(() => {
+        pythonApi.getSessionLogs().then((logs: any) => logs && setSessionLogs(logs))
+    }, [pythonApi])
+
     return <LogsWindow logs={session_logs}/>
 }
 

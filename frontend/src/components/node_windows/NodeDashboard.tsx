@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext} from 'react'
-import { useSelector } from 'react-redux'
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -11,12 +10,14 @@ import NodeMultiWindow from './NodeMultiWindow';
 import PythonApiContext from '../../apis/context';
 
 import type { Node } from '../../interfaces';
-import type { RootState } from '../../App'
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+import { NodeClassesContext } from '../../context/session_context';
 
 interface NodeDashboardProps {
     node: Node,
     node_id: number,
     name: string,
+    actions?: string[]
     defaultWindows?: string[],
     windows?: string[],
     onWindowsChange?: (windows: string[]) => void,
@@ -25,6 +26,8 @@ interface NodeDashboardProps {
 const NodeDashboard = (props: NodeDashboardProps) => {
     const node = props.node
     const name = props.name
+
+    const actions = props.actions
 
     const {pythonApi} = useContext(PythonApiContext)
 
@@ -45,7 +48,7 @@ const NodeDashboard = (props: NodeDashboardProps) => {
         setUpdatedName("")
     }, [props.node_id])
 
-    const node_classes = useSelector((state: RootState) => state.session.node_classes)
+    const node_classes = useContext(NodeClassesContext)
 
     if (!node) return <NodeOutput node={undefined}/>
 
@@ -64,6 +67,17 @@ const NodeDashboard = (props: NodeDashboardProps) => {
             onChangeInputsMode: setInputsMode,
             fieldprops: fieldprops,
         },
+    }
+
+    const actionButtons: {[key: string]: ReactJSXElement} = {
+        remove: <Button color="error" onClick={() => pythonApi.removeNode(node.id)}>REMOVE</Button>,
+        compute: <Button onClick={() => pythonApi.computeNode(node.id)}>COMPUTE</Button>,
+        duplicate: <Button onClick={() => pythonApi.duplicateNode(node.id)}>DUPLICATE</Button>,
+        update_inputs: <Button onClick={() => { pythonApi.updateNodeInputs(node.id, inputsToUpdate, inputsModeToUpdate); setInputsToUpdate({}) }}>UPDATE_INPUTS</Button>,
+        to_workflow: <Button onClick={() => pythonApi.nodeToWorkflow(node.id)}>TO_WORKFLOW</Button>,
+        reset_inputs: <Button onClick={() => { setInputsToUpdate({}); setInputsMode({}) }}>RESET_INPUTS</Button>,
+        new_window: <Button onClick={() => setWindows([...windows, "Inputs"])}>NEW_WINDOW</Button>,
+        "...": <Button>...</Button>,
     }
 
     return <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", 
@@ -88,14 +102,7 @@ const NodeDashboard = (props: NodeDashboardProps) => {
                 </div>
                 
                 <ButtonGroup  size="small" aria-label="outlined primary button group" style={{padding: 10 }}>
-                    <Button color="error" onClick={() => pythonApi.removeNode(name)}>REMOVE</Button>
-                    <Button onClick={() => pythonApi.computeNode(name)}>COMPUTE</Button>
-                    <Button onClick={() => { pythonApi.duplicateNode(name) }}>DUPLICATE</Button>
-                    <Button onClick={() => { pythonApi.updateNodeInputs(name, inputsToUpdate, inputsModeToUpdate); setInputsToUpdate({}) }}>UPDATE_INPUTS</Button>
-                    <Button onClick={() => pythonApi.nodeToWorkflow(name)}>TO_WORKFLOW</Button>
-                    <Button onClick={() => { setInputsToUpdate({}); setInputsMode({}) }}>RESET_INPUTS</Button>
-                    <Button onClick={() => setWindows([...windows, "Inputs"])}>NEW_WINDOW</Button>
-                    <Button onClick={() => { setInputsToUpdate({}); setInputsMode({}) }}>...</Button>
+                    {(actions || Object.keys(actionButtons)).map((action) => actionButtons[action])}
                 </ButtonGroup>
                 
                 

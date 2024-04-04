@@ -1,12 +1,10 @@
 import { useContext, useRef, useState } from "react"
-import { useSelector } from 'react-redux'
 
 import PythonApiContext from "../../apis/context"
 import { Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, TextField, Typography, Grid, Chip} from "@mui/material"
 import NodeDashboard from "../node_windows/NodeDashboard";
-
-import type { RootState } from "../../App";
 import EllipsisLoader from "../loading/EllipsisLoader";
+import { NodesContext } from "../../context/session_context";
 
 interface FilePlotterProps {
 
@@ -27,10 +25,10 @@ const FilePlotter = (props: FilePlotterProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const plotMethodSelectorRef = useRef<HTMLSelectElement>(null)
 
-    const nodes = useSelector((state: RootState) => state.session.nodes)
+    const nodes = useContext(NodesContext)
 
     const node_id = currentNodeID || 0
-    const {node, name: nodeName} = nodes[node_id] || {node: undefined, name: undefined}
+    const {node, name: nodeName} = (nodes || {})[node_id] || {node: undefined, name: undefined}
 
     const onFileUpload = (e: any) => {
 

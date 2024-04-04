@@ -65,13 +65,14 @@ interface NodeMultiWindowProps {
     modes?: { [key: string]: React.ReactNode },
     modes_props?: { [key: string]: { [key: string]: any } },
     mode?: string,
+    defaultMode?: string,
     onModeChange?: (mode: string) => void,
     onClose?: () => void,
     style?: React.CSSProperties
 }
 
 const NodeMultiWindow = (props: NodeMultiWindowProps) => {
-    const [selectedTab, setSelectedTab] = useState("Inputs")
+    const [selectedTab, setSelectedTab] = useState(props.defaultMode || "Inputs")
 
     const { node, node_class } = props
 

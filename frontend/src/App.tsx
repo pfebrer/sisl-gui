@@ -2,47 +2,51 @@ import React, { useEffect } from 'react';
 //import './App.css';
 //import "./styles/main.scss";
 
-
-//--Redux
-import getStoreAndPersistor from './redux/store'
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
 import MainPage from './pages/MainPage';
 
-import PythonApiContext, { PythonApiStatusContext } from './apis/context';
 import { PythonApi } from './apis/PythonApi';
-
-const {store, persistor} = getStoreAndPersistor()
+import PythonApiContext, { PythonApiStatusContext } from './apis/context';
+import { SessionLastUpdatesContext, SessionSynchronizer } from './context/session_context';
+import { TooltipsLevel, TooltipsLevelContext } from './context/tooltips';
+import { SessionLastUpdates } from './interfaces';
 
 function App() {
 
     const [ pythonApi, setPythonApi ] = React.useState<PythonApi>(new PythonApi())
     const [ pythonApiStatus, setPythonApiStatus ] = React.useState<PythonApi["status"]>(pythonApi.status)
 
+    const [lastUpdates, setLastUpdates] = React.useState<SessionLastUpdates>({nodes: 0., flows: 0., node_classes: 0.})
+
+    const [tooltipsLevel, setTooltipsLevel] = React.useState<TooltipsLevel>("normal")
+
     useEffect(() => {
         pythonApi.onStatusChange = (status) => {
             setPythonApiStatus(status)
         }
+        pythonApi.onReceiveLastUpdate((updates: any) => {
+            setLastUpdates(updates)
+        })
     }, [pythonApi])
 
     return (
-        <Provider store={store}>
-        <PersistGate persistor={persistor}>
+        <>
             <PythonApiStatusContext.Provider value={pythonApiStatus}>
             <PythonApiContext.Provider value={{pythonApi, setPythonApi}}>
-            {/* <Syncronizer/> */}
-            <div className="App" style={{display: "flex", flexDirection: "column"}}>
-            <div className = "appContent" style={{height: "100vh"}}>
-                <MainPage/>
-            </div>   
-            </div>
+                <SessionLastUpdatesContext.Provider value={lastUpdates}>
+                <SessionSynchronizer>
+                <TooltipsLevelContext.Provider value={{tooltipsLevel, setTooltipsLevel}}>
+                <div className="App" style={{display: "flex", flexDirection: "column"}}>
+                <div className = "appContent" style={{height: "100vh"}}>
+                    <MainPage/>
+                </div>   
+                </div>
+                </TooltipsLevelContext.Provider>
+                </SessionSynchronizer>
+                </SessionLastUpdatesContext.Provider>
             </PythonApiContext.Provider>
             </PythonApiStatusContext.Provider>
-        </PersistGate>
-        </Provider>
+        </>
     );
 }
-
-export type RootState = ReturnType<typeof store.getState>
 
 export default App;

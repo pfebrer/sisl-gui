@@ -1,7 +1,4 @@
-import { useState} from 'react'
-
-//--Redux
-import { useSelector } from 'react-redux'
+import { useContext, useEffect, useMemo, useState} from 'react'
 
 import TextField from '@mui/material/TextField';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -10,9 +7,9 @@ import Tab from '@mui/material/Tab';
 import ToggleButton from '@mui/material/ToggleButton';
 import { styled } from '@mui/material/styles';
 
-import type { RootState } from '../../App'
 import NewNodes from './NewNodes';
 import NodeDashboard from '../node_windows/NodeDashboard';
+import { NodeClassesContext, NodesContext } from '../../context/session_context';
 
 const NodesTabs = styled(Tabs)({
     borderRightWidth: 0,
@@ -41,6 +38,7 @@ const NodeTab = styled(Tab)({
 
 interface NodeExplorerViewProps {
     style: { [key: string]: any },
+    defaultNode?: number
 }
 
 const NodeExplorer = (props: NodeExplorerViewProps) => {
@@ -50,19 +48,26 @@ const NodeExplorer = (props: NodeExplorerViewProps) => {
     const [classFilter, setClassFilter] = useState("")
     const [nameFilter, setNameFilter] = useState("")
 
-    const nodes = useSelector((state: RootState) => state.session.nodes)
-    const node_classes = useSelector((state: RootState) => state.session.node_classes)
+    const nodes = useContext(NodesContext)
+    const node_classes = useContext(NodeClassesContext)
 
-    var nodes_keys = Object.keys(nodes || {}).map(Number)
+    const { defaultNode } = props
 
-    if (nameFilter){
-        nodes_keys = nodes_keys.filter(key => nodes[key].name.includes(nameFilter))
-    }
-    if (classFilter){
-        nodes_keys = nodes_keys.filter(key => node_classes[nodes[key].node.class].name.includes(classFilter))
-    }
+    useEffect(() => {
+        if (defaultNode) setSelectedNode(defaultNode)
+    }, [defaultNode])
 
-    const selected_obj = nodes[selectedNode]
+    const all_keys = useMemo(() => Object.keys(nodes || {}).map(Number), [nodes])
+
+    const filtered_by_name = useMemo(() => {
+        if (nameFilter) return all_keys.filter(key => nodes[key].name.includes(nameFilter))
+        return all_keys
+    }, [all_keys, nodes, nameFilter])
+
+    const nodes_keys = useMemo(() => {
+        if (classFilter) return filtered_by_name.filter(key => node_classes[nodes[key].node.class].name.includes(classFilter))
+        return filtered_by_name
+    }, [filtered_by_name, node_classes, classFilter, nodes])
 
     const tabs = <NodesTabs
         orientation="vertical"
@@ -86,9 +91,8 @@ const NodeExplorer = (props: NodeExplorerViewProps) => {
             :
         <NodeDashboard
             node_id={selectedNode}
-            name={selected_obj?.name} 
-            node={selected_obj?.node}
-            
+            name={nodes && nodes[selectedNode]?.name} 
+            node={nodes && nodes[selectedNode]?.node}
         />
 
     return <div style={{ display: "flex", height: "100%", ...props.style}}>

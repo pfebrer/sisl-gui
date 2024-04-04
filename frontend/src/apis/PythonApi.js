@@ -11,6 +11,8 @@ class PythonApi {
         200: "Connected",
     }
 
+    allows_runpython = false
+
     type = "none"
 
     constructor(settings) {
@@ -19,6 +21,7 @@ class PythonApi {
 
         this.connectCallbacks = []
         this.disconnectCallbacks = []
+        this.receiveLastUpdateCallbacks = []
         this.receiveSessionCallbacks = []
 
         this.setStatus(100)
@@ -38,13 +41,13 @@ class PythonApi {
         this.disconnectCallbacks.push(callback)
     }
 
-    onReceiveSession = (callback, ...args) => {
-        this.receiveSessionCallbacks.push(callback)
+    onReceiveLastUpdate = (callback, ...args) => {
+        this.receiveLastUpdateCallbacks.push(callback)
     }
 
-    receivedSession = (session) => {
-        this.session = session
-        this.receiveSessionCallbacks.forEach(callback => callback(session))
+    receivedLastUpdate = (last_update) => {
+        this.last_update = last_update
+        this.receiveLastUpdateCallbacks.forEach(callback => callback(last_update))
     }
 
     get connected() {
@@ -94,8 +97,44 @@ class PythonApi {
         return this._sessionMethod("plot_uploaded_file", { file_bytes: file, name: file.name, method: method , node_name: plot_name, additional_files: additional_filesDict })
     }
 
+    saveSession = async (path) => {
+        return this._sessionMethod("save", { path: path })
+    }
+
+    savesSession = async (as_string) => {
+        return this._sessionMethod("saves", { as_string: as_string })
+    }
+
+    loadSession = async (path) => {
+        return this._sessionMethod("load", { path: path })
+    }
+
+    loadsSession = async (session_string) => {
+        return this._sessionMethod("loads", { state: session_string })
+    }
+
+    getSessionLogs = async () => {
+        return this._sessionMethod("get_logs")
+    }
+
+    getNodeClasses = async () => {
+        return this._sessionMethod("get_node_classes")
+    }
+
+    getNodes = async () => {
+        return this._sessionMethod("get_nodes")
+    }
+
     getNode = async (name) => {
         return this._sessionMethod("get_node", { key: name })
+    }
+
+    getNodeLogs = async (name) => {
+        return this._sessionMethod("get_node_logs", { key: name })
+    }
+
+    getCompatibleFollowingNodes = async (name, return_id) => {
+        return this._sessionMethod("get_compatible_following_nodes", { node_key: name, return_id: return_id || false })
     }
 
     removeNode = async (name) => {
@@ -108,6 +147,10 @@ class PythonApi {
 
     duplicateNode = async (name) => {
         return this._sessionMethod("duplicate_node", { key: name })
+    }
+
+    nodeInputToNode = async (node_name, inputKey, new_name) => {
+        return this._sessionMethod("node_input_to_node", { key: node_name, input_key: inputKey, name: new_name})
     }
 
     computeNode = async (name) => {
@@ -124,6 +167,30 @@ class PythonApi {
 
     updateNodeInputs = async (name, kwargs, inputModes) => {
         return this._sessionMethod("update_node_inputs", { key: name, kwargs: kwargs || {}, input_modes: inputModes || {} })
+    }
+
+    resetNodeInputs = async (name, input_keys) => {
+        return this._sessionMethod("reset_node_inputs", { key: name, input_keys: input_keys })
+    }
+
+    getForwardNodes = async (roots, return_id) => {
+        return this._sessionMethod("get_forward_nodes", { roots: roots, return_id: return_id || false})
+    }
+
+    getBackwardNodes = async (roots, return_id) => {
+        return this._sessionMethod("get_backward_nodes", { roots: roots, return_id: return_id || false})
+    }
+
+    getConnectedNodes = async (roots, return_id) => {
+        return this._sessionMethod("get_connected_nodes", { roots: roots, return_id: return_id || false})
+    }
+
+    setFlows = async (flows) => {
+        return this._sessionMethod("set_flows", { flows: flows })
+    }
+
+    getFlows = async () => {
+        return this._sessionMethod("get_flows", {})
     }
 
     runPython = async (code) => {
@@ -225,10 +292,9 @@ class SocketPythonApi extends PythonApi {
         this.on('error', (err) => this.handleError(err, "socket"));
 
         this.on('server_error', (err) => this.handleError(err, "server"));
-        
-        this.on('current_session', (session) => {
-            document.session = session
-            this.receivedSession(session)
+
+        this.on('session_last_update', (last_update) => {
+            this.receivedLastUpdate(last_update)
         })
 
         this.on('loading_plot', (info) => {
@@ -242,9 +308,8 @@ class SocketPythonApi extends PythonApi {
     }
 
     requestSession = (path) => {
-        this.socket.emit('request_session', path, (session) => {
-            document.session = session
-            this.receivedSession(session)
+        this.socket.emit('request_last_updates', path, (last_updates) => {
+            this.receivedLastUpdate(last_updates)
         })
     }
 
@@ -275,6 +340,8 @@ class SocketPythonApi extends PythonApi {
 class PyodidePythonApi extends PythonApi {
 
     type = "pyodide"
+
+    allows_runpython = true
 
     static defaultApiSettings = {
         mounts: [],
@@ -310,10 +377,8 @@ class PyodidePythonApi extends PythonApi {
         this.pyodide_worker.onmessage = (event) => {
             if (event.data.type === "status") {
                 this.setStatus(event.data.status)
-            } else if (event.data.type === "session") {
-                this.session = event.data.session
-
-                this.receivedSession(this.session)
+            } else if (event.data.type === "last_update") {
+                this.receivedLastUpdate(event.data.last_update)
             }
         }
 
@@ -339,7 +404,7 @@ class PyodidePythonApi extends PythonApi {
 
     requestSession = (path) => {
 
-        this.pyodide_worker.postMessage({type: "session"})
+        this.pyodide_worker.postMessage({type: "last_update"})
     
     }
 

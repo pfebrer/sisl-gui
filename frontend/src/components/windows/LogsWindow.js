@@ -15,7 +15,7 @@ const LogsWindow = (props) => {
         width: "100%", height: "100%", overflow: "scroll", ...props.style
     }}>
         <Editor
-    value={props.logs}
+    value={props.logs || ""}
     onValueChange={code => {}}
     highlight={code => highlight(code, languages.log)}
     padding={10}

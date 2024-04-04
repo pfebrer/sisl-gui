@@ -1,6 +1,5 @@
 import { FC, useState, useEffect, useContext } from 'react'
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
@@ -12,9 +11,8 @@ import Typography from '@mui/material/Typography';
 import NodeInputs from '../node_windows/NodeInputs';
 import NodeClassPicker from './NodeClassPicker';
 
-import type { RootState } from '../../App'
-
 import PythonApiContext from '../../apis/context';
+import { NodeClassesContext } from '../../context/session_context';
 
 
 interface NewNodesProps {
@@ -29,7 +27,7 @@ const NewNodes: FC<NewNodesProps> = (props) => {
     const [inputs, setInputs] = useState({})
     const [inputsMode, setInputsMode] = useState<{ [key: string]: string }>({})
 
-    const session = useSelector((state: RootState) => state.session)
+    const node_classes = useContext(NodeClassesContext)
 
     const {pythonApi} = useContext(PythonApiContext) 
 
@@ -58,7 +56,7 @@ const NewNodes: FC<NewNodesProps> = (props) => {
             className="no-scrollbar"
             inputs={inputs}
             onChange={(changed_inputs) => setInputs({ ...inputs, ...changed_inputs })}
-            node_class={session.node_classes[selectedNodeClass]}
+            node_class={node_classes[selectedNodeClass]}
             inputsMode={inputsMode}
             onChangeInputsMode={(changed_inputs) => setInputsMode({ ...inputsMode, ...changed_inputs })}
         />

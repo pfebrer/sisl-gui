@@ -1,6 +1,7 @@
 """Implements conversion from python elements to JSON to send the messages."""
 
-from typing import get_type_hints, Type, Dict, Callable
+import typing
+from typing import Type, Dict, Callable, Tuple, Any, Literal, Optional
 
 import pathlib
 
@@ -91,6 +92,16 @@ def annotation_to_input_type(annotation):
         The annotation of the function argument.
     """
 
+    try:
+        orig = typing.get_origin(annotation)
+        if orig is typing.Literal:
+            input_type = 'select'
+            options = typing.get_args(annotation)
+            return input_type, {"options": options}
+    except:
+        pass
+
+
     if isinstance(annotation, type):
         annotation = annotation.__name__
         
@@ -103,7 +114,7 @@ def annotation_to_input_type(annotation):
         'bool': 'bool',
     }.get(annotation)
 
-    return input_type
+    return input_type, {}
 
 def as_jsonable(encoder, obj):
     if isinstance(obj, np.ndarray) and not np.issubdtype(obj.dtype, np.number):
@@ -135,10 +146,8 @@ def node_class_to_json(encoder, node_class: Type[Node]):
     parameters_help = get_fields_help_from_function(node_class.function)
 
     if hasattr(node_class, "function"):
-        try:
-            type_hints = get_type_hints(node_class.function)
-        except:
-            type_hints = {}
+
+        type_hints = node_class.typehints.copy()
 
         json_node_cls['output_type'] = str(type_hints.pop('return', None))
 
@@ -152,15 +161,59 @@ def node_class_to_json(encoder, node_class: Type[Node]):
             }
 
             if k in type_hints:
-                input_type = annotation_to_input_type(type_hints[k])
+                input_type, field_params = annotation_to_input_type(type_hints[k])
                 if input_type is not None:
                     parameter['type'] = input_type
+                    parameter['field_params'] = field_params
             if param.default is not inspect.Parameter.empty and param.default is not Node._blank:
                 parameter['default'] = as_jsonable(encoder, param.default)
 
             json_node_cls['parameters'][k] = parameter
 
+    if hasattr(node_class, "registry"):
+        json_node_cls['registry'] = {
+            str(k): id(node) for k, node in node_class.registry.items()
+        }
+
     return json_node_cls
+
+def get_inputs_mode(node: Node, encoder: Optional[JSONEncoder] = None) -> Tuple[Dict[str, Any], Dict[str, Literal["NODE"]]]:
+    """Given some inputs, finds out which of them are nodes and which are not.
+
+    Parameters
+    ----------
+    node : Node
+        The node for which to get the inputs mode.
+
+    Returns
+    -------
+    inputs
+        The inputs dictionary with the nodes replaced by their IDs.
+    inputs_mode
+        The dictionary indicating which inputs are nodes.
+    """
+    # Go over the inputs and find out which of them contain nodes
+    # We need to mark them so that the GUI knows it. Then, we replace
+    # the nodes by their ID.
+    inputs = {**node.inputs}
+    inputs_mode = {}
+    for k, v in inputs.items():
+        if k  == node._args_inputs_key and len(v) > 0 and isinstance(v[0], Node):
+            # This is the *args input, and it contains nodes
+            inputs_mode[k] = "NODE"
+            inputs[k] = [id(node) for node in v]
+        elif k == node._kwargs_inputs_key and len(v) > 0 and isinstance(list(v.values())[0], Node):
+            # This is the **kwargs input, and it contains nodes
+            inputs_mode[k] = "NODE"
+            inputs[k] = {k: id(node) for k, node in v.items()}
+        elif isinstance(v, Node):
+            # This is a simple input, and it contains a node
+            inputs_mode[k] = "NODE"
+            inputs[k] = id(v)
+        else:
+            inputs[k] = as_jsonable(encoder, v) if encoder is not None else v
+
+    return inputs, inputs_mode
 
 def node_to_json(encoder: JSONEncoder, node: Node):
     """Parses a node into a JSON object that can be sent to the client.
@@ -174,30 +227,15 @@ def node_to_json(encoder: JSONEncoder, node: Node):
 
     json_node['id'] = id(node)
     json_node['class'] = id(node.__class__)
-    json_node['inputs'] = dict(node.inputs)
-    json_node['logs'] = node.logs
+    
+    json_node["last_log"] = node.last_log
+    if getattr(encoder, "encode_node_logs", True):
+        json_node['logs'] = node.logs
+
     json_node['outdated'] = node._outdated
     json_node['errored'] = node._errored
 
-    # Go over the inputs and find out which of them contain nodes
-    # We need to mark them so that the GUI knows it. Then, we replace
-    # the nodes by their ID.
-    json_node['inputs_mode'] = {}
-    for k, v in json_node['inputs'].items():
-        if k  == node._args_inputs_key and len(v) > 0 and isinstance(v[0], Node):
-            # This is the *args input, and it contains nodes
-            json_node['inputs_mode'][k] = "NODE"
-            json_node['inputs'][k] = [id(node) for node in v]
-        elif k == node._kwargs_inputs_key and len(v) > 0 and isinstance(list(v.values())[0], Node):
-            # This is the **kwargs input, and it contains nodes
-            json_node['inputs_mode'][k] = "NODE"
-            json_node['inputs'][k] = {k: id(node) for k, node in v.items()}
-        elif isinstance(v, Node):
-            # This is a simple input, and it contains a node
-            json_node['inputs_mode'][k] = "NODE"
-            json_node['inputs'][k] = id(v)
-        else:
-            json_node['inputs'][k] = as_jsonable(encoder, v)
+    json_node['inputs'], json_node['inputs_mode'] = get_inputs_mode(node, encoder)
     
     output = node._output
 
@@ -232,6 +270,10 @@ class CustomJSONEncoder(JSONEncoder):
     Specifically, it can handle: node objects, session objects, node classes
     and plotly figures.
     """
+
+    def __init__(self, *args, node_logs: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.encode_node_logs = node_logs
 
     def default(self, obj):
 

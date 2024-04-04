@@ -8,6 +8,7 @@ interface NodeOutputProps {
     node: Node | undefined,
     node_class?: NodeClass,
     style?: React.CSSProperties
+    responsive?: boolean
 }
 
 const NodeOutput = (props: NodeOutputProps) => {
@@ -28,7 +29,7 @@ const NodeOutput = (props: NodeOutputProps) => {
             data={_.cloneDeep(node.output_repr.data?.data || [])}
             layout={_.cloneDeep({ autosize: true, title: "", ...node.output_repr.data?.template?.layout, ...node.output_repr.data?.layout })}
             frames={node.output_repr.data?.frames}
-            config={{ editable: true, responsive: true }}
+            config={{ editable: true, responsive: props.responsive !== undefined ? props.responsive : true }}
         /></div>
     } else if (node.output_repr?.type === "html") {
         return <div

@@ -1,10 +1,9 @@
-import { FC, useState } from 'react'
+import { FC, useContext, useState } from 'react'
 
+import { Autocomplete, Checkbox, InputAdornment, ToggleButton } from '@mui/material'
 import TextField from '@mui/material/TextField'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../App'
-import { Autocomplete, InputAdornment } from '@mui/material'
 
+import { NodesContext } from '../../context/session_context'
 import type { ParameterKind } from '../../interfaces'
 
 export type FieldType = "text" | "number" | "select" | "node" | "bool" | "file" | "json"
@@ -16,17 +15,17 @@ interface FieldProps {
     pendingUpdate?: boolean
     type: FieldType
     kind: ParameterKind
+    field_params?: {[key: string]: any}
     onChange: (value: any) => void
     warn?: boolean,
     success?: boolean
 }
 
-const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChange, warn, success}) => {
+const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChange, warn, success, field_params}) => {
 
     const [temporalValue, setTemporalValue] = useState<string | undefined>(undefined)
 
-    const nodes = useSelector((state: RootState) => state.session.nodes)
-    const paths = useSelector((state: RootState) => state.session.paths)
+    const nodes = useContext(NodesContext)
 
     const getInputValue = (value: any, default_value: any) => {
         var inputVal = value
@@ -105,26 +104,64 @@ const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChan
         //     filtered_paths = filtered_paths.filter(filter)
         // }
 
-        return (
-            <Autocomplete
-                //disablePortal
-                placeholder='Enter a path'
-                fullWidth
-                freeSolo
+        // return (
+        //     <Autocomplete
+        //         //disablePortal
+        //         placeholder='Enter a path'
+        //         fullWidth
+        //         freeSolo
+        //         size="small"
+        //         inputValue={temporalValue}
+        //         onInputChange={(e, val) => handleChange(val)}
+        //         options={paths}
+        //         renderInput={(params) => (
+        //             <TextField
+        //                 label={input_key}
+        //                 color={temporalValue ? "error" : warn ? "warning" : success ? "success" : undefined}
+        //                 focused={temporalValue || warn || success ? true : undefined}
+        //                 {...params}
+        //             />
+        //         )}
+        //     />
+        // )
+    } else if (type === "bool"){
+        const selected = temporalValue || sanitizedVal
+        return <div style={{flex: 1}}>
+               <ToggleButton
                 size="small"
-                inputValue={temporalValue}
-                onInputChange={(e, val) => handleChange(val)}
-                options={paths}
-                renderInput={(params) => (
-                    <TextField
-                        label={input_key}
-                        color={temporalValue ? "error" : warn ? "warning" : success ? "success" : undefined}
-                        focused={temporalValue || warn || success ? true : undefined}
-                        {...params}
-                    />
-                )}
-            />
-        )
+                style={{width: "100%",  padding: 0, color: "black"}}
+                value="check"
+                selected={selected} 
+                onChange={(e) => handleChange(!selected)}
+                >
+                    {input_key}
+                    <Checkbox checked={selected}/>
+                </ToggleButton>
+            </div>
+    } else if (type === "select") {
+
+        const optionMap = (field_params?.options || []).reduce((acc: {[key: string]: any}, opt: any) => {
+            acc[String(opt)] = opt
+            return acc
+        }, {})
+
+        return <Autocomplete
+            disableClearable
+            fullWidth
+            size="small"
+            value={String(temporalValue || sanitizedVal)}
+            placeholder='Pick a value'
+            onChange={(e, val) => handleChange(optionMap[val])}
+            options={Object.keys(optionMap)}
+            renderInput={(params) => (
+                <TextField
+                    label={input_key}
+                    color={temporalValue && temporalValue !== sanitizedVal ? "error" : warn ? "warning" : success ? "success" : undefined}
+                    focused={temporalValue || warn || success ? true : undefined}
+                    {...params}
+                />
+            )}
+        />
     }
 
     let endAdornment;

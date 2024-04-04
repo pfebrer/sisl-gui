@@ -1,13 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useContext } from 'react'
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 
 import Chip from '@mui/material/Chip'
 import TextField from '@mui/material/TextField'
 
-import type { RootState } from '../../App'
 import { Button, Divider, FormControlLabel, Grid, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { Expand, GridOnOutlined, AccountTreeOutlined } from '@mui/icons-material'
+import { NodeClassesContext  } from '../../context/session_context'
 
 interface NodeClassPickerProps {
     value?: number,
@@ -18,6 +17,8 @@ interface NodeClassPickerProps {
 const getModulesTree = (node_classes: { [node_class_id: number]: { module: string } }) => {
 
     const tree: any = {}
+
+    if (!node_classes) return tree
 
     Object.keys(node_classes).map(Number).forEach((node_class_id) => {
         var loc = tree
@@ -124,9 +125,7 @@ const NodeClassPicker = (props: NodeClassPickerProps) => {
     const value = props.value || selectedNode
     const onChange = props.onChange || setSelectedNode
 
-    const session = useSelector((state: RootState) => state.session)
-
-    const node_classes = session.node_classes
+    const node_classes  = useContext(NodeClassesContext)
 
     const tree = useMemo(() => getModulesTree(node_classes), [node_classes])
  

@@ -1,10 +1,14 @@
-import {useState} from 'react'
+import {useState, useContext} from 'react'
 
 import Box from '@mui/material/Box';
 import ToggleButton from '@mui/material/ToggleButton'
 
+import Button from '@mui/material/Button';
+
+import PythonApiContext from '../../apis/context';
+
 import type { NodeClass, Node } from '../../interfaces'
-import { ElectricalServices } from '@mui/icons-material';
+import { ElectricalServices, Hub } from '@mui/icons-material';
 
 import Field from "../input_fields"
 import type { FieldType } from '../input_fields'
@@ -26,6 +30,8 @@ const NodeInputs = (props: NodeInputsProps) => {
 
     const propsInputs = { ...props.node?.inputs, ...props.inputs}
     const propsInputsMode = { ...props.node?.inputs_mode, ...props.inputsMode}
+
+    const {pythonApi} = useContext(PythonApiContext)
 
     const [stateInputs, setStateInputs] = useState(propsInputs || {})
     const [stateInputsMode, setStateInputsMode] = useState<{[key: string]: string}>({})
@@ -90,9 +96,14 @@ const NodeInputs = (props: NodeInputsProps) => {
                             defaultVal={node_parameters[key].default}
                             type={getInputType(key)}
                             kind={node_parameters[key].kind}
+                            field_params={node_parameters[key].field_params}
                             onChange={(value: any) => onChange({ [key]: value })}
                             {...props.fieldprops?.[key]}
                         />
+                        { inputsMode[key] === "NODE" ? null : <Button
+                            onClick={() => pythonApi.nodeInputToNode(props.node?.id, key)}>
+                            <Hub />
+                        </Button>}
                     </div>
                 ))}
                 <ToggleButton
