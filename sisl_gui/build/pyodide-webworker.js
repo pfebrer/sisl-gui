@@ -3,12 +3,17 @@
 // Setup your project to serve `py-worker.js`. You should also serve
 // `pyodide.js`, and all its associated `.asm.js`, `.json`,
 // and `.wasm` files as well:
-importScripts("https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js");
+importScripts("https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.js");
 
 init_script = `
 import sisl
 import sisl.viz
 from sisl.nodes import Node, nodify_module
+
+# Patch Node with a dummy then attribute, because pyodide tries to call it
+# when converting a node to JS. If we don't patch it, when getting "then" pyodide
+# will create a "GetAttrNode" and then try to call it, which is catastrophic :)
+Node.then = None
 
 nodify_module(sisl)
         
@@ -41,7 +46,7 @@ async function loadRuntime() {
 
     setStatus(102)
 
-    await pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", "netCDF4" ])
+    await pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", "netCDF4", "pyyaml"])
     await pyodide.loadPackage("micropip")
         
     const micropip = pyodide.pyimport("micropip")
@@ -50,52 +55,50 @@ async function loadRuntime() {
 
     setStatus(103)
 
-    await pyodide.loadPackage('./sisl-0.14.2-cp311-cp311-emscripten_3_1_45_wasm32.whl')
+    await pyodide.loadPackage('./sisl-0.14.4.dev295+g00b8afa29d-cp312-cp312-emscripten_3_1_52_wasm32.whl')
 
     setStatus(104)
 
     await pyodide.loadPackage(['simplejson'])
     // Install sisl-gui from PyPi without its dependencies
     await micropip.install("sisl-gui", false, false)
+    //await micropip.install("./sisl_gui-0.4.1-py3-none-any.whl", false, false)
 
     setStatus(105)
 
     pyodide.runPython(init_script)
 
-    await sendSession()
+    await sendLastUpdate()
 
     setStatus(200)
 
 }
 
-async function sendSession() {
+async function sendLastUpdate() {
     const session = pyodide.globals.get("session")
-    const for_js = pyodide.globals.get("sisl_gui_for_js")
-    const session_obj = for_js(session).toJs({dict_converter: Object.fromEntries})
 
     globalThis.session = session
-    globalThis.session_obj = session_obj
 
-    return self.postMessage({type: "session", session: session_obj})
+    return self.postMessage({type: "last_update", last_update: session.last_update.toJs({dict_converter: Object.fromEntries})})
 }
 
 async function applyMethod(methodName, args, kwargs) {
     console.log("APPLYING METHOD", methodName, kwargs, args)
 
-    const py_args = args.map(arg => pyodide.toPy(arg))
+    const py_args = (args || []).map(arg => pyodide.toPy(arg))
     const py_kwargs = {}
-    Object.keys(kwargs).forEach(key => {py_kwargs[key] = pyodide.toPy(kwargs[key])})
+    Object.keys(kwargs || {}).forEach(key => {py_kwargs[key] = pyodide.toPy(kwargs[key])})
 
     const ret = await session[methodName].callKwargs(...py_args, py_kwargs)
 
-    sendSession()
+    sendLastUpdate()
 
     return ret
 }
 
 async function runPython(code) {
     const result = await pyodide.runPython(code)
-    sendSession()
+    sendLastUpdate()
 
     return result
 }
@@ -122,6 +125,7 @@ self.onmessage = async (event) => {
     if (event.data.type === "loadRuntime") await loadRuntime()
     else if (event.data.type === "sessionMethod") {
         const {methodName, args, kwargs} = event.data
+
         const ret = await applyMethod(methodName, args, kwargs)
 
         const for_js = pyodide.globals.get("sisl_gui_for_js")
@@ -136,12 +140,13 @@ self.onmessage = async (event) => {
             } 
         }
         
-    } else if (event.data.type === "session") {
-        await sendSession()
+    } else if (event.data.type === "last_update") {
+        await sendLastUpdate()
     } else if (event.data.type === "runPython") {
-        const result = await runPython(event.data.code)
 
+        const result = await runPython(event.data.code)
         event.ports[0].postMessage({result: result.toString()})
+        
     } else if (event.data.type === "writeFiles") {
         await writeFiles(event.data.files)
 
