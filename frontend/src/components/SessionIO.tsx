@@ -128,7 +128,7 @@ const SessionIO = () => {
 
     return <div style={{display: "flex"}}>
         {fileInput}
-        <a style={{visibility: "hidden"}} ref={downloadRef} target="_blank" type={"application/yaml"}>Download session</a>
+        <a style={{visibility: "hidden"}} href={"data:text/yaml, "} ref={downloadRef} target="_blank" rel="noreferrer" type={"application/yaml"}>Download session</a>
         <Tooltip title={tooltipsLevel !== "none" && tooltips_titles["save"][tooltipsLevel]} arrow>
         <IconButton
             onClick={handleDownload}
