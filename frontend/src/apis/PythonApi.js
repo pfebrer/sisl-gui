@@ -350,11 +350,9 @@ class PyodidePythonApi extends PythonApi {
     status_codes = {
         0: "Not initialized",
         100: "Not connected",
-        101: "[1 / 5] Loading pyodide",
-        102: "[2 / 5] Loading sisl dependencies",
-        103: "[3 / 5] Loading sisl",
-        104: "[4 / 5] Loading sisl_gui",
-        105: "[5 / 5] Importing packages and initializing session",
+        101: "[1 / 3] Loading pyodide",
+        102: "[2 / 3] Loading sisl and all dependencies",
+        103: "[3 / 3] Importing packages and initializing session",
         200: "Connected",
     }
 
