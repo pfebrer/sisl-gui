@@ -1,4 +1,4 @@
-This is the graphical interface that you can use to interact with [sisl's](https://github.com/zerothi/sisl) visualization module.
+This is the graphical interface that you can use to interact with [sisl](https://github.com/zerothi/sisl).
 
 It consists of two parts:
 - [Back-end](sisl_gui): The backend is implemented in python. The most important part is the `Session` class which stores
@@ -50,7 +50,10 @@ When a commit is pushed to the `master` branch and files inside the `frontend` f
 
 The rest of branches are sources. 
 
-If you want to develop a new feature of the UI, you'll need to have [`nodejs`](https://nodejs.org/en/) and [`npm`](https://www.npmjs.com/) installed. Then, just clone this directory, start a new branch, and run `npm install` inside the `frontend` directory. This should install all the project's dependencies as listed in the `package.json` file. Then just run `npm start` to start a development server where you can visualize your code changes in real time. If you want to generate a production build, you should run `npm run build`.
+If you want to **develop a new feature/fix a bug**:
+
+- In the backend (python): Proceed as you would usually do for any other python package. The version of the frontend will be fixed and available under `frontend/build` as static files, so there are no extra requirements.
+- In the frontend (javascript/typescript): You'll need to have [`nodejs`](https://nodejs.org/en/) and [`npm`](https://www.npmjs.com/) installed. These two dependencies can be installed in a conda environment like: `conda install -c conda-forge nodejs`. Then, run `npm install` inside the `frontend` directory. This should install all the project's dependencies as listed in the `package.json` file. Then just run `npm start` to start a development server where you can visualize your code changes in real time. If you want to generate a production build, you should run `npm run build`.
 
 ## Integration between front-end and python package
 
