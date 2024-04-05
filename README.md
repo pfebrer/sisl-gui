@@ -1,11 +1,29 @@
 This is the graphical interface that you can use to interact with [sisl](https://github.com/zerothi/sisl).
 
+<p align="center">
+  <img src="https://github.com/pfebrer/sisl-gui/assets/42074085/5f0e1935-38fd-479a-86b4-28b7418bc046" alt="flows">
+</p>
+
 It consists of two parts:
 - [Back-end](sisl_gui): The backend is implemented in python. The most important part is the `Session` class which stores
 and manages the app state. The `Session` can be connected to the frontend either using pyodide (it runs directly on the browser)
 or through sockets (implemented with `flask` and `flask-socketio`).
 - [Front-end](frontend): A javascript/typescript UI, which is developed using [React](https://reactjs.org/). The build is
 shipped with the python package and also available at https://pfebrer.github.io/sisl-gui/.
+
+# What can I use it for?
+
+You can quickly plot files:
+
+<p align="center">
+  <img src="https://github.com/pfebrer/sisl-gui/assets/42074085/5cf8b1df-b381-442c-ba94-953e50d235c0" alt="quickplot">
+</p>
+
+Or graphically play with complex workflows that you can share with others:
+
+<p align="center">
+  <img src="https://github.com/pfebrer/sisl-gui/assets/42074085/5f0e1935-38fd-479a-86b4-28b7418bc046" alt="flows">
+</p>
 
 # User guide
 
