@@ -8,7 +8,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import PropTypes from 'prop-types';
 
-import { LiveHelp, Wifi, WifiOff } from '@mui/icons-material';
+import { GitHub, LiveHelp, Wifi, WifiOff } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
 // import Plots from './Plots';
@@ -160,6 +160,13 @@ export default function MainPage() {
 
                 
                 <div style={{padding: 20, display: "flex", alignItems: "center"}}>
+                <Tooltip title={`Go to Github development repository.`} arrow>
+                    <IconButton 
+                        href={"https://github.com/pfebrer/sisl-gui"}
+                    >
+                        <GitHub/>
+                    </IconButton>
+                    </Tooltip>
                     <Tooltip title={`Tooltips level: ${tooltipsLevel}. Click to change.`} arrow>
                     <IconButton 
                         style={{marginRight: 10}} 

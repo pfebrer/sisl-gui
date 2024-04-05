@@ -2,7 +2,10 @@ import _ from "lodash"
 
 import type { NodeClass, Node } from '../../interfaces'
 
-import Plot from 'react-plotly.js';
+import createPlotlyComponent from 'react-plotly.js/factory';
+import Plotly from 'plotly.js-dist-min'
+
+const Plot = createPlotlyComponent(Plotly);
 
 interface NodeOutputProps {
     node: Node | undefined,
