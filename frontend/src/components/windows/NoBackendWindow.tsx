@@ -61,7 +61,7 @@ const NoBackendWindow = (props: NoBackendWindowProps) => {
                             </Typography>
                         </div>
                         <Typography>
-                            It takes some time to load pyodide (around 30s).
+                            It takes some time to load pyodide (around 20s).
                         </Typography>
                         </CardContent>
                         
