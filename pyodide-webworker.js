@@ -46,25 +46,29 @@ async function loadRuntime() {
 
     setStatus(102)
 
-    await pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", "netCDF4", "pyyaml"])
-    await pyodide.loadPackage("micropip")
-        
-    const micropip = pyodide.pyimport("micropip")
-    globalThis.micropip = micropip
-    await micropip.install("plotly")
+    const pypi_packages = pyodide.loadPackage("micropip").then(() => {
+        console.log("Importing micropip")
+        const micropip = pyodide.pyimport("micropip")
+        console.log("Imported micropip")
+        globalThis.micropip = micropip
+
+        return Promise.all([
+            micropip.install("plotly"),
+            // Install sisl-gui from PyPi without its dependencies
+            //micropip.install("./sisl_gui-0.4.1-py3-none-any.whl", false, false)
+            micropip.install("sisl-gui", false, false)
+        ])
+    })
+
+    const pyodidePackages = Promise.all([
+        pyodide.loadPackage(["numpy", "scipy", "xarray", "pyparsing", "netCDF4", "pyyaml", 'simplejson']),
+        pyodide.loadPackage('./sisl-0.14.4.dev295+g00b8afa29d-cp312-cp312-emscripten_3_1_52_wasm32.whl')
+    ])
+
+    await pyodidePackages
+    await pypi_packages
 
     setStatus(103)
-
-    await pyodide.loadPackage('./sisl-0.14.4.dev295+g00b8afa29d-cp312-cp312-emscripten_3_1_52_wasm32.whl')
-
-    setStatus(104)
-
-    await pyodide.loadPackage(['simplejson'])
-    // Install sisl-gui from PyPi without its dependencies
-    await micropip.install("sisl-gui", false, false)
-    //await micropip.install("./sisl_gui-0.4.1-py3-none-any.whl", false, false)
-
-    setStatus(105)
 
     pyodide.runPython(init_script)
 
