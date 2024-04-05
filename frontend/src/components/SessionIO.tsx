@@ -113,7 +113,7 @@ const SessionIO = () => {
         }
     }
 
-    const fileInput = <div style={{width: "100%", height: "100%", display: "flex", flexDirection: "column"}}>
+    const fileInput = <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
     <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault() }
         onClick={clickFileInput}
         style={{flex: 1, display: "flex", alignItems: "center", borderWidth: 3, borderRadius: 10, borderColor: "rgb(218, 222, 226)", borderStyle: "dashed", backgroundColor: "rgb(238, 242, 246)"}} > 
@@ -128,7 +128,7 @@ const SessionIO = () => {
 
     return <div style={{display: "flex"}}>
         {fileInput}
-        <a style={{visibility: "hidden"}} href={"data:text/yaml, "} ref={downloadRef} target="_blank" rel="noreferrer" type={"application/yaml"}>Download session</a>
+        <a style={{visibility: "hidden", width: 0}} href={"data:text/yaml, "} ref={downloadRef} target="_blank" rel="noreferrer" type={"application/yaml"}>Download session</a>
         <Tooltip title={tooltipsLevel !== "none" && tooltips_titles["save"][tooltipsLevel]} arrow>
         <IconButton
             onClick={handleDownload}
