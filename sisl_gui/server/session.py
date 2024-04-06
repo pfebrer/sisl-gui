@@ -37,7 +37,6 @@ class SislGUIregistry(NodeClassRegistry):
             self._encoder.encode(node_cls)
             self.classes_dict[id(node_cls)] = node_cls
         except Exception as e:
-            print(node_cls)
             pass
         super().register(node_cls)
 
@@ -55,16 +54,12 @@ class SislGUIregistry(NodeClassRegistry):
                         continue
                     typehints[k] = v.annotation
     
-                if node_cls.function.__name__ == "graphene":
-                    print("Hello", sig.return_annotation)
-    
                 if sig.return_annotation is not inspect._empty:
                     typehints["return"] = sig.return_annotation
             except:
                 typehints = {}
                 return
-        if node_cls.function.__name__ == "graphene":
-            print(typehints)
+            
         node_cls.typehints = typehints
     
         for i, (key, value) in enumerate(typehints.items()):
@@ -100,7 +95,7 @@ class SessionRegistry(NodeClassRegistry):
         self.session = session
     
     def register(self, node_cls):
-        self.session.last_update["node_classes"] = time.time()
+        self.session.set_last_update("node_classes", time.time())
 
 class Session:
     """Base session class that implements the functionality of a session in the GUI"""
@@ -905,3 +900,9 @@ class Session:
     
     def get_logs(self) -> str:
         return self.logs.getvalue()
+    
+    def set_last_update(self, key: str, value: float):
+        self.last_update[key] = value
+
+    def emit(self):
+        return self.synced.connection.emit(self)

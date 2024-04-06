@@ -36,8 +36,13 @@ __all__ = ["SocketioApp"]
 
 class SocketioLastUpdateEmiter(SocketioConnection):
 
-    def after_modification(self, obj):
-        return emit("session_last_update", obj.last_update, broadcast=True)
+    def emit(self, obj):
+        try:
+            return emit("session_last_update", obj.last_update, broadcast=True)
+        except RuntimeError:
+            app = list(self.socketio.server.environ.values())[0]["flask.app"]
+            with app.app_context():
+                emit("session_last_update", obj.last_update, broadcast=True, namespace="/")    
 
 class SocketioApp(App):
 
