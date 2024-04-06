@@ -823,14 +823,6 @@ class Session:
 
             if old_id in nodes_map:
                 return nodes_map[old_id]
-
-            inputs = node_to_load.pop("inputs").copy()
-            inputs_mode = node_to_load.pop('inputs_mode')
-
-            for k in inputs_mode:
-                node_id = inputs[k] 
-                inputs[k] = _load_node(nodes_to_load[node_id], nodes_to_load)
-                
                 
             node_cls = node_to_load.pop('cls')
 
@@ -849,9 +841,22 @@ class Session:
                 module = importlib.import_module(module)
 
             node_cls = getattr(module, node_cls["name"])
-
             assert issubclass(node_cls, Node), f"Provided class path leads to '{node_cls}', which is not a subclass of Node. We will not call it."
-            new_node = node_cls(**inputs)
+
+            inputs = node_to_load.pop("inputs").copy()
+            inputs_mode = node_to_load.pop('inputs_mode')
+
+            for k in inputs_mode:
+                if k == node_cls._args_inputs_key:
+                    inputs[k] = [_load_node(nodes_to_load[node_id], nodes_to_load) for node_id in inputs[k]]
+                elif k == node_cls._kwargs_inputs_key:
+                    inputs[k] = {key: _load_node(nodes_to_load[node_id], nodes_to_load) for key, node_id in inputs[k].items()}
+                else:
+                    node_id = inputs[k] 
+                    inputs[k] = _load_node(nodes_to_load[node_id], nodes_to_load)
+
+            args_inputs = inputs.pop(node_cls._args_inputs_key, [])
+            new_node = node_cls(*args_inputs, **inputs)
 
             loaded_nodes[id(new_node)] = {
                 **node_to_load,
