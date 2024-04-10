@@ -1,7 +1,5 @@
-import typing
 from typing import Dict, Any, Union, Optional, List, Type
 
-from collections import defaultdict
 from functools import wraps
 import importlib
 import inspect
@@ -11,73 +9,19 @@ import time
 
 from pathlib import Path
 
+from nodes import Node, Workflow, nodify_module
+from nodes.node import ConstantNode
+from nodes.utils import traverse_tree_forward, traverse_tree_backward, visit_all_connected
+from nodes.conversions import node_to_python_script
+
 import sisl
-from sisl.nodes import Node, Workflow, nodify_module
-from sisl.nodes.node import ConstantNode
-from sisl.nodes.registry import NodeClassRegistry, REGISTRY
 
 from .sync import Synchronized
 from .json import CustomJSONEncoder
+from ..registry import SessionRegistry, GUI_REGISTRY
 
 last_registration = time.time() 
 registry_callbacks = []
-
-class SislGUIregistry(NodeClassRegistry):
-
-    def __init__(self):
-        self._encoder = CustomJSONEncoder()
-        self.types_registry = defaultdict(lambda: {"first_arg": [], "arg": [], "return": []})
-        self.classes_dict = {}
-        super().__init__()
-    
-    def register(self, node_cls):
-        self.add_to_types_registry(node_cls)
-
-        try:
-            self._encoder.encode(node_cls)
-            self.classes_dict[id(node_cls)] = node_cls
-        except Exception as e:
-            pass
-        super().register(node_cls)
-
-    def add_to_types_registry(self, node_cls):
-    
-        try:
-            typehints = typing.get_type_hints(node_cls.function)
-        except:
-            try:
-                sig = node_cls.__signature__
-    
-                typehints = {}
-                for k, v in sig.parameters.items():
-                    if v is inspect._empty:
-                        continue
-                    typehints[k] = v.annotation
-    
-                if sig.return_annotation is not inspect._empty:
-                    typehints["return"] = sig.return_annotation
-            except:
-                typehints = {}
-                return
-            
-        node_cls.typehints = typehints
-    
-        for i, (key, value) in enumerate(typehints.items()):
-    
-            if i == 0:
-                k = "first_arg"
-            elif key == "return":
-                k = key
-            else:
-                k = "arg"
-    
-            try:
-                self.types_registry[value][k].append(node_cls)
-            except TypeError:
-                pass
-
-GUIregistry = SislGUIregistry()
-REGISTRY.subscribe(GUIregistry)
 
 def updates(key: str):
     def decorator(func):
@@ -88,14 +32,6 @@ def updates(key: str):
             return ret
         return wrapper
     return decorator
-
-class SessionRegistry(NodeClassRegistry):
-    
-    def __init__(self, session):
-        self.session = session
-    
-    def register(self, node_cls):
-        self.session.set_last_update("node_classes", time.time())
 
 class Session:
     """Base session class that implements the functionality of a session in the GUI"""
@@ -139,7 +75,7 @@ class Session:
         # Initialize last update times
         self.last_update = { k: time.time() for k in self.last_update }
         self.registry = SessionRegistry(self)
-        GUIregistry.subscribe(self.registry)
+        GUI_REGISTRY.subscribe(self.registry)
 
         # Initialize the logging stream
         self.logs = StringIO()
@@ -354,7 +290,7 @@ class Session:
             The name of the node. If None, the name will be automatically determined by ``add_node``.
 
         """
-        node_class = GUIregistry.classes_dict[cls]
+        node_class = GUI_REGISTRY.classes_dict[cls]
         
         args_key = node_class._args_inputs_key
         kwargs_key = node_class._kwargs_inputs_key
@@ -489,7 +425,7 @@ class Session:
             nodeid = self.get_nodeid(key)
             name = self.nodes[nodeid]['name']
         
-        new_node = node.__class__(**dict(node.inputs))
+        new_node = node.__class__(**dict(node._inputs))
         
         self.add_node(new_node, name)
 
@@ -517,7 +453,12 @@ class Session:
         """
         node = self.get_node(key)
 
-        input_value = node.inputs[input_key]
+        if input_key in node.inputs:
+            input_value = node.inputs[input_key]
+        elif input_key in node.__signature__.parameters:
+            input_value = Node._blank
+        else:
+            raise ValueError(f"Input key '{input_key}' not found in node '{node}'.")
 
         if isinstance(input_value, Node):
             return input_value
@@ -586,9 +527,28 @@ class Session:
         """
         node = self.get_node(key)
 
-        names_map = {node_id: name for name, node_id in self._name_to_id.items()}
+        #names_map = {node_id: name for name, node_id in self._name_to_id.items()}
         
-        return Workflow.from_node_tree(node, names_map=names_map)
+        return Workflow.from_node_tree(node)#, names_map=names_map)
+    
+    def node_to_python_script(self, key: Union[str, int], include_defaults: bool = False) -> str:
+        """Converts a node and all to a Python script.
+        
+        Parameters
+        ----------
+        key : Union[str, int]
+            The key of the node. If it is a string, it will be interpreted as the name of the node.
+            If it is an integer, it will be interpreted as the ID of the node.
+
+        See Also
+        --------
+        get_node
+        """
+        node = self.get_node(key)
+
+        names_map = {k: v["name"] for k, v in self.nodes.items()}
+
+        return node_to_python_script(node, include_defaults=include_defaults, names_map=names_map)
     
     @updates("nodes")
     def compute_node(self, key: Union[str, int]):
@@ -607,7 +567,7 @@ class Session:
         node = self.get_node(key)
         
         node.get()
-
+    
     def get_compatible_following_nodes(self, node_key: Union[str, int], return_id: bool = False) -> List[Union[Type[Node], int]]:
         """Returns all nodes that are instances of a certain class.
         
@@ -632,7 +592,7 @@ class Session:
         else:
             return []
 
-        nodes = GUIregistry.types_registry[out_class]["first_arg"]
+        nodes = GUI_REGISTRY.types_registry[out_class]["first_arg"]
     
         if return_id:
             nodes = [id(node) for node in nodes]
@@ -653,7 +613,6 @@ class Session:
         List[Node]
             A list of all nodes that are reachable from the given nodes.
         """
-        from sisl.nodes.utils import traverse_tree_forward
 
         if isinstance(roots, (str, int)):
             roots = [roots]
@@ -686,7 +645,6 @@ class Session:
         List[Node]
             A list of all nodes that are reachable from the given nodes.
         """
-        from sisl.nodes.utils import traverse_tree_backward
 
         if isinstance(roots, (str, int)):
             roots = [roots]
@@ -719,7 +677,6 @@ class Session:
         List[Node]
             A list of all nodes that are reachable from the given nodes.
         """
-        from sisl.nodes.utils import visit_all_connected
 
         if isinstance(roots, (str, int)):
             roots = [roots]
@@ -746,7 +703,7 @@ class Session:
 
         # self._node_classes = {}
 
-        # # for cls in GUIregistry.all_classes:
+        # # for cls in GUI_REGISTRY.all_classes:
         # #     try:
         # #         encoder.encode(cls)
         # #         self._node_classes[id(cls)] = cls
@@ -756,7 +713,7 @@ class Session:
         return dict(
             logs=self.logs.getvalue(),
             nodes=self.nodes,
-            node_classes=GUIregistry.classes_dict,
+            node_classes=GUI_REGISTRY.classes_dict,
             last_updates=self.last_update,
         )
     
@@ -774,7 +731,7 @@ class Session:
 
             node = node_spec["node"]
 
-            inputs, inputs_mode = get_inputs_mode(node)
+            inputs, inputs_mode = get_inputs_mode(node, include_defaults=False)
             node_to_save = {
                 "id": node_id,
                 "name": node_spec["name"],
@@ -782,7 +739,7 @@ class Session:
                     "module": node.__class__.__module__,
                     "name": node.__class__.__name__
                 },
-                "inputs": inputs,
+                "inputs": {k: inputs[k] for k in node.__signature__.parameters if k in inputs},
                 "inputs_mode": inputs_mode
             }
 
@@ -792,7 +749,7 @@ class Session:
 
         if as_string:
             import yaml
-            return yaml.dump(state, Dumper=yaml.SafeDumper)
+            return yaml.dump(state, Dumper=yaml.SafeDumper, sort_keys=False)
 
         return state
     
@@ -846,6 +803,17 @@ class Session:
             inputs = node_to_load.pop("inputs").copy()
             inputs_mode = node_to_load.pop('inputs_mode')
 
+            # If the function is a singledispatch, it has a registry with all the dispatchs.
+            # By looking at the name of the first argument of the function that was saved,
+            # try to guess which dispatch was used.
+            if hasattr(node_cls.function, "registry"):
+                for k, func in node_cls.function.registry.items():
+                    func_node = Node.from_func(func)
+                    first_arg_key = list(func_node.__signature__.parameters)[0]
+                    if first_arg_key in list(inputs)[0]:
+                        node_cls = func_node
+                        break
+
             for k in inputs_mode:
                 if k == node_cls._args_inputs_key:
                     inputs[k] = [_load_node(nodes_to_load[node_id], nodes_to_load) for node_id in inputs[k]]
@@ -882,7 +850,6 @@ class Session:
             # We need to translate node ids into the newly created nodes
             new_flows = {}
             for flow_name, flow in flows.items():
-                print(flow)
                 new_flows[flow_name] = {
                     "nodes": [id(nodes_map[node_id]) for node_id in flow["nodes"]],
                 }
@@ -893,6 +860,15 @@ class Session:
             self.set_flows({**self.flows, **new_flows})
 
     def set_flows(self, flows: Dict) -> float:
+
+        for flow in flows.values():
+            # Sanitize flows by removing nodes that are no longer in the session
+            flow["nodes"] = [node_id for node_id in flow["nodes"] if node_id in self.nodes]
+
+            # Also remove attributes of nodes that are no longer in the flow.
+            for k in ("positions", "dimensions", "expanded", "output_visible"):
+                flow[k] = {k: v for k, v in flow[k].items() if int(k) in flow["nodes"]}
+
         self.flows = flows
         self.last_update["flows"] = time.time()
         return self.last_update["flows"]
@@ -901,7 +877,14 @@ class Session:
         return self.flows
     
     def get_node_classes(self) -> Dict:
-        return GUIregistry.classes_dict
+        return GUI_REGISTRY.node_class_specs
+    
+    def get_node_classes_registry(self) -> Dict:
+        return {
+            "node_classes": GUI_REGISTRY.node_class_specs,
+            "types_registry": dict(GUI_REGISTRY.types_registry_with_ids),
+            "typehints": GUI_REGISTRY.typehint_specs
+        }
     
     def get_logs(self) -> str:
         return self.logs.getvalue()

@@ -16,7 +16,7 @@ import { Node } from '../../interfaces';
 import PythonApiContext from '../../apis/context';
 import { AccountTree } from '@mui/icons-material';
 import { FlowNode, FlowConstantNode,  } from '../flow/Nodes';
-import { FlowsContext, NodesContext, NodeClassesContext } from '../../context/session_context';
+import { FlowsContext, NodesContext, NodeClassesRegistryContext } from '../../context/session_context';
 import { NodeDimensions, NodePositions } from '../flow/interfaces';
 import { NewNodesSideBar, TopControlsBar } from '../flow/ControlBars';
 import { dagreLayout } from '../flow/layout_utils';
@@ -51,7 +51,7 @@ const Flow = (props: FlowProps) => {
     const {pythonApi} = useContext(PythonApiContext)
     const connectingInput = useRef<{node_id: number | null, input_name: string | null}>({node_id: null, input_name: null});
 
-    const node_classes = useContext(NodeClassesContext)
+    const { node_classes } = useContext(NodeClassesRegistryContext)
     const nodes = props.nodes
 
     const {
@@ -359,7 +359,7 @@ const FlowWindow = () => {
     const setFixedPositions = (positions: NodePositions) => setFlowState((state) => ({...state, fixedPositions: positions}))
     const setFixedDimensions = (dimensions: NodeDimensions) => setFlowState((state) => ({...state, fixedDimensions: dimensions}))
 
-    const node_classes = useContext(NodeClassesContext)
+    const { node_classes } = useContext(NodeClassesRegistryContext)
     const nodes = useContext(NodesContext)
     const { flows, setFlows, flowsFromServer } = useContext(FlowsContext)
 
@@ -440,8 +440,16 @@ const FlowWindow = () => {
     //      HANDLERS FOR THE SIDE CONTROL BAR
     // ----------------------------------------------
 
-    const initConnectedNode = useCallback((node_id: number, nodeToConnect: number, connectInto: string) => {
-        pythonApi.initNode(node_id, {[connectInto]: nodeToConnect}, {[connectInto]: "NODE"}).then((new_node) => {
+    const initConnectedNode = useCallback((node_class_id: number, nodeToConnect: number, connectInto: string) => {
+
+        const node_class = node_classes[node_class_id]
+        if (!node_class) return
+        const parameter = node_class.parameters[connectInto]
+        if (!parameter) return
+
+        const inputValue = parameter.kind === "VAR_POSITIONAL" ? [nodeToConnect] : nodeToConnect
+
+        pythonApi.initNode(node_class_id, {[connectInto]: inputValue}, {[connectInto]: "NODE"}).then((new_node) => {
 
             setOutputNodeId(null)
             setFlowState((state) => ({

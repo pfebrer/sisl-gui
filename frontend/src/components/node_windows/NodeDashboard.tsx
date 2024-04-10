@@ -11,7 +11,7 @@ import PythonApiContext from '../../apis/context';
 
 import type { Node } from '../../interfaces';
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
-import { NodeClassesContext } from '../../context/session_context';
+import { NodeClassesRegistryContext } from '../../context/session_context';
 
 interface NodeDashboardProps {
     node: Node,
@@ -48,7 +48,7 @@ const NodeDashboard = (props: NodeDashboardProps) => {
         setUpdatedName("")
     }, [props.node_id])
 
-    const node_classes = useContext(NodeClassesContext)
+    const { node_classes } = useContext(NodeClassesRegistryContext)
 
     if (!node) return <NodeOutput node={undefined}/>
 

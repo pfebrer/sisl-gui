@@ -1,12 +1,12 @@
 import { Viewport } from "reactflow"
+import { FieldType } from "../components/input_fields"
 
 export type ParameterKind = "POSITIONAL_ONLY" | "POSITIONAL_OR_KEYWORD" | "VAR_POSITIONAL" | "KEYWORD_ONLY" | "VAR_KEYWORD"
 
 export interface Parameter {
     name: string,
     kind: ParameterKind,
-    type?: string,
-    field_params?: {[key: string]: any},
+    typehint?: number,
     default?: any,
     help?: string
 }
@@ -18,6 +18,7 @@ export interface NodeClass {
     parameters: {
         [key: string]: Parameter
     },
+    return_typehint?: number,
     output_type?: any,
     doc?: string,
     registry?: any
@@ -30,6 +31,8 @@ export interface Node {
     inputs_mode: { [key: string]: string },
     output: any,
     output_class: any,
+    output_class_id?: number,
+    output_links: number[],
     last_log: number,
     logs?: string,
     outdated: boolean,
@@ -70,14 +73,34 @@ export interface Nodes {
     }
 }
 
+export interface TypeRegistry {
+    first_arg: number[],
+    arg: number[],
+    return: number[],
+    creators: number[],
+    modifiers: number[]
+}
+
+export interface Typehint {
+    name: string,
+    module: string | null,
+    id: number,
+    input_type: FieldType,
+    field_params: {[key: string]: any}
+}
+
+export interface NodeClassesRegistry {
+    node_classes: {[key: number]: NodeClass},
+    types_registry: {[key: string]: TypeRegistry},
+    typehints: {[key: number]: Typehint}
+}
+
 export interface Session {
     nodes: Nodes,
     flows: {
         [key: string]: Flow
     },
-    node_classes: {
-        [key: number]: NodeClass
-    },
+    node_classes_registry: NodeClassesRegistry,
     logs: string,
 }
 

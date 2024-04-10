@@ -12,7 +12,7 @@ import NodeInputs from '../node_windows/NodeInputs';
 import NodeClassPicker from './NodeClassPicker';
 
 import PythonApiContext from '../../apis/context';
-import { NodeClassesContext } from '../../context/session_context';
+import { NodeClassesRegistryContext } from '../../context/session_context';
 
 
 interface NewNodesProps {
@@ -27,7 +27,7 @@ const NewNodes: FC<NewNodesProps> = (props) => {
     const [inputs, setInputs] = useState({})
     const [inputsMode, setInputsMode] = useState<{ [key: string]: string }>({})
 
-    const node_classes = useContext(NodeClassesContext)
+    const { node_classes } = useContext(NodeClassesRegistryContext)
 
     const {pythonApi} = useContext(PythonApiContext) 
 

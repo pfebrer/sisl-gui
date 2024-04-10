@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useCallback, useState } from 'react'
 
 import TextField from '@mui/material/TextField'
 import { Autocomplete, Checkbox, InputBase, Typography } from '@mui/material'
@@ -24,7 +24,7 @@ const NodeField: FC<FieldProps> = ({input_key, type, field_params, kind, value, 
 
     const [temporalValue, setTemporalValue] = useState<string | undefined>(undefined)
 
-    const getInputValue = (value: any, default_value: any) => {
+    const getInputValue = useCallback((value: any, default_value: any) => {
         var inputVal = value
 
         if (value === undefined) inputVal = default_value
@@ -32,16 +32,19 @@ const NodeField: FC<FieldProps> = ({input_key, type, field_params, kind, value, 
         if (type === "node") return inputVal
         else if (type === "json") return JSON.stringify(inputVal)
         else return inputVal
-    }
+    }, [type])
 
-    const sanitizeChangedInput = (value: any) => {
+    const sanitizeChangedInput = useCallback((value: any) => {
         if (type === "node") return value
-        else if (type === "number") return Number(value)
-        else if(type === "json") return value !== "" ? JSON.parse(value) : undefined
+        else if (type === "number") {
+            if (value === "" || value[value.length - 1] === ".") throw new Error("Invalid number")
+            return Number(value)
+        } else if(type === "json") return value !== "" ? JSON.parse(value) : undefined
         else return value
-    }
+    }, [type])
 
-    const handleChange = (value: any) => {
+    const handleChange = useCallback((value: any) => {
+
         try {
             const sanitized = sanitizeChangedInput(value)
             onChange(sanitized)
@@ -50,7 +53,7 @@ const NodeField: FC<FieldProps> = ({input_key, type, field_params, kind, value, 
             setTemporalValue(value)
         }
 
-    }
+    }, [onChange, sanitizeChangedInput])
 
     const sanitizedVal = getInputValue(value, defaultVal)
     
@@ -59,7 +62,7 @@ const NodeField: FC<FieldProps> = ({input_key, type, field_params, kind, value, 
             <Typography> {input_key} </Typography>
             <InputBase 
                 sx={{flex: 1}} 
-                value={temporalValue || sanitizedVal} 
+                value={temporalValue !== undefined ? temporalValue : sanitizedVal} 
                 inputProps={{ style: {textAlign: 'right'} }}
                 onChange={(e) => handleChange(e.target.value)}
             />

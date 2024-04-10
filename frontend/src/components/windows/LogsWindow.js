@@ -17,7 +17,7 @@ const LogsWindow = (props) => {
         <Editor
     value={props.logs || ""}
     onValueChange={code => {}}
-    highlight={code => highlight(code, languages.log)}
+    highlight={code => highlight(code, languages[props.language || "log"])}
     padding={10}
     style={{flex: 1, border: "1px solid black"}}
 

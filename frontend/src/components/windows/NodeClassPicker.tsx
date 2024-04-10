@@ -6,7 +6,8 @@ import TextField from '@mui/material/TextField'
 
 import { Button, Divider, FormControlLabel, Grid, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { Expand, GridOnOutlined, AccountTreeOutlined } from '@mui/icons-material'
-import { NodeClassesContext  } from '../../context/session_context'
+import { NodeClassesRegistryContext  } from '../../context/session_context'
+import { NodeClass } from '../../interfaces'
 
 interface NodeClassPickerProps {
     value?: number,
@@ -14,7 +15,7 @@ interface NodeClassPickerProps {
     style?: React.CSSProperties
 }
 
-const getModulesTree = (node_classes: { [node_class_id: number]: { module: string } }) => {
+const getModulesTree = (node_classes: { [node_class_id: number]: NodeClass }) => {
 
     const tree: any = {}
 
@@ -68,7 +69,6 @@ const NodeClassesGrid = (props: NodeClassesGridProps) => {
     </Grid>
     )}
     </Grid>
-
 }
 
 
@@ -125,7 +125,7 @@ const NodeClassPicker = (props: NodeClassPickerProps) => {
     const value = props.value || selectedNode
     const onChange = props.onChange || setSelectedNode
 
-    const node_classes  = useContext(NodeClassesContext)
+    const {node_classes}  = useContext(NodeClassesRegistryContext)
 
     const tree = useMemo(() => getModulesTree(node_classes), [node_classes])
  

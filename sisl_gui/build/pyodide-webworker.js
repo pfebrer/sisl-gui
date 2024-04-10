@@ -8,7 +8,7 @@ importScripts("https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.js");
 init_script = `
 import sisl
 import sisl.viz
-from sisl.nodes import Node, nodify_module
+from nodes import Node, nodify_module
 
 # Patch Node with a dummy then attribute, because pyodide tries to call it
 # when converting a node to JS. If we don't patch it, when getting "then" pyodide
@@ -54,6 +54,7 @@ async function loadRuntime() {
 
         return Promise.all([
             micropip.install("plotly"),
+            micropip.install("nodes"),
             // Install sisl-gui from PyPi without its dependencies
             //micropip.install("./sisl_gui-0.4.1-py3-none-any.whl", false, false)
             micropip.install("sisl-gui", false, false)

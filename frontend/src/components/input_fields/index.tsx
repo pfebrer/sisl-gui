@@ -1,4 +1,4 @@
-import { FC, useContext, useState } from 'react'
+import { FC, useCallback, useContext, useState } from 'react'
 
 import { Autocomplete, Checkbox, InputAdornment, ToggleButton } from '@mui/material'
 import TextField from '@mui/material/TextField'
@@ -12,6 +12,7 @@ interface FieldProps {
     input_key: string
     defaultVal?: any
     value: any
+    help?: string
     pendingUpdate?: boolean
     type: FieldType
     kind: ParameterKind
@@ -21,13 +22,13 @@ interface FieldProps {
     success?: boolean
 }
 
-const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChange, warn, success, field_params}) => {
+const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, help, onChange, warn, success, field_params}) => {
 
     const [temporalValue, setTemporalValue] = useState<string | undefined>(undefined)
 
     const nodes = useContext(NodesContext)
 
-    const getInputValue = (value: any, default_value: any) => {
+    const getInputValue = useCallback((value: any, default_value: any) => {
         var inputVal = value
 
         if (value === undefined) inputVal = default_value
@@ -35,16 +36,18 @@ const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChan
         if (type === "node") return inputVal
         else if (type === "json") return JSON.stringify(inputVal)
         else return inputVal
-    }
+    }, [type])
 
-    const sanitizeChangedInput = (value: any) => {
+    const sanitizeChangedInput = useCallback((value: any) => {
         if (type === "node") return value
-        else if (type === "number") return Number(value)
-        else if(type === "json") return value !== "" ? JSON.parse(value) : undefined
+        else if (type === "number") {
+            if (value === "" || value[value.length - 1] === ".") throw new Error("Invalid number")
+            return Number(value)
+        } else if(type === "json") return value !== "" ? JSON.parse(value) : undefined
         else return value
-    }
+    }, [type])
 
-    const handleChange = (value: any) => {
+    const handleChange = useCallback((value: any) => {
         try {
             const sanitized = sanitizeChangedInput(value)
             onChange(sanitized)
@@ -52,8 +55,7 @@ const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChan
         } catch (error) {
             setTemporalValue(value)
         }
-
-    }
+    }, [onChange, sanitizeChangedInput])
 
     const sanitizedVal = getInputValue(value, defaultVal)
     
@@ -156,6 +158,7 @@ const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChan
             renderInput={(params) => (
                 <TextField
                     label={input_key}
+                    helperText={help}
                     color={temporalValue && temporalValue !== sanitizedVal ? "error" : warn ? "warning" : success ? "success" : undefined}
                     focused={temporalValue || warn || success ? true : undefined}
                     {...params}
@@ -171,10 +174,11 @@ const Field: FC<FieldProps> = ({input_key, type, kind, value, defaultVal, onChan
 
     return (
         <TextField
-            value={temporalValue || sanitizedVal}
+            value={temporalValue !== undefined ? temporalValue : sanitizedVal}
+            helperText={help}
             multiline
             label={input_key} size="small" fullWidth
-            color={temporalValue ? "error" : warn ? "warning" : success? "success" : undefined}
+            color={temporalValue !== undefined ? "error" : warn ? "warning" : success? "success" : undefined}
             onChange={(e) => handleChange(e.target.value)}
             focused={temporalValue || warn || success ? true : undefined}
             {...props}

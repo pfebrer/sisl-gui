@@ -121,6 +121,10 @@ class PythonApi {
         return this._sessionMethod("get_node_classes")
     }
 
+    getNodeClassesRegistry = async () => {
+        return this._sessionMethod("get_node_classes_registry")
+    }
+
     getNodes = async () => {
         return this._sessionMethod("get_nodes")
     }
@@ -159,6 +163,10 @@ class PythonApi {
 
     nodeToWorkflow = async (name) => {
         return this._sessionMethod("node_to_workflow", { key: name })
+    }
+
+    nodeToPythonScript = async (name) => {
+        return this._sessionMethod("node_to_python_script", { key: name })
     }
 
     renameNode = async (name, newName) => {

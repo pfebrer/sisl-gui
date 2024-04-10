@@ -12,6 +12,8 @@ import { ElectricalServices, Hub } from '@mui/icons-material';
 
 import Field from "../input_fields"
 import type { FieldType } from '../input_fields'
+import { NodeClassesRegistryContext } from '../../context/session_context';
+import { Tooltip, Typography } from '@mui/material';
 
 interface NodeInputsProps {
     node?: Node,
@@ -32,6 +34,7 @@ const NodeInputs = (props: NodeInputsProps) => {
     const propsInputsMode = { ...props.node?.inputs_mode, ...props.inputsMode}
 
     const {pythonApi} = useContext(PythonApiContext)
+    const { typehints } = useContext(NodeClassesRegistryContext)
 
     const [stateInputs, setStateInputs] = useState(propsInputs || {})
     const [stateInputsMode, setStateInputsMode] = useState<{[key: string]: string}>({})
@@ -54,13 +57,21 @@ const NodeInputs = (props: NodeInputsProps) => {
     const node_parameters = props.node_class.parameters
     var input_keys = Object.keys(props.node_class.parameters)
 
-    const getInputType = (key: string): FieldType => {
-        var inputType = inputsMode[key] || node_parameters[key].type
+    const getInputType = (key: string): FieldType => { 
+        const typehint = node_parameters[key].typehint
+        const param_type = typehint ? typehints[typehint].input_type : "json"
+
+        var inputType = inputsMode[key] || param_type
 
         if (inputType) inputType = inputType.toLowerCase()
         if (!inputType || !["text", "number", "select", "node", "bool", "file", "json"].includes(inputType)) inputType = "json"
 
         return inputType as FieldType
+    }
+
+    const getFieldParams = (key: string) => {
+        const typehint = node_parameters[key].typehint
+        return typehint && typehints[typehint].field_params
     }
 
     return (
@@ -73,7 +84,8 @@ const NodeInputs = (props: NodeInputsProps) => {
                 }}
             >
                 {input_keys.map((key) => (
-                    <div key={key} style={{ paddingTop: 10, paddingBottom: 10, display: "flex", ...props.inputContainerStyle }}>
+                    <div key={key}>
+                    <div style={{ paddingTop: 10, paddingBottom: 10, display: "flex", ...props.inputContainerStyle }}>
                         <ToggleButton
                             value="check"
                             size="small"
@@ -93,10 +105,11 @@ const NodeInputs = (props: NodeInputsProps) => {
                         <Field
                             input_key={key}
                             value={inputs[key]}
+                            //help={node_parameters[key].help}
                             defaultVal={node_parameters[key].default}
                             type={getInputType(key)}
                             kind={node_parameters[key].kind}
-                            field_params={node_parameters[key].field_params}
+                            field_params={getFieldParams(key)}
                             onChange={(value: any) => onChange({ [key]: value })}
                             {...props.fieldprops?.[key]}
                         />
@@ -104,6 +117,11 @@ const NodeInputs = (props: NodeInputsProps) => {
                             onClick={() => pythonApi.nodeInputToNode(props.node?.id, key)}>
                             <Hub />
                         </Button>}
+                    </div>
+                    <div style={{paddingLeft: 50, paddingBottom: 10}}>
+                        <Typography variant="caption" color="textSecondary">{node_parameters[key].help}</Typography>
+                    </div>
+                    
                     </div>
                 ))}
                 <ToggleButton

@@ -10,12 +10,13 @@ import { ReactNode, useContext, useMemo, useState, } from 'react';
 
 import { Node, NodeClass } from '../../interfaces';
 import PythonApiContext from '../../apis/context';
-import { IconButton, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
+import { IconButton, InputBase, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import NodeOutput from '../node_windows/NodeOutput';
-import { DisplaySettings, KeyboardArrowDown, KeyboardArrowRight, PlayArrow, Preview } from '@mui/icons-material';
+import { DisplaySettings, Help, KeyboardArrowDown, KeyboardArrowRight, PlayArrow, Preview } from '@mui/icons-material';
 import NodeField from '../input_fields/node_field';
 import { TooltipsLevelContext } from '../../context/tooltips';
 import { NavigatorContext } from '../../context/main_nav';
+import { NodeClassesRegistryContext } from '../../context/session_context';
 
 const input_beginner_tooltips = {
     "collapsed": <div>
@@ -60,6 +61,7 @@ const node_beginner_tooltip = {
         <div> - Expand me to see my inputs.</div>
         <div> - Drag me around (or use arrows to move me).</div>
         <div> - Change my width.</div>
+        <div> - Double click on my name to change it.</div>
     </div>
 }
 
@@ -70,12 +72,17 @@ const InputHandle = (props: any) => {
 
     const {pythonApi} = useContext(PythonApiContext)
     const {tooltipsLevel} = useContext(TooltipsLevelContext)
+    const { typehints } = useContext(NodeClassesRegistryContext)
 
     const {
         connected,
         collapsed,
         name
     } = props
+
+    const typehint = props.param.typehint
+    const inputType = props.connected ? "node" : typehint && typehints[typehint] ? typehints[typehint].input_type : "json"
+    const field_params = props.connected ? "node" : typehint && typehints[typehint] && typehints[typehint].field_params
 
     var tooltip_title: string | ReactNode = ""
     if (tooltipsLevel === "beginner") {
@@ -114,13 +121,17 @@ const InputHandle = (props: any) => {
             onClick={() => setSelected(!selected)} 
             onBlur={(e) => pythonApi.updateNodeInputs(props.node.id, {[name]: tempValue === null ? props.value: tempValue})}
             style={{flex: 1}}>
-            <NodeField 
-                kind={props.param.kind} 
+            <Tooltip title={tooltipsLevel !== "none" && props.param.help} placement='left' enterDelay={1000} enterNextDelay={1000}>
+                <div>
+                <NodeField
+                kind={props.param.kind}
                 input_key={name} 
-                type={ props.connected ? "node" : props.param.type}
-                field_params={props.param.field_params}
+                type={ inputType}
+                field_params={field_params}
                 value={tempValue === null ? props.value: tempValue} 
                 onChange={(v) => setTempValue(v)}/>
+                </div>
+            </Tooltip>
             {/* <TextField defaultValue={props.value} 
                 size="small" 
                 
@@ -146,8 +157,12 @@ const FlowConstantNode = (props: NodeProps<FlowNodeData>) => {
 
     const {pythonApi} = useContext(PythonApiContext)
 
-    const [inputMode, setInputMode] = useState(props.data.node.output_class === "str" ? "text" : props.data.node.output_repr?.type !== "text" ? "object" : "json")
-    const [selected, setSelected] = useState(false)
+    const output_type = typeof props.data.node.output
+
+    const [inputMode, setInputMode] = useState(output_type === "string" ? "text" : output_type === "number" ? "json" : "object")
+
+    const [nameEditable, setNameEditable] = useState(false)
+    const [temporalName, setTemporalName] = useState<string | undefined>(undefined)
 
     const { tooltipsLevel } = useContext(TooltipsLevelContext)
 
@@ -181,14 +196,16 @@ const FlowConstantNode = (props: NodeProps<FlowNodeData>) => {
 
     return <Tooltip title={tooltip_title} arrow placement='top'><div style={{
         backgroundColor: "lavender", 
-        border: "2px purple solid", borderRadius: 5,
+        border: props.selected ? `4px purple solid` : `2px purple solid`, 
+        borderRadius: 5,
         padding: 10,
         display: "flex", flexDirection: "column", 
         justifyContent: "center",
         overflow: "hidden"
         }}
-        onClick={() => setSelected(!selected)}
+        onDoubleClick={()=> setNameEditable(!nameEditable)}
         >
+        <NodeResizer isVisible={true} minWidth={180} minHeight={200} lineStyle={{borderColor: "transparent"}} handleStyle={{backgroundColor: "transparent"}} />
         <div style={{display: "flex", alignItems: "center"}}>
             {/* <IconButton
             disableRipple
@@ -199,13 +216,23 @@ const FlowConstantNode = (props: NodeProps<FlowNodeData>) => {
             { data.node.output_repr?.type !== "text" && <IconButton
                 disableRipple
                 style={{color: "black", textTransform: "none"}}
-                    onClick={data.onExpand} >
+                    onClick={data.onExpand}>
                         {showInputs ? <KeyboardArrowDown/> : <KeyboardArrowRight />}
             </IconButton>
             }
-            <div>
+            <div style={{flex: 1}}>
                 <div style={{display: "flex", justifyContent: "space-between",  paddingBottom: 0}}>
-                    <Typography fontWeight={"bold"}>{data.name}</Typography>
+
+                        {nameEditable ? <InputBase
+                        className='nodrag'
+                        autoFocus
+                        sx={{borderBottom: "1px solid black", flex: 1}} 
+                        value={temporalName === undefined ? data.name : temporalName} 
+                        //inputProps={{ style: {textAlign: 'right'} }}
+                        onChange={(e) => setTemporalName(e.target.value)}
+                        onBlur={() => {setNameEditable(false); setTemporalName(undefined); pythonApi.renameNode(data.node.id, temporalName || data.name)}}
+                    /> : <Typography fontWeight={"bold"}>{data.name}</Typography>}
+
                     <div className='nodrag' style={{paddingLeft: 20}}>
                         <TextField 
                         variant="standard"
@@ -306,16 +333,19 @@ const FlowNode = (props: NodeProps<FlowNodeData>) => {
 
     const {seeNodeInExplorer} = useContext(NavigatorContext)
 
+    const [nameEditable, setNameEditable] = useState(false)
+    const [temporalName, setTemporalName] = useState<string | undefined>(undefined)
+
     const { data } = props
     const showInputs = data.expanded
     const showOutput = data.outputVisible
 
+    const borderColor = data.node.outdated ? data.node.errored ? "red" : "orange" : "green"
+    const selected = props.selected
+
     const inputsView = Object.values(data.node_class.parameters).map(
         (param, i) => <InputHandle i={i} param={param} value={data.node.inputs[param.name]} name={param.name} collapsed={!showInputs} node={data.node} connected={Object.keys(props.data.node.inputs_mode).includes(param.name)}/> 
     )
-
-    const borderColor = data.node.outdated ? data.node.errored ? "red" : "orange" : "green"
-    const selected = props.selected
 
     const output_tooltip_title = tooltipsLevel === "beginner" && output_beginner_tooltip
 
@@ -325,6 +355,7 @@ const FlowNode = (props: NodeProps<FlowNodeData>) => {
             border:selected ? `4px ${borderColor} solid` : `2px ${borderColor} solid`, borderRadius: 5, overflow: "hidden", 
         }}
         onClick={() => data.onNodeClick && data.onNodeClick(data.node.id)}
+        onDoubleClick={() => setNameEditable(!nameEditable)}
         > 
         <NodeResizer isVisible={true} minWidth={180} minHeight={200} lineStyle={{borderColor: "transparent"}} handleStyle={{backgroundColor: "transparent"}} />
         <div
@@ -341,7 +372,15 @@ const FlowNode = (props: NodeProps<FlowNodeData>) => {
                     {showInputs ? <KeyboardArrowDown/> : <KeyboardArrowRight />}
             </IconButton>
             
-            <Typography>{data.name}</Typography>
+            {nameEditable ? <InputBase
+                className='nodrag'
+                autoFocus
+                sx={{borderBottom: "1px solid black", flex: 1}} 
+                value={temporalName === undefined ? data.name : temporalName} 
+                //inputProps={{ style: {textAlign: 'right'} }}
+                onChange={(e) => setTemporalName(e.target.value)}
+                onBlur={() => {setNameEditable(false); setTemporalName(undefined); pythonApi.renameNode(data.node.id, temporalName || data.name)}}
+            /> : <Typography>{data.name}</Typography>}
 
             {showInputs ? null : inputsView}
             

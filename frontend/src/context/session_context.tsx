@@ -1,17 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Session, SessionLastUpdates, Flow, NodeClass, Nodes } from '../interfaces';
+import { Session, SessionLastUpdates, Flow, NodeClass, Nodes, NodeClassesRegistry } from '../interfaces';
 import PythonApiContext from '../apis/context';
 
 const nodesDefaultState: Nodes = {}
 const flowsDefaultState: {[key: string]: Flow} = {}
-const nodeClassesDefaultState: {[key: string]: NodeClass} = {}
+const nodeClassesRegistryDefaultState: NodeClassesRegistry = {node_classes: {}, types_registry: {}, typehints: {}}
 const logsDefaultState = ""
 
 const defaultState: Session = {
     nodes: nodesDefaultState,
-    node_classes: nodeClassesDefaultState,
+    node_classes_registry: nodeClassesRegistryDefaultState,
     logs: logsDefaultState,
-    flows: flowsDefaultState
+    flows: flowsDefaultState,
 }
 
 const flowsContextDefaultState = {
@@ -24,7 +24,7 @@ const lastUpdateDefault: SessionLastUpdates = {nodes: 0., flows: 0., node_classe
 
 export const NodesContext = createContext(nodesDefaultState);
 export const FlowsContext = createContext(flowsContextDefaultState);
-export const NodeClassesContext = createContext(nodeClassesDefaultState);
+export const NodeClassesRegistryContext = createContext(nodeClassesRegistryDefaultState);
 export const SessionContext = createContext(defaultState);
 export const SessionLastUpdatesContext = createContext(lastUpdateDefault);
 
@@ -75,26 +75,26 @@ export const FlowsSynchronizer = (props: any) => {
     return <FlowsContext.Provider value={{flows, setFlows: setThisFlows, flowsFromServer}}>{props.children}</FlowsContext.Provider>
 }
 
-export const NodeClassesSynchronizer = (props: any) => {
+export const NodeClassesRegistrySynchronizer = (props: any) => {
     const { pythonApi } = useContext(PythonApiContext)
-    const [nodeClasses, setNodeClasses] = useState(nodeClassesDefaultState)
+    const [nodeClassesRegistry, setNodeClassesRegistry] = useState(nodeClassesRegistryDefaultState)
 
-    const {node_classes: lastNodeClassesUpdate} = useContext(SessionLastUpdatesContext)
+    const {node_classes: lastNodeClassesRegistryUpdate} = useContext(SessionLastUpdatesContext)
 
     useEffect(() => {
-        pythonApi.getNodeClasses().then((node_classes: any) => node_classes && setNodeClasses(node_classes))
-    }, [lastNodeClassesUpdate, pythonApi])
+        pythonApi.getNodeClassesRegistry().then((node_classes_registry: any) => node_classes_registry && setNodeClassesRegistry(node_classes_registry))
+    }, [lastNodeClassesRegistryUpdate, pythonApi])
 
-    return <NodeClassesContext.Provider value={nodeClasses}>{props.children}</NodeClassesContext.Provider>
+    return <NodeClassesRegistryContext.Provider value={nodeClassesRegistry}>{props.children}</NodeClassesRegistryContext.Provider>
 }
 
 export const SessionSynchronizer = (props: any) => {
 
     return <NodesSynchronizer>
         <FlowsSynchronizer>
-            <NodeClassesSynchronizer>
+            <NodeClassesRegistrySynchronizer>
                 {props.children}
-            </NodeClassesSynchronizer>
+            </NodeClassesRegistrySynchronizer>
         </FlowsSynchronizer>
     </NodesSynchronizer>
 

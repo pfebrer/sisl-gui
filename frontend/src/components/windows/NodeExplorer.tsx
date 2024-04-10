@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 
 import NewNodes from './NewNodes';
 import NodeDashboard from '../node_windows/NodeDashboard';
-import { NodeClassesContext, NodesContext } from '../../context/session_context';
+import { NodeClassesRegistryContext, NodesContext } from '../../context/session_context';
 
 const NodesTabs = styled(Tabs)({
     borderRightWidth: 0,
@@ -49,7 +49,7 @@ const NodeExplorer = (props: NodeExplorerViewProps) => {
     const [nameFilter, setNameFilter] = useState("")
 
     const nodes = useContext(NodesContext)
-    const node_classes = useContext(NodeClassesContext)
+    const { node_classes } = useContext(NodeClassesRegistryContext)
 
     const { defaultNode } = props
 

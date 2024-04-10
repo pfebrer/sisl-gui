@@ -9,7 +9,7 @@ import { Node, Nodes } from '../../interfaces';
 import PythonApiContext from '../../apis/context';
 import { Chip, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { ArrowBack, ArrowForward, SwapHoriz, Visibility, VisibilityOff } from '@mui/icons-material';
-import { NodeClassesContext } from '../../context/session_context';
+import { NodeClassesRegistryContext, NodesContext } from '../../context/session_context';
 import { TooltipsLevelContext } from '../../context/tooltips';
 
 
@@ -181,19 +181,35 @@ interface PossibleNodesProps {
 export const PossibleNodes = (props: PossibleNodesProps) => {
 
     const {pythonApi} = useContext(PythonApiContext)
-    const node_classes = useContext(NodeClassesContext)
+    const nodes = useContext(NodesContext)
+    const { node_classes, types_registry, typehints } = useContext(NodeClassesRegistryContext)
+
+    const [typehintId, setTypehintId] = useState<number | undefined>(undefined)
+    const [link, setLink] = useState<"input" | "output" | undefined>("output")
 
     const [possibleNodes, setPossibleNodes] = useState<NewNodeFromOutput[]>([])
 
     const { node_id, node_name } = props
 
     useEffect(() => {
-        if (!node_id) return setPossibleNodes([])
+        if (!node_id || !node_name) return setTypehintId(undefined)
 
-        pythonApi.getCompatibleFollowingNodes(node_id, true).then((possibleNodesIds) => {
-            const ids = possibleNodesIds as unknown as number[]
-    
-            setPossibleNodes(ids.map((node_cls_id: number) => {
+        const node = nodes[node_id]
+        if (!node) return setTypehintId(undefined)
+
+        const typehint = node.node.output_class_id || node_classes[node.node.class]?.return_typehint
+
+        if (typehint) setTypehintId(typehint)
+    }, [node_id])
+
+    useEffect(() => {
+
+        if(node_id && typehintId && types_registry[typehintId]){
+            const possibleNodesIds = types_registry[typehintId].first_arg
+
+            const valid_classes = Object.keys(node_classes)
+
+            setPossibleNodes(possibleNodesIds.filter((node_cls_id) => valid_classes.includes(String(node_cls_id))).map((node_cls_id: number) => {
                 return {
                     label: node_classes[node_cls_id].name, 
                     node_cls_id: node_cls_id, 
@@ -205,10 +221,26 @@ export const PossibleNodes = (props: PossibleNodesProps) => {
                     // })
                 }
             }))
+        } else {
+            setPossibleNodes([])
+        }
         
-        })
-    }, [node_id, node_classes, pythonApi])
+
+    }, [typehintId, types_registry, node_id, node_classes])
+
+    var modifiers: NewNodeFromOutput[] = []
+    var others: NewNodeFromOutput[] = []
+    if (typehintId){
+        const node_cls_types_registry = types_registry[typehintId]
+        modifiers = possibleNodes.filter(node => node_cls_types_registry.modifiers.includes(node.node_cls_id))
+        others = possibleNodes.filter(node => !node_cls_types_registry.modifiers.includes(node.node_cls_id))
+    } else {
+        modifiers = []
+        others = possibleNodes
+    }
     
+    modifiers = modifiers.sort((a, b) => a.label.localeCompare(b.label))
+    others = others.sort((a, b) => a.label.localeCompare(b.label))
 
     // Sort nodes by label
     const nodesList = possibleNodes.sort((a, b) => a.label.localeCompare(b.label))
@@ -216,7 +248,15 @@ export const PossibleNodes = (props: PossibleNodesProps) => {
         <Typography variant="h6" align='center'>New connection</Typography>
         <Typography align="center">({node_name || "drop an output edge"})</Typography>
         <div style={{overflowY: "scroll", flex: 1}} className='no-scrollbar'>
-        {nodesList.map((node, i) => {
+        <div>Modifiers</div>
+        {modifiers.map((node, i) => {
+            return <div key={i} style={{justifyContent: "center", display: "flex", padding: 5} }
+                >
+                    <Chip onClick={() => {props.onNodeClick && props.onNodeClick(node)}} label={node.label}/>
+                </div>
+        })}
+        <div>Others</div>
+        {others.map((node, i) => {
             return <div key={i} style={{justifyContent: "center", display: "flex", padding: 5} }
                 >
                     <Chip onClick={() => {props.onNodeClick && props.onNodeClick(node)}} label={node.label}/>
@@ -265,9 +305,9 @@ export const NewNodesSideBar = (props: NodesSideBarProps) => {
                 </div>
             </div>
             <div style={{width: 4, background: "whitesmoke", borderRadius: 5}}/>
-            <PossibleNodes 
+            <PossibleNodes
                 node_id={outputNodeId}
-                node_name={outputNodeId ? nodes[outputNodeId].name : null}
+                node_name={outputNodeId && nodes[outputNodeId] ? nodes[outputNodeId].name : null}
                 onNodeClick={(node) => onConnectedNodeClick(node.node_cls_id, node.nodeToConnect, node.connectInto)}/>
         </div>
 }

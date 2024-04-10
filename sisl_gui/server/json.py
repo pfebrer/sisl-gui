@@ -1,7 +1,6 @@
 """Implements conversion from python elements to JSON to send the messages."""
 
-import typing
-from typing import Type, Dict, Callable, Tuple, Any, Literal, Optional
+from typing import Dict, Tuple, Any, Literal, Optional
 
 import pathlib
 
@@ -13,108 +12,7 @@ import numpy as np
 import inspect
 
 import sisl
-from sisl.nodes import Node
-
-def get_fields_help_from_function(function: Callable) -> Dict[str, str]:
-    """Parses a function's docstring following sisl's conventions into a dictionary of help strings.
-
-    Parameters
-    ----------
-    function : Callable
-        The function for which to parse the docstring.
-    
-    Returns
-    -------
-    dict[str, str]
-        The dictionary containing a key value pair for each argument of the function.
-    """
-    sig = inspect.signature(function)
-    
-    fields = get_fields_help_from_docs(getattr(function, "__doc__", "") or "")
-
-    sanitized_fields = {}
-    for k, v in sig.parameters.items():
-        if k in fields:
-            sanitized_fields[k] = fields[k]
-        else:
-            sanitized_fields[k] = ""
-
-    return sanitized_fields
-
-def get_fields_help_from_docs(docs: str) -> Dict[str, str]:
-    """Parses a docstring following sisl's conventions into a dictionary of help strings.
-
-    Parameters
-    ----------
-    docs : str
-        The docstring to parse.
-    
-    Returns
-    -------
-    dict[str, str]
-        The dictionary containing a key value pair for each argument described in the docstring.
-        Note that some arguments may be missing, or even there can be some extra arguments that
-        are not really in the function's signature.
-    """
-
-    params_i = docs.find("Parameters\n")
-    # Check number of spaces used for tabulation
-    n_spaces = docs[params_i + 11:].find("-")
-
-    params_docs = {}
-    arg_key = None
-    key_msg = ""
-    for line in docs[params_i:].split("\n")[2:]:
-        if len(line) <= n_spaces:
-            break
-            
-        if line[n_spaces] != " ":
-            if ":" not in line:
-                break
-            if arg_key is not None:
-                params_docs[arg_key] = key_msg
-            key_msg = ""
-            arg_key = line.split(":")[0].lstrip()
-        else:
-            prefix = "" if key_msg.endswith(" ") or key_msg == "" else " "
-            key_msg += prefix + line.lstrip()
-    if arg_key is not None:
-        params_docs[arg_key] = key_msg.capitalize()
-
-    return params_docs
-
-def annotation_to_input_type(annotation):
-    """Converts the annotation of an argument to an input field type.
-    
-    Parameters
-    ----------
-    annotation : Any
-        The annotation of the function argument.
-    """
-
-    try:
-        orig = typing.get_origin(annotation)
-        if orig is typing.Literal:
-            input_type = 'select'
-            options = typing.get_args(annotation)
-            return input_type, {"options": options}
-    except:
-        pass
-
-
-    if isinstance(annotation, type):
-        annotation = annotation.__name__
-        
-    annotation = str(annotation)
-
-    input_type = {
-        'str': 'text',
-        'int': 'number',
-        'float': 'number',
-        'bool': 'bool',
-    }.get(annotation)
-
-    return input_type, {}
+from nodes import Node
 
 def as_jsonable(encoder, obj):
     if isinstance(obj, np.ndarray) and not np.issubdtype(obj.dtype, np.number):
@@ -128,56 +26,7 @@ def as_jsonable(encoder, obj):
     else:
         return obj
 
-def node_class_to_json(encoder, node_class: Type[Node]):
-    """Parses a node class into a JSON object that can be sent to the client.
-    
-    Parameters
-    ----------
-    node_class : Type[Node]
-        The node class to parse.
-    """
-    json_node_cls = {}
-
-    json_node_cls['module'] = node_class.__module__
-    json_node_cls['id'] = id(node_class)
-    json_node_cls['name'] = node_class.__name__
-    json_node_cls['doc'] = node_class.__doc__
-
-    parameters_help = get_fields_help_from_function(node_class.function)
-
-    if hasattr(node_class, "function"):
-
-        type_hints = node_class.typehints.copy()
-
-        json_node_cls['output_type'] = str(type_hints.pop('return', None))
-
-        parameters = inspect.signature(node_class.function).parameters
-
-        json_node_cls['parameters'] = {}
-        for k, param in parameters.items():
-            parameter = {
-                "name": param.name,
-                "kind": param.kind.name,
-            }
-
-            if k in type_hints:
-                input_type, field_params = annotation_to_input_type(type_hints[k])
-                if input_type is not None:
-                    parameter['type'] = input_type
-                    parameter['field_params'] = field_params
-            if param.default is not inspect.Parameter.empty and param.default is not Node._blank:
-                parameter['default'] = as_jsonable(encoder, param.default)
-
-            json_node_cls['parameters'][k] = parameter
-
-    if hasattr(node_class, "registry"):
-        json_node_cls['registry'] = {
-            str(k): id(node) for k, node in node_class.registry.items()
-        }
-
-    return json_node_cls
-
-def get_inputs_mode(node: Node, encoder: Optional[JSONEncoder] = None) -> Tuple[Dict[str, Any], Dict[str, Literal["NODE"]]]:
+def get_inputs_mode(node: Node, encoder: Optional[JSONEncoder] = None, include_defaults: bool = True) -> Tuple[Dict[str, Any], Dict[str, Literal["NODE"]]]:
     """Given some inputs, finds out which of them are nodes and which are not.
 
     Parameters
@@ -195,7 +44,11 @@ def get_inputs_mode(node: Node, encoder: Optional[JSONEncoder] = None) -> Tuple[
     # Go over the inputs and find out which of them contain nodes
     # We need to mark them so that the GUI knows it. Then, we replace
     # the nodes by their ID.
-    inputs = {**node.inputs}
+    if include_defaults:
+        inputs = {**node.inputs}
+    else:
+        inputs = {**node._inputs}
+        
     inputs_mode = {}
     for k, v in inputs.items():
         if k  == node._args_inputs_key and len(v) > 0 and isinstance(v[0], Node):
@@ -237,10 +90,13 @@ def node_to_json(encoder: JSONEncoder, node: Node):
 
     json_node['inputs'], json_node['inputs_mode'] = get_inputs_mode(node, encoder)
     
+    json_node['output_links'] = [id(link) for link in node._output_links]
+    
     output = node._output
 
     if output is not Node._blank:
         json_node['output_class'] = output.__class__.__name__
+        json_node['output_class_id'] = id(output.__class__)
 
         json_node['output'] = as_jsonable(encoder, output)
     
@@ -289,8 +145,6 @@ class CustomJSONEncoder(JSONEncoder):
             return obj.item()
         elif isinstance(obj, pathlib.Path):
             return str(obj)
-        elif isinstance(obj, type) and issubclass(obj, Node):
-            return node_class_to_json(self, obj)
         elif isinstance(obj, type):
             return repr(obj)
         
