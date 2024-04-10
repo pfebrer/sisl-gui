@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Session, SessionLastUpdates, Flow, NodeClass, Nodes, NodeClassesRegistry } from '../interfaces';
+import { Session, SessionLastUpdates, Flow, Nodes, NodeClassesRegistry } from '../interfaces';
 import PythonApiContext from '../apis/context';
 
 const nodesDefaultState: Nodes = {}

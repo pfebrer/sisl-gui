@@ -12,7 +12,7 @@ import { Node, NodeClass } from '../../interfaces';
 import PythonApiContext from '../../apis/context';
 import { IconButton, InputBase, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import NodeOutput from '../node_windows/NodeOutput';
-import { DisplaySettings, Help, KeyboardArrowDown, KeyboardArrowRight, PlayArrow, Preview } from '@mui/icons-material';
+import { DisplaySettings, KeyboardArrowDown, KeyboardArrowRight, PlayArrow, Preview } from '@mui/icons-material';
 import NodeField from '../input_fields/node_field';
 import { TooltipsLevelContext } from '../../context/tooltips';
 import { NavigatorContext } from '../../context/main_nav';

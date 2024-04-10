@@ -13,7 +13,7 @@ import { ElectricalServices, Hub } from '@mui/icons-material';
 import Field from "../input_fields"
 import type { FieldType } from '../input_fields'
 import { NodeClassesRegistryContext } from '../../context/session_context';
-import { Tooltip, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 interface NodeInputsProps {
     node?: Node,

@@ -3,7 +3,6 @@ import type { Node, NodeClass } from '../../interfaces'
 
 import LogsWindow from '../windows/LogsWindow'
 import PythonApiContext from '../../apis/context'
-import NodeTerminal from './NodeTerminal'
 
 interface NodePythonScriptProps {
     node: Node,
