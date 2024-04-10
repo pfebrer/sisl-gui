@@ -324,8 +324,8 @@ export const NewNodesSideBar = (props: NodesSideBarProps) => {
 
     const { node_classes } = useContext(NodeClassesRegistryContext)
 
-    const existing_constants = visibleNodes.filter((node_id) => nodes[node_id] && node_classes[nodes[node_id].node.class].name === "ConstantNode")
-    const existing_nodes = visibleNodes.filter((node_id) => nodes[node_id] && node_classes[nodes[node_id].node.class].name !== "ConstantNode")
+    const existing_constants = Object.keys(nodes).map(Number).filter((node_id) => nodes[node_id] && !visibleNodes.includes(node_id) && node_classes[nodes[node_id].node.class].name === "ConstantNode")
+    const existing_nodes = Object.keys(nodes).map(Number).filter((node_id) => nodes[node_id] && !visibleNodes.includes(node_id) && node_classes[nodes[node_id].node.class].name !== "ConstantNode")
 
     return <div style={{ paddingBottom: 20, ...style}}>
             <div style={{paddingTop: 5, paddingLeft: 5}}>
