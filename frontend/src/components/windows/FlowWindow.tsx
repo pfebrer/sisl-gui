@@ -20,6 +20,7 @@ import { FlowsContext, NodesContext, NodeClassesRegistryContext } from '../../co
 import { NodeDimensions, NodePositions } from '../flow/interfaces';
 import { NewNodesSideBar, TopControlsBar } from '../flow/ControlBars';
 import { dagreLayout } from '../flow/layout_utils';
+import { Paper } from '@mui/material';
 
 interface FlowProps {
     defaultViewport?: Viewport,
@@ -460,7 +461,7 @@ const FlowWindow = () => {
             }))
             setSynced(false)
         })
-    }, [newNodePosition, pythonApi])
+    }, [newNodePosition, pythonApi, node_classes])
 
     const handleExistingNodeClick = useCallback((node_id: number) => {
         setVisibleNodes((nodes) => [...nodes, node_id])
@@ -571,17 +572,23 @@ const FlowWindow = () => {
     }, [])
 
     return <div style={{display: "flex", height: "100%"}}>
+        <Paper sx={{margin: 1, boxSizing: "border-box"}} elevation={4}>
         <NewNodesSideBar
             style={{
-                backgroundColor: "#d1e9ff", margin: 10, marginTop: 0, borderRadius: 10,
+                backgroundColor: "whitesmoke",
+                marginTop: 0,
+                minWidth: 300,
+                height: "100%"
             }}
             nodes={nodes}
             visibleNodes={visibleNodes}
             outputNodeId={outputNodeId}
+            onRemoveNodeId={() => setOutputNodeId(null)}
             newNodePosition={newNodePosition}
             onExistingNodeClick={handleExistingNodeClick}
             onConnectedNodeClick={initConnectedNode}
         />
+        </Paper>
         <div style={{flex: 1, height: "100%", display: "flex", flexDirection: "column"}}>
             <TopControlsBar 
                 nodes={nodes}

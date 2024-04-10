@@ -7,8 +7,8 @@ import { useContext, useMemo, useState, useEffect} from 'react';
 
 import { Node, Nodes } from '../../interfaces';
 import PythonApiContext from '../../apis/context';
-import { Chip, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
-import { ArrowBack, ArrowForward, SwapHoriz, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItemButton, ListItemText, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { ArrowBack, ArrowForward, ExpandMore, SwapHoriz, Visibility, VisibilityOff } from '@mui/icons-material';
 import { NodeClassesRegistryContext, NodesContext } from '../../context/session_context';
 import { TooltipsLevelContext } from '../../context/tooltips';
 
@@ -180,12 +180,11 @@ interface PossibleNodesProps {
 
 export const PossibleNodes = (props: PossibleNodesProps) => {
 
-    const {pythonApi} = useContext(PythonApiContext)
     const nodes = useContext(NodesContext)
-    const { node_classes, types_registry, typehints } = useContext(NodeClassesRegistryContext)
+    const { node_classes, types_registry } = useContext(NodeClassesRegistryContext)
 
     const [typehintId, setTypehintId] = useState<number | undefined>(undefined)
-    const [link, setLink] = useState<"input" | "output" | undefined>("output")
+    // const [link, setLink] = useState<"input" | "output" | undefined>("output")
 
     const [possibleNodes, setPossibleNodes] = useState<NewNodeFromOutput[]>([])
 
@@ -200,7 +199,7 @@ export const PossibleNodes = (props: PossibleNodesProps) => {
         const typehint = node.node.output_class_id || node_classes[node.node.class]?.return_typehint
 
         if (typehint) setTypehintId(typehint)
-    }, [node_id])
+    }, [node_id, node_classes, nodes, node_name])
 
     useEffect(() => {
 
@@ -243,25 +242,58 @@ export const PossibleNodes = (props: PossibleNodesProps) => {
     others = others.sort((a, b) => a.label.localeCompare(b.label))
 
     // Sort nodes by label
-    const nodesList = possibleNodes.sort((a, b) => a.label.localeCompare(b.label))
+    //const nodesList = possibleNodes.sort((a, b) => a.label.localeCompare(b.label))
     return <div style={{width: 250, flex: 1, display: "flex", flexDirection: "column"}}>
         <Typography variant="h6" align='center'>New connection</Typography>
         <Typography align="center">({node_name || "drop an output edge"})</Typography>
-        <div style={{overflowY: "scroll", flex: 1}} className='no-scrollbar'>
-        <div>Modifiers</div>
-        {modifiers.map((node, i) => {
-            return <div key={i} style={{justifyContent: "center", display: "flex", padding: 5} }
+        <div style={{overflowY: "scroll", flex: 1, width: "100%", padding: 10}} className='no-scrollbar'>
+        <Accordion>
+            <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{backgroundColor: "lightsalmon"}}
                 >
-                    <Chip onClick={() => {props.onNodeClick && props.onNodeClick(node)}} label={node.label}/>
-                </div>
-        })}
-        <div>Others</div>
-        {others.map((node, i) => {
-            return <div key={i} style={{justifyContent: "center", display: "flex", padding: 5} }
+                Modifiers
+            </AccordionSummary>
+            <AccordionDetails style={{padding: 0}}>
+            <List
+                style={{padding: 0}}>
+                {modifiers.map((node, i) => {
+                    return <ListItemButton
+                        style={{borderBottom: "1px #ccc solid"}}
+                        key={i}
+                        selected={false}
+                        onClick={() => {props.onNodeClick && props.onNodeClick(node)}}
+                    >
+                        <ListItemText primary={node.label} />
+                    </ListItemButton>
+                })}
+                
+            </List>
+            </AccordionDetails>
+        </Accordion>
+        <Accordion>
+            <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{backgroundColor: "lightblue"}}
                 >
-                    <Chip onClick={() => {props.onNodeClick && props.onNodeClick(node)}} label={node.label}/>
-                </div>
-        })}
+                Others
+            </AccordionSummary>
+            <AccordionDetails>
+            <List>
+                {others.map((node, i) => {
+                    return <ListItemButton
+                        style={{borderBottom: "1px #ccc solid"}}
+                        key={i}
+                        selected={false}
+                        onClick={() => {props.onNodeClick && props.onNodeClick(node)}}
+                    >
+                        <ListItemText primary={node.label} />
+                    </ListItemButton>
+                })}
+                
+            </List>
+            </AccordionDetails>
+        </Accordion>
         </div>
     </div>
 }
@@ -270,6 +302,7 @@ interface NodesSideBarProps {
     nodes: {[key: number]: {node: Node, name: string}},
     visibleNodes: number[],
     outputNodeId: number | null,
+    onRemoveNodeId: () => void,
     newNodePosition: XYPosition | undefined,
     onExistingNodeClick: (node_id: number) => void,
     onConnectedNodeClick: (node_id: number, nodeToConnect: number, connectInto: string) => void,
@@ -283,31 +316,78 @@ export const NewNodesSideBar = (props: NodesSideBarProps) => {
         nodes, 
         visibleNodes,
         outputNodeId,
+        onRemoveNodeId,
         onExistingNodeClick,
         onConnectedNodeClick,
         style
     } = props
 
-    return <div style={{display: "flex", paddingTop: 20, paddingBottom: 20, ...style}}>
-            <div style={{flex: 1, display: "flex", flexDirection: "column"}}>
+    const { node_classes } = useContext(NodeClassesRegistryContext)
+
+    const existing_constants = visibleNodes.filter((node_id) => nodes[node_id] && node_classes[nodes[node_id].node.class].name === "ConstantNode")
+    const existing_nodes = visibleNodes.filter((node_id) => nodes[node_id] && node_classes[nodes[node_id].node.class].name !== "ConstantNode")
+
+    return <div style={{ paddingBottom: 20, ...style}}>
+            <div style={{paddingTop: 5, paddingLeft: 5}}>
+            {outputNodeId && <Button 
+                style={{color: "black"}}
+                startIcon={<ArrowBack />}
+                onClick={() => onRemoveNodeId()}>BACK TO NODES</Button>}
+            </div>
+            <div style={{display: "flex", paddingTop: 10}}>
+            <div style={{flex: 1, display: outputNodeId ? "none": "flex", flexDirection: "column"}}>
                 <Typography variant="h6" align='center'>Existing nodes</Typography>
                 <Typography align="center">(click to add to flow)</Typography>
-                <div className="no-scrollbar" style={{overflowY: "scroll", width: "100%", flex: 1}}>
-                {Object.keys(nodes || {}).map(Number).map((node_id) => {
-                    if (visibleNodes.includes(node_id)) return null
-                    const {name} = nodes[node_id]
+                <div className="no-scrollbar" style={{overflowY: "scroll", width: "100%", flex: 1, padding: 10}}>
+                
+                <Accordion>
+                    <AccordionSummary
+                        expandIcon={<ExpandMore />}
+                        sx={{backgroundColor: "lavender"}}
+                        >
+                        Constants
+                    </AccordionSummary>
+                    <AccordionDetails style={{padding: 0}}>
+                    <List>
+                    {existing_constants.map((node_id) => {
+                        const {name} = nodes[node_id]
 
-                    return <div key={node_id} style={{justifyContent: "center", display: "flex", padding: 5, width: "100%"}}><Chip
-                        label={name}
-                        style={{margin: 2 }}
-                        onClick={() => onExistingNodeClick(node_id)}/></div>
-                })}
+                        return <ListItemButton 
+                            style={{borderBottom: "1px #ccc solid"}}
+                            key={node_id} onClick={() => onExistingNodeClick(node_id)}>
+                            <ListItemText primary={name} />
+                        </ListItemButton>
+                    })}
+                    </List>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion>
+                    <AccordionSummary
+                        expandIcon={<ExpandMore />}
+                        sx={{backgroundColor: "lightblue"}}
+                        >
+                        Nodes
+                    </AccordionSummary>
+                    <AccordionDetails style={{padding: 0}}>
+                    <List>
+                    {existing_nodes.map((node_id) => {
+                        const {name} = nodes[node_id]
+
+                        return <ListItemButton 
+                            style={{borderBottom: "1px #ccc solid"}}
+                            key={node_id} onClick={() => onExistingNodeClick(node_id)}>
+                            <ListItemText primary={name} />
+                        </ListItemButton>
+                    })}
+                    </List>
+                    </AccordionDetails>
+                </Accordion>
                 </div>
             </div>
-            <div style={{width: 4, background: "whitesmoke", borderRadius: 5}}/>
-            <PossibleNodes
+            {outputNodeId && <PossibleNodes
                 node_id={outputNodeId}
                 node_name={outputNodeId && nodes[outputNodeId] ? nodes[outputNodeId].name : null}
-                onNodeClick={(node) => onConnectedNodeClick(node.node_cls_id, node.nodeToConnect, node.connectInto)}/>
+                onNodeClick={(node) => onConnectedNodeClick(node.node_cls_id, node.nodeToConnect, node.connectInto)}/>}
         </div>
+    </div>
 }
